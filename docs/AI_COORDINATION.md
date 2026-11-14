@@ -17,7 +17,7 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 | T3 | Tes browser untuk Komunikasi & Dokumen (setelah UI REVIEW) | Copilot | TODO | | |
 | Q1 | Review keamanan RLS/grant semua migration (laporan, bukan perubahan) | Qoder | REVIEW | ai/qoder-review-qa | Laporan `docs/SECURITY_REVIEW.md`; tidak ada klaim aman. |
 | Q2 | Rapikan README (kritis: hapus info usang/duplikat jumlah migration) | Qoder | REVIEW | ai/qoder-review-qa | README dirapikan; tautan laporan keamanan dan UAT. |
-| Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | DOING | ai/qoder-review-qa | Dikerjakan berurutan Q1→Q4. |
+| Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | REVIEW | ai/qoder-review-qa | `docs/PANDUAN_UAT.md`; belum dijalankan akun nyata. |
 | Q4 | Review PR dari AI lain sebelum merge | Qoder | DOING | ai/qoder-review-qa | Dikerjakan berurutan Q1→Q4. |
 
 ## Permintaan Lintas AI
@@ -53,3 +53,9 @@ File: `tests/demo-auth.test.mjs`.
 1. Jumlah migration kini satu sumber: 23 hosted pada tabel; berkas ke-24 (`student_habits`) dinyatakan hanya lokal dan belum diterapkan (dibuktikan 404 Data API). Klaim advisor lama diganti tautan bukti telaah.
 2. Kontradiksi versi Node diperbaiki menjadi 24.x sesuai `engines`; mode demo lokal dijelaskan jujur saat konfigurasi tidak valid; batasan (belum UAT, admin belum aktif, belum siap operasional) dipertahankan.
 3. File: `README.md`, `docs/AI_COORDINATION.md`; `npm run check` dijalankan ulang: 104/104 tes, lint, typecheck, build lulus (peringatan chunk PDF tetap).
+
+### Ringkasan Q3 — Panduan UAT
+
+1. `docs/PANDUAN_UAT.md` memuat skenario umum, pending, administrator, kepala sekolah, guru, siswa, wali, dan pemeriksaan keamanan lintas peran; hanya fitur yang ada (komunikasi, dokumen, dan kebiasaan dikecualikan).
+2. Prasyarat mencakup akun A/K/G/S/W/P, data sintetis, peringatan mode demo, kolom Hasil kosong, serta uji RLS/Storage dan `npm run check:supabase`.
+3. File: `docs/PANDUAN_UAT.md`, `docs/AI_COORDINATION.md`. Belum ada hasil UAT akun sekolah nyata; README tidak boleh menyatakan sudah diuji sampai kolom terisi.

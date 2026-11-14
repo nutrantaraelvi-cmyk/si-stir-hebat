@@ -4,13 +4,13 @@ Aplikasi sekolah SDN 03 Wonosari menggunakan React, Vite, TypeScript, dan Supaba
 
 ## Status saat ini
 
-Alur yang tersedia: autentikasi/profil, dashboard peran, pengumuman, data sekolah, registri guru/siswa, keanggotaan kelas, penugasan guru, absensi manual/impor Excel, jurnal, tautan akun terverifikasi, portal kehadiran wali, modul ajar, supervisi empat tahap dengan bukti privat, materi/tugas, pengumpulan dan umpan balik, serta asesmen dengan publikasi dan koreksi beralasan. Rekap akademik mendukung filter, CSV/Excel/PDF dan grafik perkembangan. Cakupan dan batas verifikasi tiap modul ada dalam status proyek; komunikasi dan administrasi dokumen dan sejumlah kebutuhan PRD masih terbuka.
+Alur yang tersedia: autentikasi/profil, dashboard peran, pengumuman, data sekolah, registri guru/siswa, keanggotaan kelas, penugasan guru, absensi manual/impor Excel, jurnal, tautan akun terverifikasi, portal kehadiran wali, modul ajar, supervisi empat tahap dengan bukti privat, materi/tugas, pengumpulan dan umpan balik, serta asesmen dengan publikasi dan koreksi beralasan. Rekap akademik mendukung filter, CSV/Excel/PDF dan grafik perkembangan. Cakupan dan batas verifikasi tiap modul ada dalam status proyek; komunikasi, administrasi dokumen, dan sejumlah kebutuhan PRD masih terbuka. Modul kebiasaan siswa belum memiliki UI dan migration-nya belum diterapkan ke hosted.
 
 ## Batas proyek untuk Codex
 
 Folder ini adalah root utama SI STIR HEBAT. Aplikasi utamanya tetap React/Vite; jangan membuat atau mengubah proyek di luar folder ini, dan jangan mengubah stack ke Next.js tanpa permintaan eksplisit. Instruksi kerja lengkap ada di [AGENTS.md](AGENTS.md). `D:\code\my-app` adalah contoh Next.js terpisah, bukan bagian dari aplikasi ini.
 
-Laporan rinci: [Status proyek](docs/PROJECT_STATUS.md), [Log implementasi](docs/IMPLEMENTATION_LOG.md), dan [Keputusan sementara](docs/DECISIONS.md). Folder `docs/references` (PRD, RBAC, blueprint) tidak tersedia di workspace ini; asumsi konservatif dicatat di dokumen keputusan. Skema nilai maksimum per asesmen dan publikasi manual guru merupakan keputusan sementara; skema resmi akan diberikan pengguna. Tidak ada perhitungan rapor otomatis.
+Laporan rinci: [Status proyek](docs/PROJECT_STATUS.md), [Log implementasi](docs/IMPLEMENTATION_LOG.md), [Keputusan sementara](docs/DECISIONS.md), [Telaah keamanan migration](docs/SECURITY_REVIEW.md), dan [Panduan UAT](docs/PANDUAN_UAT.md). Folder `docs/references` (PRD, RBAC, blueprint) tidak tersedia di workspace ini; asumsi konservatif dicatat di dokumen keputusan. Skema nilai maksimum per asesmen dan publikasi manual guru merupakan keputusan sementara; skema resmi akan diberikan pengguna. Tidak ada perhitungan rapor otomatis.
 
 Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Dua puluh tiga migration terkonfirmasi diterapkan hingga 13 November 2026:
 
@@ -40,13 +40,15 @@ Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Dua pu
 | `20261113061010` | `schedule_proposals` |
 | `20261113074045` | `create_private_todos` (contoh privat; tidak dipakai UI Vite) |
 
-RLS, izin dan trigger modul diverifikasi melalui metadata remote sebagaimana dicatat pada status proyek. Data API anonim diuji sesuai daftar tabel pada `scripts/check-supabase.mjs`, tanpa membaca baris data. Advisor keamanan terakhir tidak melaporkan temuan. Nama berkas migration yang tercatat mengikuti versi aktual remote. Jangan menerapkan ulang migration ini pada proyek tersebut. Tes lokal terbaru memakai Node 24; pengujian browser memakai API tiruan dan tidak menggantikan UAT akun sekolah.
+RLS, izin dan trigger modul diverifikasi melalui metadata remote sebagaimana dicatat pada status proyek. Data API anonim diuji sesuai daftar tabel pada `scripts/check-supabase.mjs`, tanpa membaca baris data. Nama berkas migration yang tercatat mengikuti versi aktual remote. Jangan menerapkan ulang migration ini pada proyek tersebut. Tes lokal terbaru memakai Node 24; pengujian browser memakai API tiruan dan tidak menggantikan UAT akun sekolah.
+
+Berkas migration ke-24, `20261114000139_student_habits.sql`, hanya ada di repo lokal dan belum diterapkan ke hosted (tabelnya tidak ditemukan lewat Data API pada 14 November 2026). Jangan menerapkannya tanpa persetujuan pemilik. Telaah keamanan migration dan temuan yang masih terbuka ada di [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md).
 
 Akun administrator belum diaktifkan. Aplikasi sudah tersedia di https://si-stir-hebat-blue.vercel.app; Site URL/redirect Supabase Auth, login dengan akun sekolah, email pemulihan, dan UAT masih perlu diverifikasi oleh pemilik akun. Deployment ini tidak berarti aplikasi sudah siap operasional.
 
 ## Menjalankan aplikasi
 
-Gunakan Node.js 22.18+; Node.js 24 disarankan agar sesuai pemeriksaan CI. Dari folder `si-stir-hebat`:
+Gunakan Node.js 24.x sesuai `engines` dan pemeriksaan CI. Dari folder `si-stir-hebat`:
 
 ```powershell
 npm ci
@@ -73,7 +75,7 @@ VITE_SUPABASE_URL=https://PROJECT_REF.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-Gunakan publishable key untuk frontend. Jangan masukkan secret key, service role key, password database, atau personal access token ke variabel `VITE_*`. Aplikasi menolak konfigurasi kosong, placeholder, URL tidak valid, dan key berprivilege yang dikenali. Restart server setelah mengubah konfigurasi; konfigurasi hosting memerlukan build ulang.
+Gunakan publishable key untuk frontend. Jangan masukkan secret key, service role key, password database, atau personal access token ke variabel `VITE_*`. Konfigurasi kosong, placeholder, URL tidak valid, dan key berprivilege yang dikenali tidak dipakai untuk terhubung ke Supabase; dalam kondisi itu aplikasi berjalan dalam **mode demo lokal** dengan akun sintetis dan data contoh di `localStorage`. Mode demo bukan untuk operasional: pastikan kedua variabel terisi pada build produksi. Restart server setelah mengubah konfigurasi; konfigurasi hosting memerlukan build ulang.
 
 ```powershell
 npm run check:supabase
@@ -191,7 +193,7 @@ npx playwright install chromium
 
 Pada Windows, gunakan `$env:PLAYWRIGHT_CHANNEL='chromium'` untuk memilih Chromium yang dipasang Playwright. Pada CI Linux, browser dipasang otomatis. Pengujian browser tiruan tidak menggantikan pengujian email dan login Supabase sungguhan.
 
-Pemeriksaan 14 November 2026: `npm run check` lulus (lint, TypeScript, 101 tes unit/database, build). Build masih memperingatkan chunk PDF berukuran besar. Browser run penuh menghasilkan 172/174 lulus; dua kegagalan berasal dari selector alert yang ambigu dan lulus saat dijalankan ulang pada desktop/ponsel setelah selector diperbaiki. Run browser penuh belum diulang sesudah perbaikan. `npm run check:supabase` sebelumnya mengonfirmasi Auth aktif dan penolakan akses anonim pada tabel yang diperiksa, tanpa membaca baris. Pengujian akun sekolah nyata belum dilakukan. Workflow GitHub Actions aplikasi tersedia di `.github/workflows/verify.yml`; workflow belum diverifikasi pada GitHub.
+Pemeriksaan 14 November 2026: `npm run check` lulus (lint, TypeScript, tes unit/database, build); jumlah tes dilaporkan Copilot 104 setelah T2. Build masih memperingatkan chunk PDF berukuran besar. Laporan Copilot untuk T1 menyebut suite browser penuh 180/180 lulus pada desktop dan ponsel setelah selector diperbaiki; Qoder tidak menjalankan ulang suite browser tersebut. `npm run check:supabase` pada 14 November 2026 mengonfirmasi Auth aktif dan penolakan akses anonim pada tabel yang diperiksa, tanpa membaca baris. Pengujian akun sekolah nyata belum dilakukan. Workflow GitHub Actions tersedia di `.github/workflows/verify.yml`; workflow belum diverifikasi pada GitHub.
 
 ## Deployment
 

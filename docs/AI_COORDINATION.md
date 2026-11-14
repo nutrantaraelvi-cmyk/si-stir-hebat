@@ -16,7 +16,7 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 | T2 | Tambah tes unit untuk util/validator yang belum tercakup | Copilot | REVIEW | ai/copilot-fix-browser-alerts | 3 tes demo-auth baru; npm run check lulus (104 tes). |
 | T3 | Tes browser untuk Komunikasi & Dokumen (setelah UI REVIEW) | Copilot | TODO | | |
 | Q1 | Review keamanan RLS/grant semua migration (laporan, bukan perubahan) | Qoder | REVIEW | ai/qoder-review-qa | Laporan `docs/SECURITY_REVIEW.md`; tidak ada klaim aman. |
-| Q2 | Rapikan README (kritis: hapus info usang/duplikat jumlah migration) | Qoder | DOING | ai/qoder-review-qa | Dikerjakan berurutan Q1→Q4. |
+| Q2 | Rapikan README (kritis: hapus info usang/duplikat jumlah migration) | Qoder | REVIEW | ai/qoder-review-qa | README dirapikan; tautan laporan keamanan dan UAT. |
 | Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | DOING | ai/qoder-review-qa | Dikerjakan berurutan Q1→Q4. |
 | Q4 | Review PR dari AI lain sebelum merge | Qoder | DOING | ai/qoder-review-qa | Dikerjakan berurutan Q1→Q4. |
 
@@ -47,3 +47,9 @@ File: `tests/demo-auth.test.mjs`.
 1. Diperiksa 24 berkas migration: tidak ada grant ke `anon`/`public`, 39/39 fungsi SECURITY DEFINER memakai `search_path`, 35/35 tabel ber-RLS; grant kolom mencegah perubahan peran/`profile_id`.
 2. Temuan perlu tindakan: `todos` tanpa transaksi + DML penuh (K1), draf umpan balik terbaca admin/kepala sekolah (K3), `habit_students()` dan status hosted migration ke-24 (K2), bukti RLS Storage terbatas (K4). Laporan tidak menyatakan database "aman".
 3. File: `docs/SECURITY_REVIEW.md`, `docs/AI_COORDINATION.md`; `npm run check:supabase` dijalankan (anon ditolak, tanpa membaca baris data).
+
+### Ringkasan Q2 — README
+
+1. Jumlah migration kini satu sumber: 23 hosted pada tabel; berkas ke-24 (`student_habits`) dinyatakan hanya lokal dan belum diterapkan (dibuktikan 404 Data API). Klaim advisor lama diganti tautan bukti telaah.
+2. Kontradiksi versi Node diperbaiki menjadi 24.x sesuai `engines`; mode demo lokal dijelaskan jujur saat konfigurasi tidak valid; batasan (belum UAT, admin belum aktif, belum siap operasional) dipertahankan.
+3. File: `README.md`, `docs/AI_COORDINATION.md`; `npm run check` dijalankan ulang: 104/104 tes, lint, typecheck, build lulus (peringatan chunk PDF tetap).

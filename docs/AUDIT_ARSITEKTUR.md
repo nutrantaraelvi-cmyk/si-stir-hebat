@@ -17,7 +17,7 @@ Sifat: baca-saja. Tidak ada perubahan kode; temuan besar diajukan sebagai usulan
 
 Ketergantungan utama: `src/app/*` mengimpor 11 modul fitur secara statis; fitur memakai `src/lib/supabase.ts` (30 berkas) dan helper domain. Ketergantungan lintas fitur yang ditemukan hanya pada helper tanggal/status absensi: `academic`, `guardian`, `journals`, `learning`, dan `supervision` mengimpor `schoolToday`/label dari `features/attendance/attendance-model.ts`. Helper itu bersifat lintas domain dan lebih tepat berada di `src/utils/`.
 
-Tidak ada impor melingkar yang terlihat pada pembacaan manual; ini bukan hasil alat analisis graf.
+Selain itu, 10 berkas fitur mengimpor `useAuth` dari `src/app/Auth`, sehingga lapisan fitur bergantung pada shell aplikasi. Ini bukan siklus modul langsung (`Auth` tidak mengimpor `App.tsx`), tetapi arah dependensinya terbalik dan menyulitkan penggunaan ulang fitur di luar shell; lihat A-07. Kesimpulan ini berasal dari pembacaan manual, bukan alat analisis graf.
 
 ## Ringkasan prioritas
 
@@ -29,6 +29,7 @@ Tidak ada impor melingkar yang terlihat pada pembacaan manual; ini bukan hasil a
 | A-04 | Rendah | Ekspor yang tidak terpakai (`DemoRole`, `DemoAccount`, `isSupabaseConfigured`) dan helper tanggal di folder fitur | Cursor |
 | A-05 | Rendah | Beberapa halaman besar satu berkas (17,0–15,4 KB) menyulitkan peninjauan | Cursor |
 | A-06 | Rendah | Daftar referensi dibatasi 1000/200 baris tanpa tanda bahwa data terpotong | Cursor |
+| A-07 | Rendah | Sepuluh fitur mengimpor `useAuth` dari `src/app/Auth`, membalik arah dependensi fitur→shell | Cursor |
 
 ## Rincian
 
@@ -66,6 +67,10 @@ Ukuran berkas terbesar: `Attendance.tsx` 17,0 KB, `AcademicSupervision.tsx` 16,2
 ### A-06 — Batas daftar tanpa indikator (Rendah)
 
 Banyak dropdown referensi memakai `limit(1000)` atau `limit(200)` tanpa memberi tahu bila batas tercapai, misalnya `MasterData.tsx:56,68`, `Attendance.tsx:68-83`, `Journals.tsx:63-66`. Pada skala satu sekolah biasanya cukup, tetapi di atas batas data menjadi tidak lengkap secara diam-diam. Saran: ambil `count` atau minta `limit+1` dan tampilkan pesan "daftar dipotong". Detail performa ada di [AUDIT_PERFORMA.md](AUDIT_PERFORMA.md).
+
+### A-07 — Fitur bergantung pada shell `app/Auth` (Rendah)
+
+Sepuluh berkas di `src/features` mengimpor `useAuth` dari `src/app/Auth` (asesmen, absensi, wali, jurnal, materi, modul ajar, jadwal, tautan akun, data master, supervisi). `App.tsx` juga mengimpor fitur-fitur tersebut. Tidak terbentuk siklus langsung karena `Auth` tidak mengimpor `App.tsx`, tetapi arah dependensi fitur→shell membuat fitur sulit dipakai ulang dan diuji terpisah. Saran: pindahkan konteks autentikasi ke `src/lib/auth-context.tsx` (atau `src/components`) dan impor dari sana; lakukan bersama perubahan H-04 agar tidak menambah churn.
 
 ## Aspek positif
 

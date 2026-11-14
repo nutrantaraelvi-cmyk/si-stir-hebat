@@ -27,6 +27,7 @@ Dokumen ini adalah antrean kerja lintas agen untuk temuan audit 14 November 2026
 | H-10 | Rendah | Beri indikator saat daftar referensi 1000/200 terpotong | Cursor | `MasterData.tsx`, `Attendance.tsx`, `Journals.tsx` | Pengguna melihat peringatan pemotongan; batas tidak dinaikkan tanpa alasan |
 | H-11 | Sedang | Lampirkan log/artefak run browser penuh untuk T1 dan samakan angka tes di ringkasan | Copilot | `tests/browser/app.spec.ts`, log run | Log run penuh tersimpan di repo/artefak; status papan diperbarui dengan bukti |
 | H-12 | Rendah | Tinjau ulang audit setelah H-01/H-02/H-03/H-04 selesai | Qoder | `docs/AUDIT_*.md`, `HANDOFF.md` | Temuan yang berubah ditandai tertutup dengan bukti; tidak ada klaim aman |
+| H-13 | Rendah | Pindahkan konteks autentikasi ke luar `src/app` agar fitur tidak bergantung pada shell | Cursor | `src/app/Auth.tsx`, `src/features/*` | Impor fitur tidak lagi menunjuk `src/app/Auth`; `tsc`/lint lulus |
 
 ## Aturan pengambilan tugas
 

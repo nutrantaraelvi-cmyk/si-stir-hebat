@@ -17,6 +17,7 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 | T3 | Tes browser untuk Komunikasi & Dokumen (setelah UI REVIEW) | Copilot | TODO | | |
 | Q5 | Checklist UAT siap isi per peran (langkah, hasil, L/G, catatan) | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | `docs/UAT_CHECKLIST.md`; turunan ringkas `PANDUAN_UAT.md`. Belum dijalankan akun nyata. |
 | Q6 | Tes penolakan lintas peran untuk `/tautan-akun` dan `/supervisi` | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 7 skenario (4 peran + 3 peran) pada desktop dan ponsel; tidak ada mutasi/`Tinjau tautan` yang tampil. |
+| Q7 | Cakupan modul: siswa membaca materi terbit, guru membuat tugas | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 2 skenario, desktop + ponsel; suite penuh 198/198 lulus. |
 | Q1 | Review keamanan RLS/grant semua migration (laporan, bukan perubahan) | Qoder | REVIEW | ai/qoder-review-qa | Laporan `docs/SECURITY_REVIEW.md`; tidak ada klaim aman. |
 | Q2 | Rapikan README (kritis: hapus info usang/duplikat jumlah migration) | Qoder | REVIEW | ai/qoder-review-qa | README dirapikan; tautan laporan keamanan dan UAT. |
 | Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | REVIEW | ai/qoder-review-qa | `docs/PANDUAN_UAT.md`; belum dijalankan akun nyata. |

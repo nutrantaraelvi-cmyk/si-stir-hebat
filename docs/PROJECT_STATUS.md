@@ -318,3 +318,7 @@ Telaah penuh C3 terblokir oleh ketiadaan dokumen acuan; daftar ini tidak menetap
 ## Fondasi komunikasi lokal - 14 November 2026
 
 Migration `20261114083827_komunikasi` dan API bertipe membatasi pesan teks append-only ke guru dan wali dengan penugasan, keanggotaan, dan relasi aktif. Pencabutan akses diuji di PGlite; `npm run check` Node 24 lulus 108 tes, lint, tipe dan build. Migration belum diterapkan ke hosted; `student_habits` yang lebih awal juga belum tercatat di riwayat hosted. UI, verifikasi hosted, UAT serta aturan resmi retensi dan pengawasan masih terbuka.
+
+## Tes Storage supervisi - 14 November 2026
+
+Tes PGlite diperluas untuk akses objek bukti oleh kepala sekolah, guru terkait sebelum dan sesudah publikasi, guru lain, administrator, siswa, wali, pending, dan anonim. Tes juga memeriksa tahap awal, nama/path rusak, bucket lain, penghapusan, dan penonaktifan guru. `npm run check` Node 24 lulus: lint, typecheck, 109 tes dan build. Fixture memakai tiruan `storage.objects`; akses Storage hosted dan UAT akun sekolah belum diverifikasi oleh tes ini. Tidak ada perubahan migration atau database hosted.

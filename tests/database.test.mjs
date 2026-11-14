@@ -819,6 +819,8 @@ test('migrations and database permissions', async t => {
       [teacherOne, today],
     )
     const update = values => db.query(`update public.academic_supervisions set ${values} where id=$1 returning stage`, [session.id])
+    const earlyPath = `${session.id}/00000000-0000-0000-0000-000000000001-awal.pdf`
+    await assert.rejects(db.query("insert into storage.objects (bucket_id,name) values ('supervision-evidence',$1)", [earlyPath]), permissionDenied)
     await assert.rejects(update('stage=2'), { code: '23514' })
     await assert.rejects(update("stage=3, preparation='Persiapan'"), { code: '23514' })
     await update("stage=2, preparation='Persiapan'")
@@ -827,8 +829,32 @@ test('migrations and database permissions', async t => {
     await update("stage=4, reflection='Refleksi', feedback='Umpan balik', follow_up_plan='Perbaikan', target_on=scheduled_on")
     const path = `${session.id}/00000000-0000-0000-0000-000000000001-bukti.pdf`
     const upload = name => db.query("insert into storage.objects (bucket_id,name) values ('supervision-evidence',$1)", [name])
-    await assert.rejects(upload('invalid/bukti.pdf'), permissionDenied)
+    for (const invalid of [
+      'invalid/bukti.pdf',
+      `not-a-uuid/00000000-0000-0000-0000-000000000001-bukti.pdf`,
+      `${session.id}/bukti.pdf`,
+      `${session.id}/00000000-0000-0000-0000-000000000001-../bukti.pdf`,
+    ]) await assert.rejects(upload(invalid), permissionDenied)
+    await assert.rejects(db.query("insert into storage.objects (bucket_id,name) values ('other-bucket',$1)", [path]), permissionDenied)
     await upload(path)
+    // Simulate legacy or malformed metadata without granting client writes.
+    await db.exec('reset role')
+    await db.query("insert into storage.objects (bucket_id,name) values ('supervision-evidence','not-a-uuid/bukti.pdf')")
+    await as('principal')
+    assert.deepEqual((await db.query('select name from storage.objects')).rows, [{ name: path }])
+    await db.exec('reset role')
+    await db.query("delete from storage.objects where name='not-a-uuid/bukti.pdf'")
+    await as('principal')
+    const temporaryPath = path.replace('bukti.pdf', 'sementara.pdf')
+    await upload(temporaryPath)
+    assert.deepEqual((await db.query('delete from storage.objects where name=$1 returning name', [temporaryPath])).rows, [{ name: temporaryPath }])
+    for (const role of ['administrator', 'otherTeacher', 'student', 'parent', 'pending', 'anon']) {
+      await as(role)
+      assert.equal((await db.query('select name from storage.objects')).rows.length, 0)
+      await assert.rejects(upload(temporaryPath), permissionDenied)
+      assert.equal((await db.query('delete from storage.objects where name=$1 returning name', [path])).rows.length, 0)
+    }
+    await as('principal')
     await assert.rejects(update('published_at=now()'), { code: '23514' })
     await as('teacher')
     assert.equal((await db.query('select * from public.academic_supervisions')).rows.length, 0)
@@ -843,7 +869,21 @@ test('migrations and database permissions', async t => {
     await as('teacher')
     assert.equal((await db.query('select * from public.academic_supervisions')).rows[0].id, session.id)
     assert.deepEqual((await db.query('select name from storage.objects')).rows, [{ name: path }])
+    await as('administrator')
+    await db.query('update public.teachers set is_active=false where id=$1', [teacherOne])
+    await as('teacher')
+    assert.equal((await db.query('select name from storage.objects')).rows.length, 0)
+    await as('administrator')
+    await db.query('update public.teachers set is_active=true where id=$1', [teacherOne])
+    await as('teacher')
+    assert.deepEqual((await db.query('select name from storage.objects')).rows, [{ name: path }])
     assert.equal((await db.query('select * from public.academic_supervision_events')).rows.length, 0)
+    for (const role of ['otherTeacher', 'student', 'parent', 'pending', 'anon']) {
+      await as(role)
+      assert.equal((await db.query('select name from storage.objects')).rows.length, 0)
+      await assert.rejects(upload(path.replace('bukti', 'baru')), permissionDenied)
+      assert.equal((await db.query('delete from storage.objects where name=$1 returning name', [path])).rows.length, 0)
+    }
     await as('administrator')
     assert.equal((await db.query('select * from public.academic_supervisions')).rows.length, 0)
     assert.equal((await db.query('select * from storage.objects')).rows.length, 0)

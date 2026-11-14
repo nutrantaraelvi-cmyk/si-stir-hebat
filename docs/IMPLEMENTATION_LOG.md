@@ -338,3 +338,8 @@ Build hanya menyertakan Roboto normal dan tebal untuk rekap akademik, tetap dimu
 ## Fondasi komunikasi lokal - 14 November 2026
 
 Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan relasi aktif, serta pesan append-only. Tes PGlite mencakup peran dan pencabutan; npm run check Node 24 lulus 108 tes, lint, tipe, build. Migration belum diterapkan: riwayat hosted belum mencatat student_habits yang lebih awal. UI, advisor dan UAT belum dilakukan.
+
+
+## Tes Storage supervisi - 14 November 2026
+
+Memperluas tes PGlite untuk hak baca/tulis/hapus lintas peran dan tahap, path rusak, bucket lain, serta pencabutan akses guru. Tidak mengubah policy atau migration. npm run check Node 24 lulus: lint, typecheck, 109 tes dan build. Fixture Storage adalah tiruan; verifikasi Storage hosted dan UAT tetap terbuka.

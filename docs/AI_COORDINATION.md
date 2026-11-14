@@ -20,6 +20,8 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 | Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | REVIEW | ai/qoder-review-qa | `docs/PANDUAN_UAT.md`; belum dijalankan akun nyata. |
 | Q4 | Review PR dari AI lain sebelum merge | Qoder | REVIEW | ai/qoder-review-qa | Review T1/T2 tertulis; branch hilang setelah git diinisialisasi ulang. |
 
+| H-02 | Uji policy Storage bukti supervisi | Codex (mengambil alih) | REVIEW | agent/codex/storage-supervisi | Tes PGlite lintas peran, tahap, path dan pencabutan lulus. |
+
 ## Permintaan Lintas AI
 (tulis di sini: dari → ke, apa yang dibutuhkan)
 
@@ -144,3 +146,9 @@ Berkas: `supabase/migrations/20261114083827_komunikasi.sql`, `src/features/komun
 - Migration baru `20261114083827_komunikasi` belum diterapkan; `20261114000139_student_habits` yang lebih awal juga belum tercatat hosted. Metadata hosted dicek tanpa membaca baris data. Advisor skema hosted saat ini kosong; `check:supabase` lulus setelah akses jaringan tersedia, tanpa mencakup komunikasi.
 - Pemeriksaan terakhir `npm run check` Node 24 lulus 109 tes, lint, typecheck dan build; peringatan mesin PDF masih ada. Browser memakai API tiruan dan tidak lulus penuh. Auth/redirect, aktivasi admin, email dan UAT akun sekolah tetap perlu pemilik.
 - Branch `ai/codex-pdf-splitting`, belum di-merge karena `main` lokal tidak ada. File browser staged serta dokumen audit dan log sesi lain dipertahankan. Lanjutan: susun UI U1, termasuk pemulihan respons hilang, lalu C2; selaraskan urutan migration sebelum penerapan.
+
+### H-02 - tes Storage supervisi
+
+- Tes PGlite memeriksa kepala sekolah, guru terkait sebelum/sesudah publikasi, guru lain, administrator, siswa, wali, pending dan anonim; unggah/hapus, tahap awal, bucket/path tidak sesuai, metadata path rusak dan guru nonaktif.
+- Node 24 `npm run check` lulus: lint, typecheck, 109 tes dan build. Pemeriksaan ini memakai tiruan tabel Storage, bukan Storage hosted atau UAT. Tidak ada perubahan migration atau skema hosted.
+- Berkas: `tests/database.test.mjs`, `docs/PROJECT_STATUS.md`, `docs/IMPLEMENTATION_LOG.md`, `docs/AI_COORDINATION.md`; `docs/HANDOFF.md` juga diperbarui tetapi tetap tidak terlacak karena berisi pekerjaan agen lain.

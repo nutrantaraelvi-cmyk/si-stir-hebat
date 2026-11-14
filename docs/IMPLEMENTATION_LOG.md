@@ -338,3 +338,13 @@ Build hanya menyertakan Roboto normal dan tebal untuk rekap akademik, tetap dimu
 ## Fondasi komunikasi lokal - 14 November 2026
 
 Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan relasi aktif, serta pesan append-only. Tes PGlite mencakup peran dan pencabutan; npm run check Node 24 lulus 108 tes, lint, tipe, build. Migration belum diterapkan: riwayat hosted belum mencatat student_habits yang lebih awal. UI, advisor dan UAT belum dilakukan.
+
+## Stabilisasi suite browser dan checklist UAT - 14 November 2026 (Kilo/QA)
+
+- Selector alert dipersempit ke `getByRole('alert').filter({ hasText })` di seluruh suite agar tidak ambigu ketika beberapa `alert` tampil bersamaan.
+- Uji impor XLSX desktop memakai `setInputFiles` langsung (bukan dialog file natif) dan batas 15 detik untuk preview yang diproses di worker.
+- `vite.config.ts` menonaktifkan watcher HMR hanya ketika `VITE_TEST_NO_WATCH=1` (disetel oleh `playwright.config.ts`); ini menghentikan crash `EBUSY` yang sebelumnya mematikan server tes dan memicu `ERR_CONNECTION_REFUSED` massal.
+- Ditambahkan 7 skenario penolakan lintas peran: `/tautan-akun` untuk guru/siswa/wali/pending dan `/supervisi` untuk siswa/wali/pending; dipastikan pesan penolakan tampil dan tidak ada tombol aksi.
+- `docs/UAT_CHECKLIST.md` dibuat sebagai daftar periksa siap isi per peran (langkah, hasil diharapkan, L/G, catatan), melengkapi `PANDUAN_UAT.md`.
+- Verifikasi: tiga run browser penuh berturut-turut 194/194 lulus (desktop + ponsel) dengan API tiruan; `npm run check` Node 24 lulus 109 tes, lint, typecheck, build (peringatan chunk PDF tetap).
+- Batas: belum diuji dengan akun sekolah nyata, email pemulihan, maupun UI komunikasi (belum ada). Tidak ada perubahan migration atau data hosted.

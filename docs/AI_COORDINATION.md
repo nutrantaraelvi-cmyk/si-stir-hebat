@@ -12,9 +12,11 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 | U2 | UI modul Administrasi Dokumen (setelah C2 REVIEW) | Cursor | TODO | | |
 | U3 | Audit responsif & aksesibilitas semua halaman | Cursor | DOING | ai/cursor-akses-status | Cursor |
 | U4 | Konsistensi empty/loading/error state | Cursor | DOING | ai/cursor-akses-status | Cursor |
-| T1 | Perbaiki 2 tes browser dengan selector alert ambigu, jalankan ulang penuh | Codex (mengambil alih) | BLOCKED | ai/codex-pdf-splitting | Suite 178 lulus, 2 timeout; pengulangan 1 lulus dan 1 timeout. |
+| T1 | Perbaiki 2 tes browser dengan selector alert ambigu, jalankan ulang penuh | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 3× run penuh 194/194 lulus (desktop+ponsel). Selector alert spesifik + impor XLSX deterministik. `vite.config.ts` mematikan watcher saat server tes (EBUSY). |
 | T2 | Tambah tes unit untuk util/validator yang belum tercakup | Copilot | REVIEW | ai/copilot-fix-browser-alerts | 3 tes demo-auth baru; npm run check lulus (104 tes). |
 | T3 | Tes browser untuk Komunikasi & Dokumen (setelah UI REVIEW) | Copilot | TODO | | |
+| Q5 | Checklist UAT siap isi per peran (langkah, hasil, L/G, catatan) | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | `docs/UAT_CHECKLIST.md`; turunan ringkas `PANDUAN_UAT.md`. Belum dijalankan akun nyata. |
+| Q6 | Tes penolakan lintas peran untuk `/tautan-akun` dan `/supervisi` | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 7 skenario (4 peran + 3 peran) pada desktop dan ponsel; tidak ada mutasi/`Tinjau tautan` yang tampil. |
 | Q1 | Review keamanan RLS/grant semua migration (laporan, bukan perubahan) | Qoder | REVIEW | ai/qoder-review-qa | Laporan `docs/SECURITY_REVIEW.md`; tidak ada klaim aman. |
 | Q2 | Rapikan README (kritis: hapus info usang/duplikat jumlah migration) | Qoder | REVIEW | ai/qoder-review-qa | README dirapikan; tautan laporan keamanan dan UAT. |
 | Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | REVIEW | ai/qoder-review-qa | `docs/PANDUAN_UAT.md`; belum dijalankan akun nyata. |
@@ -144,3 +146,19 @@ Berkas: `supabase/migrations/20261114083827_komunikasi.sql`, `src/features/komun
 - Migration baru `20261114083827_komunikasi` belum diterapkan; `20261114000139_student_habits` yang lebih awal juga belum tercatat hosted. Metadata hosted dicek tanpa membaca baris data. Advisor skema hosted saat ini kosong; `check:supabase` lulus setelah akses jaringan tersedia, tanpa mencakup komunikasi.
 - Pemeriksaan terakhir `npm run check` Node 24 lulus 109 tes, lint, typecheck dan build; peringatan mesin PDF masih ada. Browser memakai API tiruan dan tidak lulus penuh. Auth/redirect, aktivasi admin, email dan UAT akun sekolah tetap perlu pemilik.
 - Branch `ai/codex-pdf-splitting`, belum di-merge karena `main` lokal tidak ada. File browser staged serta dokumen audit dan log sesi lain dipertahankan. Lanjutan: susun UI U1, termasuk pemulihan respons hilang, lalu C2; selaraskan urutan migration sebelum penerapan.
+
+### T1/Q5/Q6 — Kilo (QA), 14 November 2026
+
+1. Selector alert dipersempit di seluruh suite (`getByRole('alert').filter({ hasText })`), termasuk kasus dashboard, pengumuman, penjadwalan, dan impor.
+2. Impor XLSX desktop tidak lagi bergantung dialog file natif: uji memakai `setInputFiles` langsung dan batas waktu 15 dtk untuk preview, karena pemrosesan berjalan di worker.
+3. `vite.config.ts` menonaktifkan watcher HMR hanya saat `VITE_TEST_NO_WATCH=1` (dipakai `playwright.config.ts`). Ini menghilangkan crash `EBUSY ... src/features/komunikasi/api/index.ts` yang sebelumnya mematikan server tes di tengah suite.
+4. Bukti: tiga run penuh berturut-turut 194/194 lulus (6,1 / 4,7 / 5,0 menit) pada desktop dan ponsel dengan API tiruan; `npm run check` Node 24 lulus 109 tes, lint, typecheck, build (peringatan chunk PDF tetap).
+5. Tes penolakan baru: `/tautan-akun` untuk guru/siswa/wali/pending dan `/supervisi` untuk siswa/wali/pending — pesan penolakan tampil dan tidak ada tombol aksi.
+6. Belum diverifikasi: UAT akun sekolah nyata, email pemulihan, dan modul komunikasi (UI belum ada).
+7. Berkas: `tests/browser/app.spec.ts`, `playwright.config.ts`, `vite.config.ts`, `docs/UAT_CHECKLIST.md`, `docs/AI_COORDINATION.md`.
+
+### Permintaan Kilo → semua agen
+
+- Jalankan suite browser pada port berbeda (`$env:PLAYWRIGHT_PORT='5191'`) bila ada agen lain yang memakai 5180; `strictPort` membuat run kedua gagal.
+- Jangan menjalankan `npm run test:browser` atau `vite build` bersamaan; pada RAM 7,6 GB, dua run paralel membuat peluncuran Edge melewati batas 180 dtk dan memunculkan kegagalan teardown `browserContext.close`.
+- Tulis berkas di `src/` saat run browser berjalan dapat memicu `EBUSY` pada watcher (sudah dimitigasi untuk server tes, tetapi menyulitkan penelusuran).

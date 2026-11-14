@@ -1593,3 +1593,36 @@ test('teacher creates a class task draft with a deadline', async ({ page }) => {
   expect(writes).toHaveLength(1)
   expect(writes[0]).toMatchObject({ kind: 'task', assignment_id: 'assignment-example', title: 'Data Contoh Tugas Baru', due_on: '2026-11-20' })
 })
+
+test('teacher saves a teaching module draft for an active assignment', async ({ page }) => {
+  await mockSchool(page, { role: 'teacher' })
+  const rows: Record<string, unknown>[] = []
+  const writes: Record<string, unknown>[] = []
+  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ json: [{
+    id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' },
+  }] }))
+  await page.route('**/rest/v1/teaching_modules?*', route => {
+    if (route.request().method() === 'POST') {
+      const payload = route.request().postDataJSON()
+      writes.push(payload)
+      rows.unshift({ ...payload, status: 'draft', review_note: '', revision: 0,
+        teacher_assignments: { id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } } })
+      return route.fulfill({ json: { id: payload.id } })
+    }
+    return route.fulfill({ json: rows })
+  })
+  await page.goto('/modul-ajar')
+  await page.getByRole('button', { name: 'Buat modul' }).click()
+  await page.getByLabel('Penugasan').selectOption('assignment-example')
+  await page.getByLabel('Judul').fill('Data Contoh Modul Baru')
+  await page.getByLabel('Tujuan pembelajaran').fill('Menyebutkan tujuan contoh.')
+  await page.getByLabel('Kegiatan pembelajaran').fill('Melakukan kegiatan contoh.')
+  await page.getByRole('button', { name: 'Simpan modul' }).click()
+  await expect(page.getByText('Modul ajar tersimpan.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Data Contoh Modul Baru' })).toBeVisible()
+  expect(writes).toHaveLength(1)
+  expect(writes[0]).toMatchObject({
+    assignment_id: 'assignment-example', title: 'Data Contoh Modul Baru',
+    objectives: 'Menyebutkan tujuan contoh.', activities: 'Melakukan kegiatan contoh.',
+  })
+})

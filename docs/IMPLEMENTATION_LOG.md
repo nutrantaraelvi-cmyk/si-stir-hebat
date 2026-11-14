@@ -354,3 +354,8 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Menambah dua skenario browser: siswa membaca materi terbit tanpa kontrol penulisan, dan guru membuat draf tugas dengan penugasan, judul, instruksi, serta tenggat.
 - Memastikan muatan POST memuat `kind: task`, `assignment_id`, `due_on`, dan pesan "Draf tugas tersimpan." setelah respons terkonfirmasi.
 - Verifikasi: `npm run lint` bersih; suite penuh 198/198 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.
+
+## Cakupan modul ajar - 14 November 2026 (Kilo/QA)
+
+- Menambah skenario guru menyimpan draf modul ajar: pemilihan penugasan aktif, judul, tujuan, dan kegiatan; memastikan muatan POST serta pesan "Modul ajar tersimpan." dan modul tampil di daftar.
+- Verifikasi: `npm run lint` bersih; suite penuh 200/200 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.

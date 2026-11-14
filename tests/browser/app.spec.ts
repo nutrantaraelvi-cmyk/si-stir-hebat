@@ -1547,3 +1547,49 @@ for (const role of ['student','parent','pending'] as const) {
     await expect(page.getByRole('button', { name: 'Simpan' })).toHaveCount(0)
   })
 }
+
+test('student reads published material without authoring controls', async ({ page }) => {
+  await mockSchool(page, { role: 'student' })
+  await page.route('**/rest/v1/class_materials?*', route => {
+    expect(new URL(route.request().url()).searchParams.get('kind')).toBe('eq.material')
+    return route.fulfill({ json: [{
+      id: 'material-example', class_name: 'Kelas 1A', subject_name: 'Matematika',
+      title: 'Data Contoh Materi', body: 'Isi materi terbit', status: 'published', revision: 1, due_on: null,
+    }] })
+  })
+  await page.goto('/materi')
+  await expect(page.getByRole('heading', { name: 'Data Contoh Materi' })).toBeVisible()
+  await expect(page.getByText('Isi materi terbit')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Buat materi' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Terbitkan materi' })).toHaveCount(0)
+})
+
+test('teacher creates a class task draft with a deadline', async ({ page }) => {
+  await mockSchool(page, { role: 'teacher' })
+  const rows: Record<string, unknown>[] = []
+  const writes: Record<string, unknown>[] = []
+  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ json: [{
+    id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' },
+  }] }))
+  await page.route('**/rest/v1/class_materials?*', route => {
+    const request = route.request()
+    if (request.method() === 'POST') {
+      const payload = request.postDataJSON()
+      writes.push(payload)
+      rows.unshift({ id: 'task-new', class_name: 'Kelas 1A', subject_name: 'Matematika', status: 'draft', revision: 0, ...payload })
+      return route.fulfill({ json: { id: 'task-new' } })
+    }
+    return route.fulfill({ json: rows })
+  })
+  await page.goto('/tugas')
+  await page.getByRole('button', { name: 'Buat tugas' }).click()
+  await page.getByLabel('Penugasan').selectOption('assignment-example')
+  await page.getByLabel('Judul tugas').fill('Data Contoh Tugas Baru')
+  await page.getByLabel('Instruksi tugas').fill('Kerjakan di rumah.')
+  await page.getByLabel('Tenggat tugas').fill('2026-11-20')
+  await page.getByRole('button', { name: 'Simpan draf' }).click()
+  await expect(page.getByText('Draf tugas tersimpan.')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Data Contoh Tugas Baru' })).toBeVisible()
+  expect(writes).toHaveLength(1)
+  expect(writes[0]).toMatchObject({ kind: 'task', assignment_id: 'assignment-example', title: 'Data Contoh Tugas Baru', due_on: '2026-11-20' })
+})

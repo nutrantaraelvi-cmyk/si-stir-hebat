@@ -5,8 +5,8 @@ Basis review: `03b87c0`. Komit yang ditinjau: `135fef8` ("test(browser): stabilk
 
 ## Isi perubahan
 
-1. Sebelas assertion `getByRole('alert')` diganti dengan filter teks spesifik, misalnya `getByRole('alert').filter({ hasText: 'Tidak dapat masuk' })`. Ini menghilangkan benturan ketika dashboard menampilkan beberapa alert sekaligus.
-2. Dua assertion ringkasan (`Ringkasan kepala sekolah`, `Ringkasan data sekolah`, kabar pengumuman) kini memakai pesan lengkap yang unik.
+1. Sekitar dua puluh assertion `getByRole('alert')` diganti atau dipersempit dengan filter teks spesifik, misalnya `getByRole('alert').filter({ hasText: 'Tidak dapat masuk' })`. Ini menghilangkan benturan ketika dashboard menampilkan beberapa alert sekaligus.
+2. Assertion ringkasan (`Ringkasan kepala sekolah`, `Ringkasan data sekolah`, kabar pengumuman) kini memakai pesan lengkap yang unik.
 3. Unggah XLSX tidak lagi memakai `filechooser`; langsung `setInputFiles` pada input, dengan batas tunggu preview 15 detik karena parsing berjalan di worker.
 4. Kasus jurnal "respons tidak pasti" dipersempit ke alert `Penyimpanan belum dapat dipastikan.`; alur pemeriksaan ulang hanya dijalankan bila alert itu terlihat.
 5. Loop rekap akademik (`truncated`/`overflow`/`failure`) memfilter tiga pesan error yang memang dipakai UI.

@@ -4,6 +4,8 @@ Status dokumen: 14 November 2026
 Peran penyusun: auditor arsitektur, keamanan, dan performa  
 Sifat dokumen: ringkasan berbasis bukti repo, bukan jaminan keamanan atau pernyataan "siap operasional"
 
+Pembaruan: tujuh dokumen acuan dari pengguna (PRD, RBAC, Database Blueprint, API Specification, UI/UX Blueprint, Implementation Plan, dan SAD) telah diterima di luar repo. Perbandingan rincinya ada di `docs/AUDIT_KESESUAIAN_ACUAN.md`. Dokumen tersebut belum menjadi acuan resmi repo sampai pemilik menyetujui lokasi dan versinya.
+
 ## 1. Ringkasan eksekutif
 
 SI STIR HEBAT adalah aplikasi web sekolah untuk SDN 03 Wonosari yang menghubungkan administrator, kepala sekolah, guru, siswa, dan orang tua. Aplikasi sudah memiliki fondasi operasional yang cukup luas dan lulus pengujian lokal, tetapi belum dapat disebut siap operasional karena UAT akun sekolah nyata, pengaturan Auth hosted, aktivasi admin, dan penerapan dua migration tertunda belum diverifikasi.
@@ -13,7 +15,7 @@ SI STIR HEBAT adalah aplikasi web sekolah untuk SDN 03 Wonosari yang menghubungk
 | Progress sekarang | Modul inti sudah dibangun dan diuji lokal. `npm run check` lulus 109 tes. Suite browser tercatat 194/194 dengan API tiruan. 25 migration lokal, 23 sudah tercatat di hosted. |
 | Tujuan web | Menjadi satu ruang terintegrasi untuk administrasi sekolah, pembelajaran, supervisi, dan komunikasi guru-wali dengan akses berbasis peran serta perlindungan data anak. |
 | Harapan yang diminta | Aplikasi mobile-first, teks Indonesia, ramah anak, aman, dan sesuai kebutuhan tiap peran. Arah desain terbaru yang tercatat: ungu tua/lilac/biru muda/pink, profesional tetapi playful. |
-| PRD | Tidak ada PRD resmi atau dokumen acuan sekolah di repo. Yang tersedia adalah ringkasan kebutuhan, keputusan sementara, dan status implementasi. PRD masih perlu disahkan pemilik. |
+| PRD | PRD v1.0 bertanggal 30 Oktober 2026 tersedia di folder lampiran pengguna, tetapi belum masuk repo. Matriks RBAC resmi belum lengkap; konflik stack dan kewenangan harus diputuskan pemilik. |
 | Implementasi | Sekitar 12 kelompok fitur sudah berjalan lokal, komunikasi baru sampai backend/API, Kebiasaan baru migration, administrasi dokumen dan notifikasi belum ada. |
 | CI/CD | Workflow verifikasi dan konfigurasi Vercel ada, tetapi belum ada bukti CI berjalan di GitHub dan deployment belum diverifikasi end-to-end. |
 | RBAC | Matriks peran sudah diterapkan di RLS, bukan hanya di UI. Beberapa sel masih memerlukan konfirmasi kebijakan resmi. |
@@ -87,16 +89,19 @@ Saat ini butir 2, 4, dan sebagian butir 1 serta 5 belum terpenuhi.
 
 ### 4.1 Yang ada
 
-Tidak ditemukan PRD resmi, matriks RBAC resmi, atau dokumen acuan sekolah di repo. Kebutuhan saat ini tersebar di:
+PRD versi 1.0 bertanggal 30 Oktober 2026 kini tersedia di folder lampiran pengguna, bersama enam dokumen acuan lain. Dokumen tersebut menjelaskan tujuan, 15 modul, peran pengguna, persyaratan fungsional, keamanan, integrasi, rilis, dan kriteria penerimaan. Namun dokumen belum masuk repo, belum disahkan sebagai versi resmi, dan Matriks RBAC yang dilampirkan baru memuat cakupan, bukan tabel role x modul.
+
+Kebutuhan juga tersebar di:
 
 - `docs/PROJECT_STATUS.md`: ringkasan kebutuhan, status modul, prioritas, dan arahan pengguna.
 - `docs/DECISIONS.md`: keputusan sementara per modul dan pertanyaan terbuka.
 - `docs/AKTIVASI_DAN_RILIS.md` dan `docs/PANDUAN_UAT.md`: prosedur operasional.
 - Migration dan kode: perilaku yang benar-benar diterapkan.
+- `docs/AUDIT_KESESUAIAN_ACUAN.md`: perbandingan rinci acuan vs implementasi.
 
-Klaim adanya tujuh lampiran acuan belum dapat diverifikasi karena berkas referensinya tidak ada di repo. Ini adalah temuan konsistensi dokumen, bukan bukti bahwa acuan tersebut tidak pernah ada.
+Catatan penting: PRD menetapkan Next.js, Tailwind, Zod, dan monorepo, sedangkan aturan proyek melarang Next.js dan kode saat ini memakai Vite + Supabase + CSS. Konflik ini belum diselesaikan dan tidak boleh dijadikan alasan mengubah stack secara sepihak.
 
-### 4.2 PRD inferensial
+### 4.2 Ringkasan isi PRD
 
 | Bagian | Isi yang dapat disimpulkan |
 | --- | --- |
@@ -404,6 +409,7 @@ Tidak ada temuan Kritis baru yang terbukti pada kode aplikasi.
 3. **Demo mode berpotensi aktif di produksi.** Gerbang demo harus menjadi syarat rilis.
 4. **Urutan migration tertunda.** Dua migration lokal belum hosted; `student_habits` lebih awal dan tidak boleh dilewati.
 5. **CI/CD belum terbukti end-to-end.** Workflow dan konfigurasi Vercel ada, tetapi belum ada bukti run dan verifikasi produksi.
+6. **Konflik dokumen acuan dan stack.** PRD menyebut Next.js/Tailwind/monorepo, sedangkan aturan proyek melarang Next.js dan implementasi memakai Vite + Supabase + CSS. RBAC resmi juga belum disahkan.
 
 ### Sedang
 
@@ -447,7 +453,7 @@ Temuan besar tidak boleh diubah sepihak oleh auditor. Perubahan database harus b
 
 ## 14. Rekomendasi urutan kerja
 
-1. Pemilik mengesahkan PRD ringkas dan keputusan terbuka: asesmen, retensi, notifikasi, komunikasi, dan 7 Kebiasaan.
+1. Pemilik mengarsipkan tujuh dokumen acuan di repo (misalnya `docs/references/`), menyetujui versi resminya, dan memutuskan konflik stack serta RBAC.
 2. Selesaikan UAT akun sekolah serta verifikasi Auth/redirect dan aktivasi admin.
 3. Selaraskan urutan migration, terapkan setelah persetujuan, lalu jalankan pemeriksaan hosted dan Advisor.
 4. Tutup risiko rilis: gerbang demo, tes Storage, dan kebijakan retensi data anak.

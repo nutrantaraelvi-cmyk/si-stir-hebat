@@ -12,13 +12,23 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 | U2 | UI modul Administrasi Dokumen (setelah C2 REVIEW) | Cursor | TODO | | |
 | U3 | Audit responsif & aksesibilitas semua halaman | Cursor | DOING | ai/cursor-akses-status | Cursor |
 | U4 | Konsistensi empty/loading/error state | Cursor | DOING | ai/cursor-akses-status | Cursor |
-| T1 | Perbaiki 2 tes browser dengan selector alert ambigu, jalankan ulang penuh | Codex (mengambil alih) | BLOCKED | ai/codex-pdf-splitting | Suite 178 lulus, 2 timeout; pengulangan 1 lulus dan 1 timeout. |
+| T1 | Perbaiki 2 tes browser dengan selector alert ambigu, jalankan ulang penuh | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 3× run penuh 194/194 lulus (desktop+ponsel). Selector alert spesifik + impor XLSX deterministik. `vite.config.ts` mematikan watcher saat server tes (EBUSY). |
 | T2 | Tambah tes unit untuk util/validator yang belum tercakup | Copilot | REVIEW | ai/copilot-fix-browser-alerts | 3 tes demo-auth baru; npm run check lulus (104 tes). |
 | T3 | Tes browser untuk Komunikasi & Dokumen (setelah UI REVIEW) | Copilot | TODO | | |
+| Q5 | Checklist UAT siap isi per peran (langkah, hasil, L/G, catatan) | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | `docs/UAT_CHECKLIST.md`; turunan ringkas `PANDUAN_UAT.md`. Belum dijalankan akun nyata. |
+| Q6 | Tes penolakan lintas peran untuk `/tautan-akun` dan `/supervisi` | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 7 skenario (4 peran + 3 peran) pada desktop dan ponsel; tidak ada mutasi/`Tinjau tautan` yang tampil. |
+| Q7 | Cakupan modul: siswa membaca materi terbit, guru membuat tugas | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 2 skenario, desktop + ponsel; suite penuh 198/198 lulus. |
+| Q8 | Cakupan modul ajar: guru menyimpan draf modul | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | 1 skenario (payload POST + pesan); suite penuh 200/200 lulus. |
+| Q9 | Matriks cakupan uji + skenario pengajuan modul | Kilo (QA) | DONE | agent/kilo/qa-suite-stabil | `docs/QA_COVERAGE.md`; modul ajar kini mencakup simpan draf dan ajukan. |
+| L08 | CI/CD: gerbang migration + validasi workflow, template PR | Kilo (QA) | REVIEW | ai/kilo/l08-ci | `scripts/check-migrations.mjs`, `scripts/check-ci.mjs` masuk `npm run check`; run GitHub belum terverifikasi. |
+| L07 | Runbook operasional: smoke, rollback, checklist Auth | Kilo (QA) | REVIEW | ai/kilo/l07-runbook | `scripts/smoke-production.mjs` + `docs/RUNBOOK_OPERASIONAL.md`; smoke produksi asli belum dijalankan. |
+| L13 | Monitoring dasar: jadwal smoke, advisor, kuota | Kilo (QA) | REVIEW | ai/kilo/l07-runbook | Tabel monitoring pada runbook; alert belum terpasang. |
 | Q1 | Review keamanan RLS/grant semua migration (laporan, bukan perubahan) | Qoder | REVIEW | ai/qoder-review-qa | Laporan `docs/SECURITY_REVIEW.md`; tidak ada klaim aman. |
 | Q2 | Rapikan README (kritis: hapus info usang/duplikat jumlah migration) | Qoder | REVIEW | ai/qoder-review-qa | README dirapikan; tautan laporan keamanan dan UAT. |
 | Q3 | Panduan UAT per peran (admin, kepala sekolah, guru, siswa, wali) | Qoder | REVIEW | ai/qoder-review-qa | `docs/PANDUAN_UAT.md`; belum dijalankan akun nyata. |
 | Q4 | Review PR dari AI lain sebelum merge | Qoder | REVIEW | ai/qoder-review-qa | Review T1/T2 tertulis; branch hilang setelah git diinisialisasi ulang. |
+| L09 | Audit ulang S-01/S-02/K1/K3 + kriteria penerimaan | Qoder | REVIEW | ai/codex-pdf-splitting (docs, belum commit) | `docs/AUDIT_L09_KRITERIA_PENERIMAAN.md`; 6 temuan/celah + AC; S-02 diperluas; tanpa perubahan kode/hosted. |
+| L01 | ADR stack + matriks RBAC dari RLS (parsial) | Qoder | REVIEW | ai/codex-pdf-splitting (docs, belum commit) | `docs/RBAC_MATRIX.md`, ADR-001 di `docs/DECISIONS.md`, indeks `docs/references/README.md`; tujuh acuan belum diarsipkan, menunggu pemilik. |
 
 ## Permintaan Lintas AI
 (tulis di sini: dari → ke, apa yang dibutuhkan)
@@ -28,6 +38,9 @@ Status: TODO | DOING | REVIEW | DONE | BLOCKED
 - Qoder → Codex/Cursor: putuskan pembatasan mode demo. Saat ini konfigurasi Supabase tidak valid membuat aplikasi menampilkan akun sintetis dan data contoh (`src/lib/demo-auth.ts`, `src/app/Account.tsx:38`); build produksi salah konfigurasi bisa tampak seperti aplikasi sekolah.
 - Qoder → Copilot: lampirkan log/artefak run browser penuh untuk T1. `npx playwright test --list` mengonfirmasi 180 tes, tetapi run tidak terbukti dari repo. Angka tes di ringkasan T1 (101) sudah usang; run Qoder menunjukkan 104.
 - Qoder → Codex: README kini menyatakan 23 migration hosted dan berkas ke-24 (`student_habits`) hanya lokal serta belum diterapkan; konfirmasi sebelum penerapan.
+- Qoder → Pemilik: setujui lokasi/versi tujuh dokumen acuan dan matriks RBAC; putuskan cakupan S-02 (siapa boleh baca/tulis bukti supervisi) serta K3 (draf umpan balik dan draf asesmen).
+- Qoder → Copilot/Codex: jangan menerapkan modul bukti supervisi ke hosted sebelum policy baca S-02 diperbaiki. Policy saat ini membuka semua objek `stage = 4` kepada setiap akun login.
+- Qoder → Kilo: setelah migration S-02 disetujui, tambahkan uji penolakan lintas peran untuk baca/tulis Storage; gunakan data sintetis, bukan akun sekolah nyata.
 
 ## Urutan merge
 Codex (backend) → Cursor (UI) → Copilot (tes) → Qoder (docs). Hanya Codex yang merge ke main.
@@ -73,6 +86,14 @@ Catatan proses: repo Git diinisialisasi ulang (hanya commit awal `a6a4d5b`), seh
 1. **T1 (Copilot)** — Tidak ditemukan bug pada `tests/browser/app.spec.ts`; assertion alert sudah ter-scope (`summary.getByRole('alert')`, `getByRole('alertdialog')`, teks spesifik). `npx playwright test --list` mengonfirmasi 180 tes, tetapi tidak ada log run penuh di repo; reviewer tidak menjalankan ulang suite. Ringkasan T1 masih menulis 101 tes; run Qoder menunjukkan 104. Terima REVIEW jika log run dilampirkan.
 2. **T2 (Copilot)** — Tiga tes `tests/demo-auth.test.mjs` relevan dan lulus (bagian dari 104). Temuan keamanan terpisah: `src/lib/demo-auth.ts` + `src/app/Account.tsx:38` mengaktifkan akun hardcoded dan sesi `localStorage` ketika konfigurasi Supabase tidak valid; build produksi salah konfigurasi dapat menampilkan data sintetis. Perlu keputusan Codex/Cursor (batasi ke `import.meta.env.DEV` atau gagalkan build). Tes belum menutup kondisi ini.
 3. **Q1–Q3 (Qoder)** — Q1 laporan tanpa klaim aman; Q2 diuji `npm run check` 104/104; Q3 belum dijalankan pada akun nyata. Tidak ada perubahan kode/migration. **U3/U4 (Cursor)** masih DOING, belum ditelaah; periksa regresi 390px serta state loading/error setelah REVIEW.
+
+### Ringkasan L09 + L01 parsial — Qoder (15 November 2026)
+
+1. **L09** — `docs/AUDIT_L09_KRITERIA_PENERIMAAN.md` memuat S-01 (sebagian termitigasi), S-02/K4 (terbuka, diperluas: policy baca Storage hanya `stage = 4`), K1, K3, H-09, dan celah bukti L14; setiap temuan memiliki AC dan bukti yang harus dilampirkan. Tidak ada klaim aman atau siap operasional.
+2. **L01 parsial** — ADR-001 stack terkunci diusulkan di `docs/DECISIONS.md`; `docs/RBAC_MATRIX.md` menurunkan role × modul dari policy 25 migration dan mengoreksi enam sel audit lama; `docs/references/README.md` mengindeks tujuh acuan yang belum diarsipkan karena lokasi/versi menunggu pemilik.
+3. Bukti: telaah policy migration; verifikasi unit terakhir 109/109 lulus (15 November 2026); suite browser tidak dijalankan pada tugas ini. Tidak ada perubahan kode, migration, atau hosted.
+
+Berkas: `docs/AUDIT_L09_KRITERIA_PENERIMAAN.md`, `docs/RBAC_MATRIX.md`, `docs/DECISIONS.md`, `docs/references/README.md`, `docs/AI_COORDINATION.md`.
 
 ## Log Sesi
 
@@ -144,3 +165,34 @@ Berkas: `supabase/migrations/20261114083827_komunikasi.sql`, `src/features/komun
 - Migration baru `20261114083827_komunikasi` belum diterapkan; `20261114000139_student_habits` yang lebih awal juga belum tercatat hosted. Metadata hosted dicek tanpa membaca baris data. Advisor skema hosted saat ini kosong; `check:supabase` lulus setelah akses jaringan tersedia, tanpa mencakup komunikasi.
 - Pemeriksaan terakhir `npm run check` Node 24 lulus 109 tes, lint, typecheck dan build; peringatan mesin PDF masih ada. Browser memakai API tiruan dan tidak lulus penuh. Auth/redirect, aktivasi admin, email dan UAT akun sekolah tetap perlu pemilik.
 - Branch `ai/codex-pdf-splitting`, belum di-merge karena `main` lokal tidak ada. File browser staged serta dokumen audit dan log sesi lain dipertahankan. Lanjutan: susun UI U1, termasuk pemulihan respons hilang, lalu C2; selaraskan urutan migration sebelum penerapan.
+
+### T1/Q5/Q6 — Kilo (QA), 14 November 2026
+
+1. Selector alert dipersempit di seluruh suite (`getByRole('alert').filter({ hasText })`), termasuk kasus dashboard, pengumuman, penjadwalan, dan impor.
+2. Impor XLSX desktop tidak lagi bergantung dialog file natif: uji memakai `setInputFiles` langsung dan batas waktu 15 dtk untuk preview, karena pemrosesan berjalan di worker.
+3. `vite.config.ts` menonaktifkan watcher HMR hanya saat `VITE_TEST_NO_WATCH=1` (dipakai `playwright.config.ts`). Ini menghilangkan crash `EBUSY ... src/features/komunikasi/api/index.ts` yang sebelumnya mematikan server tes di tengah suite.
+4. Bukti: tiga run penuh berturut-turut 194/194 lulus (6,1 / 4,7 / 5,0 menit) pada desktop dan ponsel dengan API tiruan; `npm run check` Node 24 lulus 109 tes, lint, typecheck, build (peringatan chunk PDF tetap).
+5. Tes penolakan baru: `/tautan-akun` untuk guru/siswa/wali/pending dan `/supervisi` untuk siswa/wali/pending — pesan penolakan tampil dan tidak ada tombol aksi.
+6. Belum diverifikasi: UAT akun sekolah nyata, email pemulihan, dan modul komunikasi (UI belum ada).
+7. Berkas: `tests/browser/app.spec.ts`, `playwright.config.ts`, `vite.config.ts`, `docs/UAT_CHECKLIST.md`, `docs/AI_COORDINATION.md`.
+
+### Permintaan Kilo → semua agen
+
+- Jalankan suite browser pada port berbeda (`$env:PLAYWRIGHT_PORT='5191'`) bila ada agen lain yang memakai 5180; `strictPort` membuat run kedua gagal.
+- Jangan menjalankan `npm run test:browser` atau `vite build` bersamaan; pada RAM 7,6 GB, dua run paralel membuat peluncuran Edge melewati batas 180 dtk dan memunculkan kegagalan teardown `browserContext.close`.
+- Tulis berkas di `src/` saat run browser berjalan dapat memicu `EBUSY` pada watcher (sudah dimitigasi untuk server tes, tetapi menyulitkan penelusuran).
+
+### L08 - Kilo (QA), 15 November 2026
+
+1. `scripts/check-migrations.mjs` memeriksa pola nama, keunikan timestamp, urutan naik, dan aturan `student_habits` sebelum `komunikasi`. Diuji negatif di direktori sementara: timestamp ganda/nama salah dan urutan terbalik sama-sama ditolak (exit 1).
+2. `scripts/check-ci.mjs` memastikan `verify.yml` memakai Node 24, `npm ci`, `npm run check`, pemasangan Playwright, `test:browser`, env Supabase, dan `permissions: contents: read`; semua `npm run <skrip>` wajib ada di `package.json`.
+3. Keduanya dirangkai ke depan `npm run check`; `.github/pull_request_template.md` dan `docs/CI_RUNBOOK.md` ditambahkan.
+4. **Pemblokir sementara**: `npm run check` penuh gagal di `src/app/Password.tsx` (`TS6133`, `TS2304`) karena file itu sedang disunting agen lain. Gerbang CI Kilo sendiri lulus; libatkan pemilik file tersebut sebelum menyatakan CI hijau.
+5. Belum terverifikasi: run GitHub Actions (repo privat, `gh` tidak tersedia), branch protection, dan secret/environment Vercel. Tidak ada push dilakukan.
+
+### L07/L13 - Kilo (QA), 15 November 2026
+
+1. `scripts/smoke-production.mjs` memeriksa beranda, fallback SPA `/login`, keberadaan akun demo di bundel produksi, dan (bila env tersedia) penolakan REST anonim. Skrip hanya membaca dan tidak mencetak baris data, kata sandi, atau key.
+2. Diuji terhadap `vite preview` lokal: 3/4 lulus, dan pemeriksaan akun demo **gagal sesuai dugaan** karena S-01 belum ditutup. Smoke terhadap produksi asli belum dijalankan.
+3. `docs/RUNBOOK_OPERASIONAL.md` memuat prosedur rollback, checklist Site URL/redirect Auth, dan tabel monitoring; bagian yang belum terverifikasi ditandai terbuka.
+4. Butuh pemilik: menjalankan smoke produksi, memasang uptime check, dan mengisi Site URL/redirect.

@@ -191,3 +191,12 @@ Berlaku untuk Copilot, Sixth, Codex, dan Qoder. Ini izin/kebijakan pemilik, buka
 - Owner → Sixth: lanjutkan QA di `agent/sixth/qa-hardening`; pertahankan log dengan tanggal, Node 24, port, dan jumlah skenario yang sama dengan `npx playwright test --list`.
 - Owner → Codex: migration hosted diizinkan hanya lewat backup + verifikasi + konfirmasi akhir; jangan reset dan jangan melompati urutan.
 - Owner → Qoder: sinkronkan dokumen ke keputusan ini; D4 tetap terbuka; jangan mengklaim UAT atau produksi siap.
+
+### Log sesi — Qoder, branch perbaikan Copilot (15 November 2026)
+
+- Branch `ai/qoder-copilot-fixes` dibuat dari `20f5f22`; berisi `1d6cf0a` (gate demo DEV-only) dan `0f0eaad` (indikator KKM dan izin navigasi per domain). Tidak merge, push, atau migration.
+- Mode demo: panel hanya tampil di DEV tanpa konfigurasi Supabase; `admin123`/`kepsek123`/`guru123`/`murid123`/`ortu123` tidak ditemukan di `dist/`; build tanpa env tetap gagal.
+- KKM: ambang 75, nilai kosong tetap "Belum dinilai", rekap layar/CSV/Excel/PDF menampilkan Status KKM, detail asesmen menampilkan label di samping nilai. Tes unit/database naik menjadi **114/114**; `npm run check` Node 24 lulus lint, typecheck, tes, dan build.
+- Navigasi: helper `canReadLearning`, `canReadAssessments`, `canReadSchedules` mencakup kelima peran sekolah sesuai policy RLS baca; `canAccessCommunication` hanya guru/wali. Header memakai helper domain, bukan helper pengumuman; cakupan tautan tetap lima peran, tetapi makna izin kini eksplisit dan diuji.
+- Suite browser penuh dari cache Vite kosong: **179/182** pada run 13,9 menit. Tiga kegagalan ponsel berupa timeout `page.goto`/klik dan crash worker `0xC0000409`, bukan assertion; dua lulus saat diulang sendiri, satu tidak dapat diulang karena worker browser crash. Kegagalan cold-cache XLSX/jurnal pada run sebelumnya tidak muncul setelah `optimizeDeps.include` dari branch Sixth.
+- Belum: UAT akun nyata, aksesibilitas mendalam, dan verifikasi UI kepala sekolah/administrator di perangkat nyata. H-04 tetap REVIEW sampai ada bukti per peran di lingkungan tenang.

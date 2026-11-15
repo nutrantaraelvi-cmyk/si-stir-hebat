@@ -378,3 +378,12 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - `npm run test:browser` penuh (desktop + ponsel, API tiruan, port 5191) selesai 202/202 lulus dalam 7,2 menit. Log: `docs/qa-logs/test-browser-2026-11-15-202-lulus.log`.
 - `docs/QA_COVERAGE.md` diperbarui: 202 skenario, rute `/komunikasi` dicatat belum ada tes.
 - `npm run check` penuh **belum** lulus pada 15 November 2026 karena `src/features/komunikasi/Communication.tsx` (sedang disunting) gagal typecheck. Gerbang CI Kilo (`check-migrations`, `check-ci`) lulus.
+
+## Pengamanan demo dan penyelesaian UI Komunikasi — 15 November 2026
+
+- Mode demo digate ketat pada `import.meta.env.DEV === true` dan Supabase yang tidak terkonfigurasi. Untuk build, Vite mengganti modul demo dengan stub; `scripts/check-demo-bundle.mjs` memeriksa seluruh JS hasil build. Tidak ada perubahan akun, Auth hosted, atau data.
+- Alur kirim Komunikasi mempertahankan ID dan isi pesan ketika respons belum diketahui, mencari ID sebelum retry, lalu memverifikasi hasil setelah galat. Daftar pesan memuat 25 baris per halaman dengan sentinel pagination agar tidak melewatkan baris batas.
+- Tes ditambah untuk gate demo, pagination API, respons kirim hilang, dan halaman pesan UI. Tidak ada migration atau perubahan hosted.
+- Verifikasi: `npm run check` lulus (116 tes unit/database, lint, typecheck, pemeriksaan migration/CI, build dan bundel tanpa akun demo). Tes Komunikasi browser lulus 2/2 per desktop dan ponsel.
+- Suite browser penuh: 212/216 lulus; empat kegagalan terjadi saat `browserContext.close` karena berkas trace/zip tidak ditemukan (`ENOENT`). Keempat skenario lulus pada pengulangan terarah. Suite penuh belum berstatus lulus.
+- Belum: migration `student_habits` dan `komunikasi` hosted, keputusan RBAC/retensi/pengawasan Komunikasi, smoke produksi, CI hosted, dan UAT akun sekolah. Jangan commit/push/deploy sebelum worktree bersama ditinjau dan perubahan agen lain dipisahkan.

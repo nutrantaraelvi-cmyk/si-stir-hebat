@@ -23,8 +23,22 @@ test('communication list bounds pages and propagates backend errors', async () =
   const query = { select: () => query, order: () => query, range: async (start, end) => { range = [start, end]; return { data: null, error: failure } } }
   const client = { from: () => query }
   await assert.rejects(daftarPesan(client, 2), error => error === failure)
-  assert.deepEqual(range, [50, 74])
+  assert.deepEqual(range, [50, 75])
   await assert.rejects(daftarPesan(client, -1))
+})
+
+test('message list uses a sentinel row to report pagination without gaps', async () => {
+  const rows = Array.from({ length: 26 }, (_, id) => ({ id: String(id) }))
+  let range
+  const query = { select: () => query, order: () => query, range: async (start, end) => {
+    range = [start, end]
+    return { data: rows, error: null }
+  } }
+  const client = { from: () => query }
+  const result = await daftarPesan(client, 0)
+  assert.deepEqual(range, [0, 25])
+  assert.equal(result.items.length, 25)
+  assert.equal(result.hasMore, true)
 })
 
 test('recipient API reports further authorized pages without returning the sentinel', async () => {

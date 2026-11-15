@@ -3,6 +3,7 @@ import { useAuth } from '../../app/Auth'
 import { supabase } from '../../lib/supabase'
 
 const kinds = { teacher: 'Guru', student: 'Siswa', parent: 'Wali siswa' }
+const kindRoleLabels = { teacher: 'guru', student: 'siswa', parent: 'wali siswa' }
 type Kind = keyof typeof kinds
 type Relationship = {
   kind: Kind
@@ -65,6 +66,13 @@ function RelationshipForm({ userId }: { userId: string }) {
     }
     setBusy(true)
     try {
+      const profileQuery = await supabase.from('profiles').select('role').eq('id', target).maybeSingle()
+      if (profileQuery.error) throw profileQuery.error
+      if (!profileQuery.data || profileQuery.data.role !== kind) {
+        setError(`ID akun harus berperan sebagai ${kindRoleLabels[kind]} sebelum tautan dibuat.`)
+        return
+      }
+
       const { data, error: failure } = await supabase.from(kind === 'teacher' ? 'teachers' : 'students')
         .select('id,name,is_active').eq('code', registryCode).maybeSingle()
       if (failure) throw failure

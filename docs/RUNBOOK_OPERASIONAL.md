@@ -42,6 +42,10 @@ Smoke 3/4 lulus
 
 Kegagalan itu **benar** dan sesuai temuan S-01: akun demo masih ikut bundel produksi. Smoke terhadap produksi asli **belum dijalankan**; pemilik perlu menjalankannya setelah S-01 ditutup.
 
+### Verifikasi ulang bundel — 15 November 2026
+
+Build berikutnya mengganti modul autentikasi demo dengan stub produksi dan menjalankan `scripts/check-demo-bundle.mjs` setelah `vite build`. `npm run check` lulus; pemeriksaan menyisir 7 berkas JavaScript dan tidak menemukan penanda akun demo. Ini menutup kegagalan bundel lokal yang tercatat di atas, tetapi bukan smoke produksi: URL Vercel, Auth, REST anonim, email, dan UAT akun sekolah tetap belum diperiksa pada sesi ini.
+
 ## 3. Rollback
 
 1. Vercel → Deployments → pilih deployment terakhir yang sehat → **Promote to Production** (rollback instan, tanpa rebuild).

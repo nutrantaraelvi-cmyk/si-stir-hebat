@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 import { getPublicSupabaseConfig } from './src/lib/config'
 
 const require = createRequire(import.meta.url)
@@ -29,7 +30,20 @@ export default defineConfig(({ command, mode }) => {
   }
   return {
   plugins: [academicPdfFonts(), react()],
-  server: { host: '127.0.0.1', port: 5173, strictPort: true },
+  resolve: {
+    alias: command === 'build'
+      ? [{ find: /^(?:\.\.\/)+lib\/demo-auth(?:\.ts)?$/, replacement: resolve(process.cwd(), 'src/lib/demo-auth.production.ts') }]
+      : [],
+  },
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+    strictPort: true,
+    // On Windows a concurrent editor can hold a lock on a source file, which
+    // makes the watcher throw EBUSY and kills the dev server. Test runs do not
+    // need HMR, so Playwright disables the watcher for a stable web server.
+    watch: process.env.VITE_TEST_NO_WATCH === '1' ? null : undefined,
+  },
   preview: { host: '127.0.0.1', port: 4173, strictPort: true },
   build: {
     rollupOptions: {

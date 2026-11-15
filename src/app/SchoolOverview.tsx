@@ -33,9 +33,9 @@ export function SchoolOverview({ role }: { role: string }) {
     <p>Jumlah registri berstatus aktif. Kelas mencakup semua tahun ajaran; angka siswa bukan jumlah keanggotaan kelas.</p>
     {loading && <p role="status">Memuat ringkasan sekolah…</p>}
     <div className="dashboard-stats">{metrics.map((metric, index) => <article key={metric.table} aria-label={metric.label}>
-      <span>{metric.label}</span><strong>{counts[index] ?? '—'}</strong><Link to={metric.href}>Lihat {metric.label.toLowerCase()}</Link>
+      <span>{metric.label}</span><strong>{counts[index] ?? 'N/A'}</strong><Link to={metric.href}>Lihat {metric.label.toLowerCase()}</Link>
     </article>)}</div>
-    {failed && <p className="error" role="alert">Sebagian jumlah belum dapat dimuat. Angka yang tidak tersedia ditandai —.</p>}
+    {failed && <p className="error" role="alert">Sebagian jumlah belum dapat dimuat. Angka yang tidak tersedia ditandai N/A.</p>}
     <button className="refresh-button" disabled={loading} onClick={() => setAttempt(n => n + 1)}>Muat ulang ringkasan</button>
     {!loading && counts.every(value => value === 0) && role === 'administrator' && <p className="status">Data aktif belum tersedia. <Link to="/sekolah">Mulai isi data sekolah</Link>, lalu tambahkan guru, siswa dan kelas.</p>}
   </section>

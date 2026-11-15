@@ -16,13 +16,14 @@ const columns = 'id,assignment_id,student_id,parent_profile_id,body,author_id,cr
 const pageSize = 25
 
 // RLS enforces access; caller-provided IDs do not grant permission.
-export async function daftarPesan(client: SupabaseClient, page = 0): Promise<PesanKomunikasi[]> {
+export async function daftarPesan(client: SupabaseClient, page = 0): Promise<{ items: PesanKomunikasi[]; hasMore: boolean }> {
   if (!Number.isSafeInteger(page) || page < 0 || page > 10000) throw new Error('Halaman tidak valid.')
   const { data, error } = await client.from('communication_messages').select(columns)
     .order('created_at', { ascending: false }).order('id', { ascending: false })
-    .range(page * pageSize, (page + 1) * pageSize - 1)
+    .range(page * pageSize, page * pageSize + pageSize)
   if (error) throw error
-  return data as PesanKomunikasi[]
+  const rows = data as PesanKomunikasi[]
+  return { items: rows.slice(0, pageSize), hasMore: rows.length > pageSize }
 }
 
 // Check a client-generated message ID after a lost response before retrying.

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { getDemoProfile, updateDemoPassword } from '../lib/demo-auth'
+import { getDemoProfileByEmail, isDemoModeEnabled, updateDemoPassword } from '../lib/demo-auth'
 import { supabase } from '../lib/supabase'
 import { validateNewPassword } from '../lib/password'
 import { useAuth } from './Auth'
@@ -13,19 +13,24 @@ export function ForgotPassword() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy || sent) return
-    if (!supabase) {
-      const account = getDemoProfile('')
-      if (!account || account.email.toLowerCase() !== email.trim().toLowerCase()) {
+    if (isDemoModeEnabled()) {
+      const account = getDemoProfileByEmail(email)
+      if (!account) {
         setError('Email demo tidak ditemukan. Gunakan salah satu email akun demo yang tersedia pada halaman login.')
         return
       }
       setSent(true)
       return
     }
+    const client = supabase
+    if (!client) {
+      setError('Konfigurasi Supabase belum tersedia. Periksa pengaturan sekolah.')
+      return
+    }
     setBusy(true)
     setError('')
     try {
-      const { error: failure } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      const { error: failure } = await client.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: new URL('/kata-sandi', window.location.origin).href,
       })
       if (failure) setError('Permintaan belum dapat diproses. Coba lagi nanti atau hubungi administrator sekolah.')
@@ -34,7 +39,7 @@ export function ForgotPassword() {
     finally { setBusy(false) }
   }
   return <section className="login"><h1>Lupa kata sandi?</h1><p>Masukkan email akun sekolah untuk meminta tautin pemulihan.</p>
-    {!supabase && <div className="status">Mode demo aktif. Gunakan salah satu akun demo yang terdaftar pada halaman masuk.</div>}
+    {isDemoModeEnabled() && <div className="status">Mode demo aktif. Gunakan salah satu akun demo yang terdaftar pada halaman masuk.</div>}
     {sent ? <div className="status" role="status">Jika email terdaftar, Anda akan menerima tautan pemulihan. Periksa kotak masuk dan folder spam. Jika email belum diterima, hubungi administrator sekolah.</div> : <form onSubmit={submit}>
       <label htmlFor="recovery-email">Email akun sekolah</label>
       <input id="recovery-email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />
@@ -66,7 +71,7 @@ export function ChangePassword() {
     if (validation) return
     setBusy(true)
 
-    if (!supabase) {
+    if (isDemoModeEnabled()) {
       if (!session) {
         setBusy(false)
         return
@@ -83,8 +88,14 @@ export function ChangePassword() {
       setBusy(false)
       return
     }
+    const client = supabase
+    if (!client) {
+      setError('Konfigurasi Supabase belum tersedia. Periksa pengaturan sekolah.')
+      setBusy(false)
+      return
+    }
     try {
-      const { error: failure } = await supabase.auth.updateUser({ password })
+      const { error: failure } = await client.auth.updateUser({ password })
       if (failure) setError('Kata sandi belum dapat diubah. Gunakan kata sandi baru yang memenuhi kebijakan sekolah. Jika sesi kedaluwarsa, minta tautan pemulihan baru.')
       else { setPassword(''); setConfirmation(''); setSaved(true) }
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }

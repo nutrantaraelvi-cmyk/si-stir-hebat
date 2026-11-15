@@ -69,7 +69,7 @@ export function TaskFeedback({ taskId, submissionId, role }: { taskId: string; s
     {!rows && !error && <p role="status">Memuat umpan balik…</p>}
     {rows?.slice(0, 20).map(row => <div key={row.id}>
       {role === 'parent' && <h5>{row.student_name}</h5>}
-      <p>{row.status === 'draft' ? 'Draf — belum dibagikan' : 'Terbit'}</p>
+      <p>{row.status === 'draft' ? 'Draf, belum dibagikan' : 'Terbit'}</p>
       <p className="announcement-body">{row.feedback}</p>
     </div>)}
     {rows?.length === 0 && !editable && <p>Belum ada umpan balik yang diterbitkan.</p>}

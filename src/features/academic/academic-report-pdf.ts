@@ -1,4 +1,5 @@
 import type { TDocumentDefinitions, TableCell } from 'pdfmake/interfaces'
+import { labelKetuntasan } from '../../lib/kkm.ts'
 import { academicCells, reportLimit, type AcademicReportRow } from './academic-report-model.ts'
 
 export type AcademicPdfContext = {
@@ -7,10 +8,11 @@ export type AcademicPdfContext = {
 
 export function academicPdfDefinition(rows: AcademicReportRow[], context: AcademicPdfContext): TDocumentDefinitions {
   if (!rows.length || rows.length > reportLimit) throw new Error('Complete bounded report required')
-  const headers = ['Tanggal', 'Siswa', 'Kelas / pelajaran', 'Asesmen', 'Nilai', 'Maks.', '% maks.']
+  const headers = ['Tanggal', 'Siswa', 'Kelas / pelajaran', 'Asesmen', 'Nilai', 'Maks.', '% maks.', 'Status KKM']
   const body: TableCell[][] = [headers.map(text => ({ text, bold: true, color: '#FFFFFF', fillColor: '#12383A' }))]
   for (const row of rows) {
     const cells = academicCells(row)
+    const status = labelKetuntasan(row.score, row.assessments.maximum_score)
     body.push([
       String(cells[0]),
       { stack: [{ text: row.student_name, bold: true }, { text: `Kode: ${row.student_code}`, fontSize: 8 }] },
@@ -18,12 +20,13 @@ export function academicPdfDefinition(rows: AcademicReportRow[], context: Academ
       { stack: [{ text: String(cells[3]), bold: true }, `${cells[4]} · ${cells[5]}`] },
       { text: row.score === null ? 'Belum dinilai' : String(cells[8]), alignment: 'right' },
       { text: String(cells[9]), alignment: 'right' },
-      { text: row.score === null ? '—' : `${cells[10]}%`, alignment: 'right' },
+      { text: row.score === null ? 'N/A' : `${cells[10]}%`, alignment: 'right' },
+      { text: status, alignment: 'center' },
     ])
   }
   return {
     pageSize: 'A4', pageOrientation: 'landscape', pageMargins: [32, 30, 32, 36],
-    info: { title: 'Rekap Akademik — SI STIR HEBAT', author: 'SI STIR HEBAT', subject: 'Hasil asesmen sesuai filter dan hak akses' },
+    info: { title: 'Rekap Akademik: SI STIR HEBAT', author: 'SI STIR HEBAT', subject: 'Hasil asesmen sesuai filter dan hak akses' },
     defaultStyle: { font: 'Roboto', fontSize: 9, color: '#12383A' },
     content: [
       { text: 'SI STIR HEBAT', fontSize: 11, bold: true, color: '#359FA0' },
@@ -35,7 +38,7 @@ export function academicPdfDefinition(rows: AcademicReportRow[], context: Academ
       { text: 'Skema sementara: nilai maksimum per asesmen dan publikasi manual guru. Persentase adalah nilai dibagi maksimum, bukan nilai rapor. Nilai kosong berarti belum dinilai.',
         fontSize: 8, margin: [0, 0, 0, 12] },
       {
-        table: { headerRows: 1, dontBreakRows: true, keepWithHeaderRows: 1, widths: [55, 110, 105, '*', 45, 45, 50], body },
+        table: { headerRows: 1, dontBreakRows: true, keepWithHeaderRows: 1, widths: [55, 110, 105, '*', 45, 45, 50, 62], body },
         layout: {
           hLineWidth: () => 0.4, vLineWidth: () => 0,
           hLineColor: () => '#CFDFDF',

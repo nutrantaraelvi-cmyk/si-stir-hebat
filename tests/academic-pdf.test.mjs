@@ -17,7 +17,7 @@ test('PDF adapter preserves text, zero and ungraded values across combined colum
   assert.equal(table.body[1][4].text, '0')
   assert.equal(table.body[1][6].text, '0%')
   assert.equal(table.body[2][4].text, 'Belum dinilai')
-  assert.equal(table.body[2][6].text, '—')
+  assert.equal(table.body[2][6].text, 'N/A')
   assert.equal(definition.footer(2, 5).columns[1].text, 'Halaman 2 / 5')
 })
 

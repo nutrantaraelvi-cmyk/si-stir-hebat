@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/check-demo-bundle.mjs",
     "preview": "vite preview",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "playwright test",
     "check:supabase": "node --env-file=.env.local scripts/check-supabase.mjs",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "check": "node scripts/check-migrations.mjs && node scripts/check-ci.mjs && npm run lint && npm run typecheck && npm test && npm run build",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc -b --pretty false"
   },

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { getDemoProfile, updateDemoProfile } from '../lib/demo-auth'
+import { getDemoProfile, isDemoModeEnabled, updateDemoProfile } from '../lib/demo-auth'
 import { supabase } from '../lib/supabase'
 import { schoolRoleLabels } from '../lib/school'
 
@@ -20,7 +20,7 @@ export function Profile({ userId }: { userId: string }) {
     setError('')
 
     const client = supabase
-    if (!client) {
+    if (isDemoModeEnabled()) {
       const demoProfile = getDemoProfile(userId)
       if (active) {
         setProfile(demoProfile ? { id: demoProfile.id, full_name: demoProfile.full_name, role: demoProfile.role } : null)
@@ -31,6 +31,10 @@ export function Profile({ userId }: { userId: string }) {
     }
 
     const load = async () => {
+      if (!client) {
+        if (active) setLoading(false)
+        return
+      }
       try {
         const { data, error: failure } = await client.from('profiles').select('id, full_name, role').eq('id', userId).maybeSingle()
         if (failure) throw failure
@@ -56,20 +60,31 @@ export function Profile({ userId }: { userId: string }) {
     setError('')
     setMessage('')
 
-    if (!supabase) {
-      updateDemoProfile(userId, fullName)
-      const nextProfile = getDemoProfile(userId)
-      if (nextProfile) {
+    if (isDemoModeEnabled()) {
+      try {
+        updateDemoProfile(userId, fullName)
+        const nextProfile = getDemoProfile(userId)
+        if (!nextProfile) {
+          setError('Nama belum berhasil disimpan. Silakan coba lagi.')
+          return
+        }
         setProfile({ id: nextProfile.id, full_name: nextProfile.full_name, role: nextProfile.role })
         setName(nextProfile.full_name)
         setMessage('Nama berhasil disimpan.')
-      }
-      setSaving(false)
+      } catch {
+        setError('Nama belum berhasil disimpan. Silakan coba lagi.')
+      } finally { setSaving(false) }
       return
     }
 
+    const client = supabase
+    if (!client) {
+      setError('Konfigurasi Supabase belum tersedia. Periksa pengaturan sekolah.')
+      setSaving(false)
+      return
+    }
     try {
-      const { data, error: failure } = await supabase.from('profiles').update({ full_name: fullName }).eq('id', userId).select('id, full_name, role').single()
+      const { data, error: failure } = await client.from('profiles').update({ full_name: fullName }).eq('id', userId).select('id, full_name, role').single()
       if (failure) throw failure
       setProfile(data)
       setName(data.full_name)

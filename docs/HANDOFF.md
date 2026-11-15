@@ -83,3 +83,12 @@ Dokumen ini adalah antrean kerja lintas agen untuk temuan audit 14 November 2026
 - Sesi dijeda atas permintaan pemilik. Suite penuh terakhir **belum** selesai: `test-results-kilo-8.log` berhenti di 36/202 (bukan 202/202). Skenario baru modul ajar lulus terarah di desktop.
 - `docs/MASTER_PROMPT_MULTI_AI.md` ditambahkan sebagai acuan agen (Qoder, Copilot, Kilo) beserta pembagian 16 lapisan.
 - Langkah berikut (sesi lanjutan): tuntaskan run penuh di port khusus saat repo tenang, perbarui `QA_COVERAGE`, lalu L08 (verifikasi `verify.yml`) dan L07/L13 (runbook).
+
+### 15 November 2026 — Copilot (lanjutan)
+
+- Selesai lokal: demo hanya aktif di DEV tanpa Supabase; build produksi memakai stub tanpa akun demo dan memeriksa bundel. UI Komunikasi mempertahankan request ID/isian ketika respons hilang, memeriksa pesan sebelum retry, serta menyediakan pagination 25 baris. Tes unit dan browser terarah ditambahkan.
+- Verifikasi `npm run check`: lulus, 116 tes unit/database, lint, typecheck, gerbang migration/CI, build dan pemeriksaan bundel. Dua tes Komunikasi lulus desktop dan ponsel.
+- Suite browser penuh: 212/216; 4 gagal saat teardown trace dengan `ENOENT`, lalu 4/4 lulus saat diulang terarah. Tidak mengklaim run penuh bersih.
+- Tidak ada migration, data hosted, akun, push, atau deployment yang diubah. Keputusan akses Storage/draf, retensi anak, pengawasan/retensi Komunikasi dan konfirmasi akhir migration tetap menunggu pemilik.
+- Worktree tetap bercampur di `ai/qoder-docs-sync` dengan perubahan staged, unstaged, dan untracked dari beberapa pekerjaan; jangan commit atau bersihkan sebelum pemilik perubahan mengonfirmasi pemisahan.
+- Berikutnya: tinjau/pecah worktree; selesaikan keputusan RBAC dan retensi; lalu jalankan UAT serta smoke produksi dengan akses pemilik. Administrasi dokumen tetap belum dibuat.

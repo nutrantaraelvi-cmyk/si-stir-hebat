@@ -848,6 +848,81 @@ test('migrations and database permissions', async t => {
     assert.equal((await db.query('select * from public.academic_supervisions')).rows.length, 0)
     assert.equal((await db.query('select * from storage.objects')).rows.length, 0)
   })
+  await t.test('supervision evidence storage policy separates principal, owner teacher and outsiders', async () => {
+    const otherUserId = '10000000-0000-4000-8000-000000000007'
+    await db.exec('reset role')
+    await db.query('delete from storage.objects')
+    await db.query('insert into auth.users (id) values ($1)', [otherUserId])
+    await db.query("update public.profiles set role = 'teacher' where id = $1", [otherUserId])
+    await db.query(
+      "insert into public.teachers (code,name,profile_id) values ('TEST_3','Data Contoh Guru Lain',$1)",
+      [otherUserId],
+    )
+    await as('administrator')
+
+    const asUser = async (id, role = 'authenticated') => {
+      await db.exec('reset role')
+      await db.query("select set_config('request.jwt.claim.sub', $1, false)", [id])
+      await db.exec(`set role ${role}`)
+    }
+    const insertObject = async (name, id) => {
+      await asUser(id)
+      return db.query("insert into storage.objects (bucket_id,name) values ('supervision-evidence',$1)", [name])
+    }
+    const selectObjects = async (id) => {
+      await asUser(id)
+      return db.query('select name from storage.objects order by name')
+    }
+
+    await as('principal')
+    const { rows: [session] } = await db.query(
+      "insert into public.academic_supervisions (teacher_id,scheduled_on,focus) values ($1,$2,'Data Contoh') returning id",
+      [teacherOne, today],
+    )
+    const update = values => db.query(`update public.academic_supervisions set ${values} where id=$1 returning stage`, [session.id])
+    await update("stage=2, preparation='Persiapan'")
+    await update("stage=3, planning_score=2, instruction_score=3, assessment_score=4, observation_notes='Observasi'")
+    await update("stage=4, reflection='Refleksi', feedback='Umpan balik', follow_up_plan='Perbaikan', target_on=scheduled_on")
+
+    const objectName = `${session.id}/00000000-0000-0000-0000-000000000002-bukti.pdf`
+    const malformed = [
+      'tanpa-folder.pdf',
+      'bukan-uuid/00000000-0000-0000-0000-000000000002-bukti.pdf',
+      `${session.id}/tanpa-uuid-bukti.pdf`,
+      `${session.id}/00000000-0000-0000-0000-000000000002/extra-bukti.pdf`,
+      `${session.id}/00000000-0000-0000-0000-000000000002`,
+    ]
+    for (const name of malformed) {
+      await assert.rejects(insertObject(name, ids.principal), permissionDenied, name)
+    }
+    assert.equal((await insertObject(objectName, ids.principal)).rowCount, 1)
+
+    await asUser(ids.principal)
+    assert.equal((await db.query('delete from storage.objects returning name')).rowCount, 1)
+    assert.equal((await insertObject(objectName, ids.principal)).rowCount, 1)
+
+    for (const [role, id] of [['teacher', ids.teacher], ['teacher', otherUserId], ['student', ids.student], ['parent', ids.parent], ['pending', ids.pending]]) {
+      assert.deepEqual((await selectObjects(id)).rows, [], `${role} tidak boleh membaca bukti sebelum terbit`)
+    }
+    await asUser('', 'anon')
+    assert.deepEqual((await db.query('select name from storage.objects')).rows, [], 'anon tidak boleh membaca bukti')
+
+    await as('principal')
+    await update("follow_up_status='complete', follow_up_evaluation='Evaluasi'")
+    await update('published_at=now()')
+    await assert.rejects(insertObject(`${session.id}/00000000-0000-0000-0000-000000000003-baru.pdf`, ids.principal), permissionDenied)
+    await asUser(ids.principal)
+    assert.equal((await db.query('delete from storage.objects returning name')).rowCount, 0)
+    assert.deepEqual((await db.query('select name from storage.objects')).rows, [{ name: objectName }])
+
+    assert.deepEqual((await selectObjects(ids.teacher)).rows, [{ name: objectName }])
+    for (const [role, id] of [['teacher', otherUserId], ['student', ids.student], ['parent', ids.parent], ['pending', ids.pending]]) {
+      assert.deepEqual((await selectObjects(id)).rows, [], `${role} tidak boleh membaca bukti setelah terbit`)
+    }
+
+    await db.exec('reset role')
+    await db.query('delete from storage.objects')
+  })
   await t.test('teaching modules enforce author edits, principal review, and immutable status audit', async () => {
     await as('teacher')
     const { rows: [module] } = await db.query(

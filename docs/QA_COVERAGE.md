@@ -1,8 +1,8 @@
 # Cakupan Uji Otomatis
 
-Status: audit 15 November 2026 (Kilo/QA)
-Sumber: `tests/browser/app.spec.ts` (212 skenario = 106 kasus × desktop + ponsel) dan `tests/*.test.mjs` (114 tes unit/database).
-Bukti run penuh terakhir: `docs/qa-logs/test-browser-2026-11-15-r1.log` (212/212 lulus, 5,3 menit) dan `docs/qa-logs/check-2026-11-15-r1.log` (`npm run check` lulus, 114/114 tes unit).
+Status: verifikasi lokal 15 November 2026
+Sumber: `tests/browser/app.spec.ts` dan `tests/browser/communication.spec.ts` (216 skenario termasuk desktop + ponsel); `tests/*.test.mjs` (116 tes unit/database).
+Bukti terbaru pada sesi ini: `npm run check` lulus (116 tes unit/database, lint, typecheck, gerbang migration/CI, build, pemeriksaan bundel). Run browser penuh 212/216; empat kegagalan adalah `ENOENT` saat penutupan artefak trace. Keempatnya lulus saat diulang terarah; dua tes Komunikasi lulus di desktop dan ponsel.
 
 Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponsel dengan API tiruan. Semua modul di bawah **belum** diuji dengan akun sekolah nyata; lihat [UAT_CHECKLIST.md](UAT_CHECKLIST.md).
 
@@ -25,7 +25,7 @@ Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponse
 | Jadwal | admin buat/ubah/konflik, usulan guru, keputusan admin (termasuk revisi usang), riwayat kepala sekolah, filter kelas | penarikan usulan guru, pemecahan periode |
 | Supervisi | jadwal→observasi, simpan otomatis + konflik, unggah bukti privat, laporan + ekspor, penolakan siswa/wali/pending | instrumen resmi, tanda tangan digital |
 | Tautan akun & wali | admin meninjau tautan, portal wali & pencabutan relasi, penolakan wali pada formulir tautan, penolakan guru/siswa/wali/pending | verifikasi identitas manual |
-| Komunikasi (baru) | belum ada tes; UI `/komunikasi` sedang dikerjakan | seluruh alur UI (menunggu U1) |
+| Komunikasi | 2 skenario UI: respons insert hilang dan konfirmasi pesan; pagination melewati batas 25 baris tanpa celah | pengujian dengan akun sekolah nyata, supervisi/retensi/notifikasi sesuai keputusan pemilik |
 | Administrasi dokumen | belum ada implementasi | seluruh modul (menunggu C2/U2) |
 
 ## Uji non-browser
@@ -41,5 +41,5 @@ Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponse
 ## Batas
 
 - Tes browser memakai API tiruan (`page.route`) dan sesi sintetis; bukan bukti RLS hosted.
-- Angka 202 adalah jumlah skenario terdaftar/tereksekusi pada 15 November 2026 (log tersimpan); jalankan ulang setelah modul baru masuk.
+- Run penuh terbaru tidak sepenuhnya bersih akibat empat kegagalan teardown artefak; angka pass tidak boleh dilaporkan sebagai 216/216.
 - Kesenjangan yang butuh keputusan produk (kehadiran guru, komunikasi, dokumen) tercatat di [DECISIONS.md](DECISIONS.md) dan [HANDOFF.md](HANDOFF.md).

@@ -1,3 +1,4 @@
+import { statusKetuntasan } from '../../lib/kkm.ts'
 import { assessmentTypes } from './assessment-model.ts'
 
 export type ReportAssessment = {
@@ -11,6 +12,7 @@ export type AcademicReportRow = {
 export type Choice = { id: string; label: string }
 export const reportLimit = 500
 export const academicHeaders = ['Tanggal', 'Kelas', 'Mata pelajaran', 'Asesmen', 'Jenis', 'Publikasi', 'Kode siswa', 'Nama pada asesmen', 'Nilai', 'Nilai maksimum', 'Persentase maksimum']
+export const academicExportHeaders = [...academicHeaders, 'Status KKM']
 
 export function validateAcademicRange(start: string, end: string) {
   const valid = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value
@@ -39,6 +41,11 @@ export function academicCells(row: AcademicReportRow): (string | number)[] {
   const a = row.assessments
   return [a.held_on, a.class_name, a.subject_name, a.title, assessmentTypes[a.assessment_type], a.status === 'published' ? 'Terbit' : 'Draf',
     row.student_code, row.student_name, row.score ?? '', a.maximum_score, scorePercent(row.score, a.maximum_score) ?? '']
+}
+
+export function academicExportCells(row: AcademicReportRow): (string | number)[] {
+  const status = statusKetuntasan(row.score, row.assessments.maximum_score)
+  return [...academicCells(row), status === 'tuntas' ? 'Tuntas' : status === 'belum_tuntas' ? 'Belum tuntas' : 'Belum dinilai']
 }
 
 export function developmentPoints(rows: AcademicReportRow[], student: string, subject: string) {

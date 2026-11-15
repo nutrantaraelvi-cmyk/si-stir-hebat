@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const metrics = [
-  { table: 'academic_supervisions', field: 'stage', value: 1, label: 'Pra-observasi', href: '/supervisi', tone: 'supervision' },
-  { table: 'academic_supervisions', field: 'stage', value: 2, label: 'Observasi', href: '/supervisi', tone: 'supervision' },
-  { table: 'academic_supervisions', field: 'stage', value: 3, label: 'Pasca-observasi', href: '/supervisi', tone: 'supervision' },
-  { table: 'academic_supervisions', field: 'stage', value: 4, label: 'Tindak lanjut', href: '/supervisi', tone: 'supervision' },
-  { table: 'teaching_modules', field: 'status', value: 'submitted', label: 'Perlu ditinjau', href: '/modul-ajar', tone: 'submitted' },
-  { table: 'teaching_modules', field: 'status', value: 'returned', label: 'Dikembalikan', href: '/modul-ajar', tone: 'returned' },
+  { table: 'academic_supervisions', field: 'stage', value: 1, label: 'Pra-observasi', tone: 'supervision' },
+  { table: 'academic_supervisions', field: 'stage', value: 2, label: 'Observasi', tone: 'supervision' },
+  { table: 'academic_supervisions', field: 'stage', value: 3, label: 'Pasca-observasi', tone: 'supervision' },
+  { table: 'academic_supervisions', field: 'stage', value: 4, label: 'Tindak lanjut', tone: 'supervision' },
+  { table: 'teaching_modules', field: 'status', value: 'submitted', label: 'Perlu ditinjau', tone: 'submitted' },
+  { table: 'teaching_modules', field: 'status', value: 'returned', label: 'Dikembalikan', tone: 'returned' },
 ] as const
 
 export function PrincipalOverview() {
@@ -45,11 +45,11 @@ export function PrincipalOverview() {
     <div className="principal-metrics">
       {metrics.map((metric, index) => <article className={`principal-metric ${metric.tone}`} key={`${metric.table}-${metric.value}`} aria-label={metric.label}>
         <span>{metric.label}</span>
-        <strong>{counts[index] ?? '—'}</strong>
-        <Link to={metric.href}>Buka {metric.table === 'academic_supervisions' ? 'supervisi' : 'modul ajar'}</Link>
+        <strong>{counts[index] ?? 'N/A'}</strong>
       </article>)}
     </div>
-    {!loading && failed && <p className="principal-error" role="alert">Sebagian ringkasan belum dapat dimuat. Angka yang tidak tersedia ditandai —.</p>}
+    {!loading && failed && <p className="principal-error" role="alert">Sebagian ringkasan belum dapat dimuat. Angka yang tidak tersedia ditandai N/A.</p>}
+    <div className="principal-links"><Link to="/supervisi">Buka supervisi</Link><Link to="/modul-ajar">Buka modul ajar</Link></div>
     <button className="principal-refresh" type="button" disabled={loading} onClick={() => setAttempt(value => value + 1)}>Muat ulang ringkasan kepala sekolah</button>
   </section>
 }

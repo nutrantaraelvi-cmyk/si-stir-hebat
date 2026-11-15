@@ -2,15 +2,23 @@
 
 Pembaruan terakhir: 15 November 2026. Workspace: `D:/code/SI_STIR_HEBAT_Starter/si-stir-hebat`.
 
-Status ringkas (baseline 15 November 2026):
+Status ringkas (verifikasi lokal 15 November 2026):
 
-- **Tes:** 109 tes unit/database; lint, typecheck, dan build lulus pada run terakhir yang tercatat.
-- **Browser:** 194 skenario menurut laporan Kilo, memakai API tiruan. Ini bukan UAT akun sekolah dan tidak dijalankan ulang untuk tugas dokumentasi ini. Run 202/202 yang lebih baru dicatat terpisah di papan/`docs/qa-logs/` dan belum menggantikan baseline ini.
+- **Tes:** `npm run check` lulus dengan 116 tes unit/database, lint, typecheck, gerbang migration/CI, build, dan pemeriksaan bundel produksi.
+- **Browser:** 216 skenario terdaftar. Run penuh terakhir: 212 lulus dan 4 gagal saat Playwright menutup konteks karena artefak trace hilang (`ENOENT`); empat skenario itu lulus saat diulang terarah. Dua skenario Komunikasi lulus pada desktop dan ponsel. Suite penuh belum menghasilkan run bersih.
 - **Migration:** 25 berkas lokal; 23 tercatat hosted. `20261114000139_student_habits` dan `20261114083827_komunikasi` belum hosted; setelah disetujui, terapkan berurutan dan jangan melompati yang lebih awal.
 - **Keputusan:** D1–D4 tercatat di `docs/DECISIONS.md`. D4 retensi data anak masih **BELUM DIPUTUSKAN**. Matriks RBAC resmi masih draf di `docs/RBAC_RESMI_DRAFT.md`.
 - **Belum terverifikasi:** UAT akun sekolah, email/pemulihan nyata, CI hosted, restore backup, dan kesiapan operasional. Jangan menyatakan “aman” atau “siap operasional” tanpa bukti baru.
 
 Catatan: entri bertanggal di bawah adalah riwayat. Angka pada entri lama adalah angka run saat itu; angka tersebut tidak otomatis menggantikan baseline di atas.
+
+## Pengamanan bundel demo dan Komunikasi — 15 November 2026
+
+Mode demo kini hanya aktif ketika Vite menyatakan `DEV === true` dan Supabase tidak terkonfigurasi. Build produksi mengganti modul demo dengan implementasi kosong dan memeriksa semua berkas JavaScript terbangun agar penanda akun demo tidak ikut terbundel. `npm run check` lulus; 7 berkas JavaScript diperiksa tanpa temuan akun demo.
+
+UI Komunikasi kini mempertahankan ID dan isi permintaan saat hasil kirim belum diketahui, memeriksa ID pesan sebelum mengirim ulang, serta memverifikasi pesan yang tersimpan setelah galat jaringan. Daftar pesan memakai pagination 25 baris dengan sentinel agar tidak melewatkan pesan di batas halaman. Tes unit dan browser menutup alur respons hilang serta perpindahan halaman.
+
+Batas verifikasi: suite penuh browser berakhir 212/216 karena empat galat penutupan trace, bukan assertion aplikasi; empat skenario lulus ketika diulang sendiri. Tes memakai API tiruan. Migration komunikasi belum hosted, dan UAT sekolah nyata belum dilakukan.
 
 ## Perbaikan demo forgot-password — 15 November 2026
 

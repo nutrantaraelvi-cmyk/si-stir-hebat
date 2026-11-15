@@ -140,7 +140,7 @@ function MasterManager({ userId, kind }: { userId: string; kind: MasterKind }) {
       return target ? referenceLabel(target, reference) : 'Data terkait tidak tersedia'
     }
     if (typeof value === 'boolean') return value ? 'Aktif' : 'Nonaktif'
-    return String(value ?? '') || '—'
+    return String(value ?? '') || '-'
   }
 
   function referenceLabel(row: MasterRow, table: ReferenceTable) {
@@ -182,7 +182,7 @@ function MasterManager({ userId, kind }: { userId: string; kind: MasterKind }) {
         {confirming ? <div className="confirm-panel" role="alertdialog" aria-modal="false" aria-labelledby="confirm-period"><h3 id="confirm-period">{referenceTables.length ? 'Simpan relasi ini?' : 'Aktifkan periode ini?'}</h3><p>{referenceTables.length ? 'Pastikan pilihan dan status aktif benar. Relasi aktif dapat memengaruhi akses guru ke data siswa.' : 'Pastikan periode lama sudah dinonaktifkan dan kalender telah diperiksa.'}</p><div className="actions"><button className="button" type="button" disabled={saving} onClick={() => void persist()}>{saving ? 'Menyimpan…' : referenceTables.length ? 'Ya, simpan relasi' : 'Ya, aktifkan'}</button><button className="button secondary" type="button" disabled={saving} onClick={() => setConfirming(false)}>Kembali periksa</button></div></div>
           : <div className="actions"><button className="button" type="submit" disabled={saving}>{saving ? 'Menyimpan…' : 'Simpan data'}</button><button className="button secondary" type="button" disabled={saving} onClick={() => setEditing(null)}>Batal</button></div>}
       </form>}
-      {!rows.length ? <EmptyState>Belum ada data {definition.singular} yang dapat ditampilkan untuk akun Anda.</EmptyState> : <div className="table-scroll"><table><caption>{definition.label}</caption><thead><tr>{definition.fields.map(field => <th scope="col" key={field.key}>{field.label}</th>)}{canWrite && <th scope="col">Tindakan</th>}</tr></thead><tbody>{rows.map(row => <tr key={String(row.id)}>{definition.fields.map(field => <td key={field.key}>{cell(row, field.key)}</td>)}{canWrite && <td><button className="text-button" disabled={Boolean(editing) || saving} onClick={() => openEditor(row)}>Ubah<span className="sr-only"> {rowTitle(row)}</span></button></td>}</tr>)}</tbody></table></div>}
+      {!rows.length ? <EmptyState>Belum ada data {definition.singular} yang dapat ditampilkan untuk akun Anda.</EmptyState> : <div className="table-scroll" role="region" aria-label={`Tabel ${definition.label} yang dapat digeser`} tabIndex={0}><table><caption>{definition.label}</caption><thead><tr>{definition.fields.map(field => <th scope="col" key={field.key}>{field.label}</th>)}{canWrite && <th scope="col">Tindakan</th>}</tr></thead><tbody>{rows.map(row => <tr key={String(row.id)}>{definition.fields.map(field => <td key={field.key}>{cell(row, field.key)}</td>)}{canWrite && <td><button className="text-button" disabled={Boolean(editing) || saving} onClick={() => openEditor(row)}>Ubah<span className="sr-only"> {rowTitle(row)}</span></button></td>}</tr>)}</tbody></table></div>}
       <nav className="pagination" aria-label="Halaman data sekolah"><button disabled={page === 0 || Boolean(editing)} onClick={() => setPage(value => value - 1)}>Sebelumnya</button><span>Halaman {page + 1}</span><button disabled={!hasNext || Boolean(editing)} onClick={() => setPage(value => value + 1)}>Berikutnya</button></nav>
     </>}
   </section>

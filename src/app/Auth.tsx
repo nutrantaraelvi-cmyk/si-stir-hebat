@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { Navigate } from 'react-router-dom'
-import { getDemoSession } from '../lib/demo-auth'
+import { getDemoSession, isDemoModeEnabled } from '../lib/demo-auth'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext<{ session: Session | null; loading: boolean; error: string }>({ session: null, loading: true, error: '' })
@@ -11,13 +11,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   useEffect(() => {
-    if (!supabase) {
+    const client = supabase
+    if (isDemoModeEnabled()) {
       setSession(getDemoSession())
       setLoading(false)
       return
     }
 
-    const client = supabase
+    if (!client) {
+      setSession(null)
+      setLoading(false)
+      return
+    }
+
     let active = true
     let changed = false
     const { data: { subscription } } = client.auth.onAuthStateChange((_event, next) => {

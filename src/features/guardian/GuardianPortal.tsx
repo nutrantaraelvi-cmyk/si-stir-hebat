@@ -68,7 +68,7 @@ function GuardianAttendance({ userId }: { userId: string }) {
         <h2>{child.name}</h2>
         {child.attendance.length === 0
           ? <EmptyState>Belum ada catatan kehadiran.</EmptyState>
-          : <div className="table-scroll">
+          : <div className="table-scroll" role="region" aria-label="Tabel kehadiran anak yang dapat digeser" tabIndex={0}>
             <table>
               <caption>Hingga 30 catatan kehadiran terbaru</caption>
               <thead><tr><th scope="col">Tanggal</th><th scope="col">Status</th></tr></thead>

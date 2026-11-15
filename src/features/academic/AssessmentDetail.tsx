@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
+import { labelKetuntasan } from '../../lib/kkm.ts'
 import { ErrorNotice, LoadingState, EmptyState } from '../../components/ui/Feedback'
 import { assessmentFields, assessmentTypes, parseScore, resultFields, type Assessment, type AssessmentResult } from './assessment-model'
 import { AssessmentHistory } from './AssessmentHistory'
@@ -93,7 +94,7 @@ export function AssessmentDetail({ id, role, onBack }: { id: string; role: strin
       : !assessment ? <EmptyState>Asesmen tidak tersedia untuk akun ini.</EmptyState> : <>
         <h1>{assessment.title}</h1>
         <p>{assessment.class_name} · {assessment.subject_name} · {assessmentTypes[assessment.assessment_type]} · {assessment.held_on}</p>
-        <p>Nilai maksimum {assessment.maximum_score} · {assessment.status === 'draft' ? 'Draf — belum dibagikan' : 'Terbit'}</p>
+        <p>Nilai maksimum {assessment.maximum_score} · {assessment.status === 'draft' ? 'Draf, belum dibagikan' : 'Terbit'}</p>
         {staff && <p>{assessment.graded_count} dari {assessment.student_count} peserta sudah dinilai.</p>}
         {message && <p role="status">{message}</p>}
         {error && <ErrorNotice onRetry={reload}>{error}</ErrorNotice>}
@@ -120,7 +121,7 @@ export function AssessmentDetail({ id, role, onBack }: { id: string; role: strin
         {!rows.length && <EmptyState>Belum ada hasil yang dapat ditampilkan pada halaman ini.</EmptyState>}
         {rows.slice(0, 20).map(row => <article key={row.id} className="announcement-editor">
           <h2>{row.student_name}</h2>
-          <p>{row.student_code} · {row.score === null ? 'Belum dinilai' : `Nilai ${row.score} / ${assessment.maximum_score}`}</p>
+          <p>{row.student_code} · {row.score === null ? 'Belum dinilai' : `Nilai ${row.score} / ${assessment.maximum_score} · ${labelKetuntasan(row.score, assessment.maximum_score)}`}</p>
           {row.feedback && <p className="announcement-body">{row.feedback}</p>}
           {teacher && !formOpen && <button className="button secondary" type="button" onClick={() => { setEditing(row); setMessage('') }}>
             {assessment.status === 'published' ? 'Koreksi nilai' : 'Isi nilai'}

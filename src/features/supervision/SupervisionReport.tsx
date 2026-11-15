@@ -87,12 +87,12 @@ export function SupervisionReport() {
       <button className="button secondary" type="button" onClick={() => downloadCsv(
         `supervisi-${request.start}-${request.end}.csv`, createCsv(headers, result.map(cells)),
       )}>Unduh CSV laporan</button>
-      <div className="table-scroll">
+      <div className="table-scroll" role="region" aria-label="Tabel laporan supervisi yang dapat digeser" tabIndex={0}>
         <table>
           <caption>Jadwal dan progres supervisi</caption>
           <thead><tr>{headers.map(label => <th key={label} scope="col">{label}</th>)}</tr></thead>
           <tbody>{result.map(row => <tr key={row.id}>
-            {cells(row).map((value, index) => <td key={headers[index]}>{value || '—'}</td>)}
+            {cells(row).map((value, index) => <td key={headers[index]}>{value || '-'}</td>)}
           </tr>)}</tbody>
         </table>
       </div>

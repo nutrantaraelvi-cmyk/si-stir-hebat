@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { canReadMasterData } from '../features/school/master'
 import { canReadAnnouncements } from '../lib/announcements'
-import { getDemoProfile } from '../lib/demo-auth'
-import { canReadAttendance, canReadJournals } from '../lib/school'
+import { getDemoProfile, isDemoModeEnabled } from '../lib/demo-auth'
+import { canAccessCommunication, canReadAssessments, canReadAttendance, canReadJournals, canReadLearning, canReadSchedules } from '../lib/school'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './Auth'
 
@@ -12,8 +12,12 @@ function SchoolNavigation({ userId }: { userId: string }) {
 
   useEffect(() => {
     const client = supabase
-    if (!client) {
+    if (isDemoModeEnabled()) {
       setRole(getDemoProfile(userId)?.role ?? null)
+      return
+    }
+    if (!client) {
+      setRole(null)
       return
     }
 
@@ -32,18 +36,19 @@ function SchoolNavigation({ userId }: { userId: string }) {
 
   return <>
     <NavLink to="/dashboard">Dashboard</NavLink>
-    {supabase && canReadMasterData('school_settings', role) && <NavLink to="/sekolah">Data sekolah</NavLink>}
-    {supabase && canReadAttendance(role) && <NavLink to="/absensi">Absensi</NavLink>}
-    {supabase && canReadJournals(role) && <NavLink to="/jurnal">Jurnal</NavLink>}
-    {supabase && canReadJournals(role) && <NavLink to="/modul-ajar">Modul Ajar</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/materi">Materi Kelas</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/tugas">Tugas Kelas</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/asesmen">Asesmen</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/jadwal">Jadwal</NavLink>}
-    {supabase && (role === 'principal' || role === 'teacher') && <NavLink to="/supervisi">Supervisi</NavLink>}
+    {canReadMasterData('school_settings', role) && <NavLink to="/sekolah">Data sekolah</NavLink>}
+    {canReadAttendance(role) && <NavLink to="/absensi">Absensi</NavLink>}
+    {canReadJournals(role) && <NavLink to="/jurnal">Jurnal</NavLink>}
+    {canReadJournals(role) && <NavLink to="/modul-ajar">Modul Ajar</NavLink>}
+    {canReadLearning(role) && <NavLink to="/materi">Materi Kelas</NavLink>}
+    {canReadLearning(role) && <NavLink to="/tugas">Tugas Kelas</NavLink>}
+    {canReadAssessments(role) && <NavLink to="/asesmen">Asesmen</NavLink>}
+    {canReadSchedules(role) && <NavLink to="/jadwal">Jadwal</NavLink>}
+    {canAccessCommunication(role) && <NavLink to="/komunikasi">Komunikasi</NavLink>}
+    {(role === 'principal' || role === 'teacher') && <NavLink to="/supervisi">Supervisi</NavLink>}
     {canReadAnnouncements(role) && <NavLink to="/pengumuman">Pengumuman</NavLink>}
-    {supabase && role === 'administrator' && <NavLink to="/tautan-akun">Tautan akun</NavLink>}
-    {supabase && role === 'parent' && <NavLink to="/ruang-orang-tua">Ruang Orang Tua</NavLink>}
+    {role === 'administrator' && <NavLink to="/tautan-akun">Tautan akun</NavLink>}
+    {role === 'parent' && <NavLink to="/ruang-orang-tua">Ruang Orang Tua</NavLink>}
     <NavLink to="/akun">Akun</NavLink>
   </>
 }

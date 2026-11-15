@@ -7,6 +7,22 @@ export function canReadJournals(role: string | null) {
   return role === 'administrator' || role === 'principal' || role === 'teacher'
 }
 
+export function canReadLearning(role: string | null) {
+  return role === 'teacher' || role === 'student' || role === 'parent'
+}
+
+export function canReadAssessments(role: string | null) {
+  return role === 'teacher' || role === 'student' || role === 'parent'
+}
+
+export function canReadSchedules(role: string | null) {
+  return role === 'administrator' || role === 'principal' || role === 'teacher' || role === 'student' || role === 'parent'
+}
+
 export function canReadAttendance(role: string | null) {
   return canReadJournals(role) || role === 'student'
+}
+
+export function canAccessCommunication(role: string | null) {
+  return role === 'teacher' || role === 'parent'
 }

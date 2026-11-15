@@ -29,6 +29,9 @@ export default defineConfig(({ command, mode }) => {
   }
   return {
   plugins: [academicPdfFonts(), react()],
+  optimizeDeps: {
+    include: ['read-excel-file/universal', 'unzipit', 'write-excel-file/browser'],
+  },
   server: {
     host: '127.0.0.1',
     port: 5173,

@@ -1,7 +1,7 @@
 # Cakupan Uji Otomatis
 
-Status: audit 14 November 2026 (Kilo/QA)
-Sumber: `tests/browser/app.spec.ts` (200 skenario = 100 kasus × desktop + ponsel) dan `tests/*.test.mjs` (109 tes unit/database).
+Status: audit 15 November 2026 (Sixth/QA)
+Sumber: `tests/browser/app.spec.ts` (202 skenario = 101 kasus × desktop + ponsel) dan `tests/*.test.mjs` (109 tes unit/database).
 
 Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponsel dengan API tiruan. Semua modul di bawah **belum** diuji dengan akun sekolah nyata; lihat [UAT_CHECKLIST.md](UAT_CHECKLIST.md).
 
@@ -37,8 +37,14 @@ Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponse
 | Database (RLS, trigger, grant kolom) | `tests/database.test.mjs`, `tests/communication.test.mjs` |
 | Autentikasi demo | `tests/demo-auth.test.mjs` |
 
+## Verifikasi
+
+- 15 November 2026: Node v24.22.3, `PLAYWRIGHT_PORT=5199`, `PLAYWRIGHT_CHANNEL=chromium`, `202/202` lulus dari cache Vite kosong. Log: [`qa-logs/test-browser-2026-11-15-202-node24-port5199.log`](qa-logs/test-browser-2026-11-15-202-node24-port5199.log).
+- `npm run check` lulus lint, TypeScript, 109 tes unit/database, dan build dengan konfigurasi Supabase uji.
+- Impor XLSX distabilkan dengan memuat awal dependensi worker (`read-excel-file/universal`, `unzipit`) agar Vite tidak melakukan reload halaman saat file pertama dipilih.
+
 ## Batas
 
 - Tes browser memakai API tiruan (`page.route`) dan sesi sintetis; bukan bukti RLS hosted.
-- Angka 200 adalah jumlah skenario terdaftar/tereksekusi pada 14 November 2026; jalankan ulang setelah modul baru masuk.
+- Angka 202 adalah jumlah skenario terdaftar/tereksekusi pada 15 November 2026; jalankan ulang setelah modul baru masuk.
 - Kesenjangan yang butuh keputusan produk (kehadiran guru, komunikasi, dokumen) tercatat di [DECISIONS.md](DECISIONS.md) dan [HANDOFF.md](HANDOFF.md).

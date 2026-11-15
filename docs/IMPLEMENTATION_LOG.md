@@ -338,3 +338,30 @@ Build hanya menyertakan Roboto normal dan tebal untuk rekap akademik, tetap dimu
 ## Fondasi komunikasi lokal - 14 November 2026
 
 Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan relasi aktif, serta pesan append-only. Tes PGlite mencakup peran dan pencabutan; npm run check Node 24 lulus 108 tes, lint, tipe, build. Migration belum diterapkan: riwayat hosted belum mencatat student_habits yang lebih awal. UI, advisor dan UAT belum dilakukan.
+
+## Stabilisasi suite browser dan checklist UAT - 14 November 2026 (Kilo/QA)
+
+- Selector alert dipersempit ke `getByRole('alert').filter({ hasText })` di seluruh suite agar tidak ambigu ketika beberapa `alert` tampil bersamaan.
+- Uji impor XLSX desktop memakai `setInputFiles` langsung (bukan dialog file natif) dan batas 15 detik untuk preview yang diproses di worker.
+- `vite.config.ts` menonaktifkan watcher HMR hanya ketika `VITE_TEST_NO_WATCH=1` (disetel oleh `playwright.config.ts`); ini menghentikan crash `EBUSY` yang sebelumnya mematikan server tes dan memicu `ERR_CONNECTION_REFUSED` massal.
+- Ditambahkan 7 skenario penolakan lintas peran: `/tautan-akun` untuk guru/siswa/wali/pending dan `/supervisi` untuk siswa/wali/pending; dipastikan pesan penolakan tampil dan tidak ada tombol aksi.
+- `docs/UAT_CHECKLIST.md` dibuat sebagai daftar periksa siap isi per peran (langkah, hasil diharapkan, L/G, catatan), melengkapi `PANDUAN_UAT.md`.
+- Verifikasi: tiga run browser penuh berturut-turut 194/194 lulus (desktop + ponsel) dengan API tiruan; `npm run check` Node 24 lulus 109 tes, lint, typecheck, build (peringatan chunk PDF tetap).
+- Batas: belum diuji dengan akun sekolah nyata, email pemulihan, maupun UI komunikasi (belum ada). Tidak ada perubahan migration atau data hosted.
+
+## Cakupan modul materi/tugas - 14 November 2026 (Kilo/QA)
+
+- Menambah dua skenario browser: siswa membaca materi terbit tanpa kontrol penulisan, dan guru membuat draf tugas dengan penugasan, judul, instruksi, serta tenggat.
+- Memastikan muatan POST memuat `kind: task`, `assignment_id`, `due_on`, dan pesan "Draf tugas tersimpan." setelah respons terkonfirmasi.
+- Verifikasi: `npm run lint` bersih; suite penuh 198/198 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.
+
+## Cakupan modul ajar - 14 November 2026 (Kilo/QA)
+
+- Menambah skenario guru menyimpan draf modul ajar: pemilihan penugasan aktif, judul, tujuan, dan kegiatan; memastikan muatan POST serta pesan "Modul ajar tersimpan." dan modul tampil di daftar.
+- Verifikasi: `npm run lint` bersih; suite penuh 200/200 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.
+
+## Pengajuan modul ajar dan matriks cakupan - 14 November 2026 (Kilo/QA)
+
+- Menambah skenario guru mengajukan draf modul: PATCH `status: submitted` dengan revisi, pesan "Status modul diperbarui." dan status daftar menjadi "Diajukan".
+- Menambah `docs/QA_COVERAGE.md`: matriks modul terhadap skenario yang sudah ada dan yang belum tercakup.
+- Verifikasi: skenario baru lulus terarah di desktop (1/1). Suite penuh **belum** diverifikasi ulang: run terakhir (log `test-results-kilo-8.log`) baru mencapai 36/202 saat sesi dijeda. `npm run lint` bersih. UAT akun sekolah tetap terbuka.

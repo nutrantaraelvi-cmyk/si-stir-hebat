@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import { resolve } from 'node:path'
 import { getPublicSupabaseConfig } from './src/lib/config'
 
 const require = createRequire(import.meta.url)
@@ -29,6 +30,9 @@ export default defineConfig(({ command, mode }) => {
   }
   return {
   plugins: [academicPdfFonts(), react()],
+  resolve: {
+    alias: command === 'build' ? [{ find: './demo-accounts.ts', replacement: resolve('src/lib/demo-accounts.prod.ts') }] : [],
+  },
   server: { host: '127.0.0.1', port: 5173, strictPort: true },
   preview: { host: '127.0.0.1', port: 4173, strictPort: true },
   build: {

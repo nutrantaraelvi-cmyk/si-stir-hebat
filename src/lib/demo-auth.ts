@@ -1,4 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
+import { getPublicSupabaseConfig } from './config.ts'
+import { DEMO_ACCOUNTS } from './demo-accounts.ts'
 
 export type DemoRole = 'administrator' | 'principal' | 'teacher' | 'student' | 'parent'
 
@@ -10,18 +12,21 @@ export type DemoAccount = {
   role: DemoRole
 }
 
-export const DEMO_ACCOUNTS: DemoAccount[] = [
-  { id: 'demo-admin', email: 'admin@sdn03.sch.id', password: 'admin123', full_name: 'Admin Sekolah', role: 'administrator' },
-  { id: 'demo-principal', email: 'kepsek@sdn03.sch.id', password: 'kepsek123', full_name: 'Kepala Sekolah', role: 'principal' },
-  { id: 'demo-teacher', email: 'guru@sdn03.sch.id', password: 'guru123', full_name: 'Budi Santoso', role: 'teacher' },
-  { id: 'demo-student', email: 'murid@sdn03.sch.id', password: 'murid123', full_name: 'Nia Ayu', role: 'student' },
-  { id: 'demo-parent', email: 'ortu@sdn03.sch.id', password: 'ortu123', full_name: 'Sari Wulandari', role: 'parent' },
-]
+const viteEnv = (import.meta as ImportMeta & { env?: { DEV?: boolean; VITE_SUPABASE_URL?: string; VITE_SUPABASE_PUBLISHABLE_KEY?: string } }).env
+const isDevRuntime = viteEnv ? viteEnv.DEV === true : true
+const hasSupabaseConfig = getPublicSupabaseConfig(viteEnv?.VITE_SUPABASE_URL, viteEnv?.VITE_SUPABASE_PUBLISHABLE_KEY) !== null
+
+export { DEMO_ACCOUNTS }
 
 const SESSION_KEY = 'si-stir-hebat-demo-session'
 const PROFILE_KEY = 'si-stir-hebat-demo-profiles'
 
+export function isDemoModeEnabled() {
+  return !hasSupabaseConfig && isDevRuntime
+}
+
 function readProfiles(): DemoAccount[] {
+  if (!isDemoModeEnabled()) return []
   if (typeof window === 'undefined') return DEMO_ACCOUNTS
   try {
     const raw = window.localStorage.getItem(PROFILE_KEY)
@@ -34,19 +39,21 @@ function readProfiles(): DemoAccount[] {
 }
 
 function writeProfiles(profiles: DemoAccount[]) {
-  if (typeof window === 'undefined') return
+  if (!isDemoModeEnabled() || typeof window === 'undefined') return
   window.localStorage.setItem(PROFILE_KEY, JSON.stringify(profiles))
 }
 
 export function getDemoProfiles() {
-  return readProfiles()
+  return isDemoModeEnabled() ? readProfiles() : []
 }
 
 export function getDemoProfile(userId: string) {
+  if (!isDemoModeEnabled()) return null
   return getDemoProfiles().find((account) => account.id === userId) ?? null
 }
 
 export function signInDemo(email: string, password: string) {
+  if (!isDemoModeEnabled()) return null
   const account = getDemoProfiles().find((item) => item.email.toLowerCase() === email.trim().toLowerCase() && item.password === password)
   if (!account) return null
   const session: Session = {
@@ -74,7 +81,7 @@ export function signInDemo(email: string, password: string) {
 }
 
 export function getDemoSession(): Session | null {
-  if (typeof window === 'undefined') return null
+  if (!isDemoModeEnabled() || typeof window === 'undefined') return null
   const saved = window.localStorage.getItem(SESSION_KEY)
   if (!saved) return null
 
@@ -89,23 +96,26 @@ export function getDemoSession(): Session | null {
 }
 
 export function clearDemoSession() {
-  if (typeof window === 'undefined') return
+  if (!isDemoModeEnabled() || typeof window === 'undefined') return
   window.localStorage.removeItem(SESSION_KEY)
 }
 
 export function updateDemoProfile(userId: string, fullName: string) {
+  if (!isDemoModeEnabled()) return
   const profiles = getDemoProfiles()
   const next = profiles.map((profile) => profile.id === userId ? { ...profile, full_name: fullName } : profile)
   writeProfiles(next)
 }
 
 export function updateDemoPassword(userId: string, newPassword: string) {
+  if (!isDemoModeEnabled()) return
   const profiles = getDemoProfiles()
   const next = profiles.map((profile) => profile.id === userId ? { ...profile, password: newPassword } : profile)
   writeProfiles(next)
 }
 
 export function getDemoAnnouncements() {
+  if (!isDemoModeEnabled()) return []
   return [
     {
       id: 'demo-ann-1',

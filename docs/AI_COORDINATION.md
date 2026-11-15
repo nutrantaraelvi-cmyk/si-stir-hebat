@@ -159,3 +159,19 @@ Berkas: `supabase/migrations/20261114083827_komunikasi.sql`, `src/features/komun
 - Migration baru `20261114083827_komunikasi` belum diterapkan; `20261114000139_student_habits` yang lebih awal juga belum tercatat hosted. Metadata hosted dicek tanpa membaca baris data. Advisor skema hosted saat ini kosong; `check:supabase` lulus setelah akses jaringan tersedia, tanpa mencakup komunikasi.
 - Pemeriksaan terakhir `npm run check` Node 24 lulus 109 tes, lint, typecheck dan build; peringatan mesin PDF masih ada. Browser memakai API tiruan dan tidak lulus penuh. Auth/redirect, aktivasi admin, email dan UAT akun sekolah tetap perlu pemilik.
 - Branch `ai/codex-pdf-splitting`, belum di-merge karena `main` lokal tidak ada. File browser staged serta dokumen audit dan log sesi lain dipertahankan. Lanjutan: susun UI U1, termasuk pemulihan respons hilang, lalu C2; selaraskan urutan migration sebelum penerapan.
+
+## Tugas Kilo (QA/CI/Ops) — dilampirkan terpisah
+
+Baris Q5–Q9/L07/L08/L13 sempat hilang saat berkas ini ditimpa dari salinan lama (lihat catatan Qoder di atas). Karena itu tugas Kilo dicatat di bagian ini, bukan disisipkan ke tabel utama, agar tidak menimpa pekerjaan agen lain.
+
+| ID | Tugas | Status | Branch | Bukti |
+| --- | --- | --- | --- | --- |
+| Q5 | Checklist UAT siap isi per peran | DONE | ai/kilo/l14-suite | `docs/UAT_CHECKLIST.md` (belum dijalankan akun nyata) |
+| Q6 | Tes penolakan lintas peran `/tautan-akun`, `/supervisi` | DONE | ai/kilo/l14-suite | 7 skenario, desktop + ponsel |
+| Q7 | Cakupan materi terbit dan pembuatan tugas | DONE | ai/kilo/l14-suite | 2 skenario |
+| Q8 | Cakupan modul ajar (simpan draf, ajukan) | DONE | ai/kilo/l14-suite | 2 skenario |
+| Q9 | Matriks cakupan uji | DONE | ai/kilo/l14-suite | `docs/QA_COVERAGE.md`; suite 202/202 (`docs/qa-logs/`) |
+| L08 | Gerbang urutan migration + validasi workflow, template PR | REVIEW | ai/kilo/l14-suite | `scripts/check-migrations.mjs`, `scripts/check-ci.mjs`; run GitHub belum terverifikasi |
+| L07 | Runbook operasional: smoke, rollback, checklist Auth | REVIEW | ai/kilo/l14-suite | `scripts/smoke-production.mjs`, `docs/RUNBOOK_OPERASIONAL.md` |
+| L11 | Ukur bundel + usulan header cache | REVIEW | ai/kilo/l14-suite | `docs/L11_BUNDEL_CACHE.md`; header belum diterapkan |
+| L13 | Monitoring dasar (smoke, advisor, kuota) | REVIEW | ai/kilo/l14-suite | Tabel monitoring pada runbook; alert belum terpasang |

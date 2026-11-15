@@ -1138,6 +1138,8 @@ test('academic report filters identities, charts published scores and exports co
   await expect(report.getByRole('meter')).toHaveCount(2)
   await expect(report.getByRole('meter').nth(0)).toHaveAttribute('value','0')
   await expect(report.getByRole('meter').nth(1)).toHaveAttribute('value','50')
+  await expect(report.getByRole('columnheader', { name: 'Status KKM' })).toBeVisible()
+  await expect(report.getByRole('cell', { name: 'Belum tuntas' }).first()).toBeVisible()
   await expect(report.getByRole('cell', { name: 'Data Contoh Lain', exact: true })).toHaveCount(0)
   const download = page.waitForEvent('download')
   await report.getByRole('button', { name: 'Ekspor akademik (CSV)' }).click()
@@ -1145,14 +1147,16 @@ test('academic report filters identities, charts published scores and exports co
   const chunks: Buffer[] = []; for await (const chunk of stream!) chunks.push(Buffer.from(chunk))
   const csv = Buffer.concat(chunks).toString('utf8')
   expect(csv).toContain('"001","\'=Data Contoh","0","20","0"')
+  expect(csv).toContain('"Status KKM"')
+  expect(csv).toContain('"Belum tuntas"')
   expect(csv).not.toContain('Data Contoh Lain')
   const excelDownload = page.waitForEvent('download')
   await report.getByRole('button', { name: 'Ekspor akademik (Excel)' }).click()
   const workbook = await excelDownload
   const values = await readSheet((await workbook.path())!)
   expect(values).toHaveLength(4)
-  expect(values[1].slice(6)).toEqual(['001','=Data Contoh',0,20,0])
-  expect(values[2].slice(8)).toEqual([5,10,50])
+  expect(values[1].slice(6)).toEqual(['001','=Data Contoh',0,20,0,'Belum tuntas'])
+  expect(values[2].slice(8)).toEqual([5,10,50,'Belum tuntas'])
   expect(values[3][8]).toBeNull()
   const pdfDownload = page.waitForEvent('download')
   await report.getByRole('button', { name: 'Ekspor akademik (PDF)' }).click()
@@ -1258,6 +1262,13 @@ for (const role of ['student', 'parent', 'principal']) {
     if (role !== 'principal') await expect(page.getByRole('button', { name: 'Riwayat nilai', exact: true })).toHaveCount(0)
   })
 }
+
+test('assessment result shows the KKM label next to the score', async ({ page }) => {
+  await mockAssessments(page, { role: 'student' })
+  await page.goto('/asesmen')
+  await page.getByRole('button', { name: 'Buka asesmen' }).click()
+  await expect(page.getByText('CONTOH01 · Nilai 10 / 20 · Belum tuntas')).toBeVisible()
+})
 
 test('teacher saves, edits and publishes task feedback with revision checks', async ({ page }) => {
   await mockSchool(page, { role: 'teacher' })

@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { canReadMasterData } from '../features/school/master'
 import { canReadAnnouncements } from '../lib/announcements'
 import { getDemoProfile } from '../lib/demo-auth'
-import { canReadAttendance, canReadJournals } from '../lib/school'
+import { canReadAssessments, canReadAttendance, canReadJournals, canReadLearning, canReadSchedules } from '../lib/school'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './Auth'
 
@@ -36,10 +36,10 @@ function SchoolNavigation({ userId }: { userId: string }) {
     {supabase && canReadAttendance(role) && <NavLink to="/absensi">Absensi</NavLink>}
     {supabase && canReadJournals(role) && <NavLink to="/jurnal">Jurnal</NavLink>}
     {supabase && canReadJournals(role) && <NavLink to="/modul-ajar">Modul Ajar</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/materi">Materi Kelas</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/tugas">Tugas Kelas</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/asesmen">Asesmen</NavLink>}
-    {supabase && canReadAnnouncements(role) && <NavLink to="/jadwal">Jadwal</NavLink>}
+    {supabase && canReadLearning(role) && <NavLink to="/materi">Materi Kelas</NavLink>}
+    {supabase && canReadLearning(role) && <NavLink to="/tugas">Tugas Kelas</NavLink>}
+    {supabase && canReadAssessments(role) && <NavLink to="/asesmen">Asesmen</NavLink>}
+    {supabase && canReadSchedules(role) && <NavLink to="/jadwal">Jadwal</NavLink>}
     {supabase && (role === 'principal' || role === 'teacher') && <NavLink to="/supervisi">Supervisi</NavLink>}
     {canReadAnnouncements(role) && <NavLink to="/pengumuman">Pengumuman</NavLink>}
     {supabase && role === 'administrator' && <NavLink to="/tautan-akun">Tautan akun</NavLink>}

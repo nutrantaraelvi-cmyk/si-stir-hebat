@@ -30,6 +30,9 @@ export default defineConfig(({ command, mode }) => {
   }
   return {
   plugins: [academicPdfFonts(), react()],
+  optimizeDeps: {
+    include: ['read-excel-file/universal', 'unzipit', 'write-excel-file/browser'],
+  },
   resolve: {
     alias: command === 'build' ? [{ find: './demo-accounts.ts', replacement: resolve('src/lib/demo-accounts.prod.ts') }] : [],
   },

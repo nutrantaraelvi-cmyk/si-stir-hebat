@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { ErrorNotice, LoadingState, EmptyState } from '../../components/ui/Feedback'
 import { createCsv, downloadCsv } from '../../utils/csv'
 import { schoolToday } from '../attendance/attendance-model'
-import { academicCells, academicHeaders, developmentPoints, orderAcademicRows, reportLimit, scorePercent, studentChoices, validateAcademicRange,
+import { academicExportCells, academicExportHeaders, developmentPoints, orderAcademicRows, reportLimit, scorePercent, studentChoices, validateAcademicRange,
   type AcademicReportRow, type Choice, type ReportAssessment } from './academic-report-model'
 
 type Request = { start: string; end: string; classId: string; subject: string; status: string }
@@ -81,7 +81,7 @@ export function AcademicReport({ role }: { role: string }) {
     setExporting(true); setExportFormat('excel'); setExportError('')
     try {
       const { default: writeExcelFile } = await import('write-excel-file/browser')
-      const cells = [academicHeaders, ...rows.map(academicCells)].map(row => row.map(value =>
+      const cells = [academicExportHeaders, ...rows.map(academicExportCells)].map(row => row.map(value =>
         typeof value === 'number' ? { type: Number, value } : { type: String, value }))
       await writeExcelFile(cells).toFile(`rekap-akademik-${request.start}-${request.end}.xlsx`)
     } catch { setExportError('File Excel gagal dibuat. Silakan ekspor kembali.') }
@@ -139,7 +139,7 @@ export function AcademicReport({ role }: { role: string }) {
         <p>Persentase = nilai ÷ nilai maksimum × 100. Angka ini bukan nilai rapor atau rata-rata berbobot. Muat ulang rekap untuk melihat perubahan terbaru.</p>
         <div className="actions">
           <button className="button secondary" type="button" disabled={exporting || !rows.length} onClick={() => downloadCsv(
-            `rekap-akademik-${request.start}-${request.end}.csv`, createCsv(academicHeaders, rows.map(academicCells)),
+            `rekap-akademik-${request.start}-${request.end}.csv`, createCsv(academicExportHeaders, rows.map(academicExportCells)),
           )}>Ekspor akademik (CSV)</button>
           <button className="button secondary" type="button" disabled={exporting || !rows.length} onClick={() => void exportExcel()}>
             {exportFormat === 'excel' ? 'Membuat Excel akademik…' : 'Ekspor akademik (Excel)'}
@@ -165,9 +165,9 @@ export function AcademicReport({ role }: { role: string }) {
             </>}
         <div className="table-scroll"><table>
           <caption>Rincian rekap akademik · halaman {page + 1}</caption>
-          <thead><tr>{academicHeaders.map(header => <th key={header} scope="col">{header}</th>)}</tr></thead>
+          <thead><tr>{academicExportHeaders.map(header => <th key={header} scope="col">{header}</th>)}</tr></thead>
           <tbody>{rows.slice(page * 25, page * 25 + 25).map(row => <tr key={row.id}>
-            {academicCells(row).map((value, index) => <td key={academicHeaders[index]}>{value === '' ? 'Belum dinilai' : value}</td>)}
+            {academicExportCells(row).map((value, index) => <td key={academicExportHeaders[index]}>{value === '' ? 'Belum dinilai' : value}</td>)}
           </tr>)}</tbody>
         </table></div>
         {page > 0 && <button type="button" onClick={() => setPage(page - 1)}>Hasil sebelumnya</button>}

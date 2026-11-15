@@ -29,7 +29,15 @@ export default defineConfig(({ command, mode }) => {
   }
   return {
   plugins: [academicPdfFonts(), react()],
-  server: { host: '127.0.0.1', port: 5173, strictPort: true },
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+    strictPort: true,
+    // On Windows a concurrent editor can hold a lock on a source file, which
+    // makes the watcher throw EBUSY and kills the dev server. Test runs do not
+    // need HMR, so Playwright disables the watcher for a stable web server.
+    watch: process.env.VITE_TEST_NO_WATCH === '1' ? null : undefined,
+  },
   preview: { host: '127.0.0.1', port: 4173, strictPort: true },
   build: {
     rollupOptions: {

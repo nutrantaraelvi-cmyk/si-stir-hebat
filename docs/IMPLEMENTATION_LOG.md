@@ -338,3 +338,43 @@ Build hanya menyertakan Roboto normal dan tebal untuk rekap akademik, tetap dimu
 ## Fondasi komunikasi lokal - 14 November 2026
 
 Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan relasi aktif, serta pesan append-only. Tes PGlite mencakup peran dan pencabutan; npm run check Node 24 lulus 108 tes, lint, tipe, build. Migration belum diterapkan: riwayat hosted belum mencatat student_habits yang lebih awal. UI, advisor dan UAT belum dilakukan.
+
+## Stabilisasi suite browser dan checklist UAT - 14 November 2026 (Kilo/QA)
+
+- Selector alert dipersempit ke `getByRole('alert').filter({ hasText })` di seluruh suite agar tidak ambigu ketika beberapa `alert` tampil bersamaan.
+- Uji impor XLSX desktop memakai `setInputFiles` langsung (bukan dialog file natif) dan batas 15 detik untuk preview yang diproses di worker.
+- `vite.config.ts` menonaktifkan watcher HMR hanya ketika `VITE_TEST_NO_WATCH=1` (disetel oleh `playwright.config.ts`); ini menghentikan crash `EBUSY` yang sebelumnya mematikan server tes dan memicu `ERR_CONNECTION_REFUSED` massal.
+- Ditambahkan 7 skenario penolakan lintas peran: `/tautan-akun` untuk guru/siswa/wali/pending dan `/supervisi` untuk siswa/wali/pending; dipastikan pesan penolakan tampil dan tidak ada tombol aksi.
+- `docs/UAT_CHECKLIST.md` dibuat sebagai daftar periksa siap isi per peran (langkah, hasil diharapkan, L/G, catatan), melengkapi `PANDUAN_UAT.md`.
+- Verifikasi: tiga run browser penuh berturut-turut 194/194 lulus (desktop + ponsel) dengan API tiruan; `npm run check` Node 24 lulus 109 tes, lint, typecheck, build (peringatan chunk PDF tetap).
+- Batas: belum diuji dengan akun sekolah nyata, email pemulihan, maupun UI komunikasi (belum ada). Tidak ada perubahan migration atau data hosted.
+
+## Cakupan modul materi/tugas - 14 November 2026 (Kilo/QA)
+
+- Menambah dua skenario browser: siswa membaca materi terbit tanpa kontrol penulisan, dan guru membuat draf tugas dengan penugasan, judul, instruksi, serta tenggat.
+- Memastikan muatan POST memuat `kind: task`, `assignment_id`, `due_on`, dan pesan "Draf tugas tersimpan." setelah respons terkonfirmasi.
+- Verifikasi: `npm run lint` bersih; suite penuh 198/198 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.
+
+## Cakupan modul ajar - 14 November 2026 (Kilo/QA)
+
+- Menambah skenario guru menyimpan draf modul ajar: pemilihan penugasan aktif, judul, tujuan, dan kegiatan; memastikan muatan POST serta pesan "Modul ajar tersimpan." dan modul tampil di daftar.
+- Verifikasi: `npm run lint` bersih; suite penuh 200/200 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.
+
+## Pengajuan modul ajar dan matriks cakupan - 14 November 2026 (Kilo/QA)
+
+- Menambah skenario guru mengajukan draf modul: PATCH `status: submitted` dengan revisi, pesan "Status modul diperbarui." dan status daftar menjadi "Diajukan".
+- Menambah `docs/QA_COVERAGE.md`: matriks modul terhadap skenario yang sudah ada dan yang belum tercakup.
+- Verifikasi: skenario baru lulus terarah di desktop (1/1). Suite penuh **belum** diverifikasi ulang: run terakhir (log `test-results-kilo-8.log`) baru mencapai 36/202 saat sesi dijeda. `npm run lint` bersih. UAT akun sekolah tetap terbuka.
+
+## CI, bundel, dan operasional - 15 November 2026 (Kilo/QA)
+
+- `scripts/check-migrations.mjs` dan `scripts/check-ci.mjs` dirangkai ke depan `npm run check`; `.github/pull_request_template.md` dan `docs/CI_RUNBOOK.md` ditambahkan. Uji negatif menolak timestamp ganda, nama salah, dan urutan `komunikasi` sebelum `student_habits`.
+- `scripts/smoke-production.mjs` memeriksa beranda, fallback SPA, akun demo di bundel, dan penolakan REST anonim. Terhadap build lokal: 3/4 lulus; pemeriksaan akun demo gagal sesuai temuan S-01. `docs/RUNBOOK_OPERASIONAL.md` memuat rollback, checklist Site URL/redirect, dan monitoring.
+- `docs/L11_BUNDEL_CACHE.md` mencatat muatan awal 758,72 kB (gzip 213,92 kB); chunk PDF dan XLSX tetap lazy. Usulan header cache belum diterapkan.
+- Batas: `npm run check` penuh belum lulus karena `src/app/Password.tsx` sedang disunting agen lain (`TS6133`, `TS2304`). Run GitHub Actions, branch protection, smoke produksi, dan monitoring belum diverifikasi.
+
+## L14 - suite penuh 202/202 - 15 November 2026 (Kilo/QA)
+
+- `npm run test:browser` penuh (desktop + ponsel, API tiruan, port 5191) selesai 202/202 lulus dalam 7,2 menit. Log: `docs/qa-logs/test-browser-2026-11-15-202-lulus.log`.
+- `docs/QA_COVERAGE.md` diperbarui: 202 skenario, rute `/komunikasi` dicatat belum ada tes.
+- `npm run check` penuh **belum** lulus pada 15 November 2026 karena `src/features/komunikasi/Communication.tsx` (sedang disunting) gagal typecheck. Gerbang CI Kilo (`check-migrations`, `check-ci`) lulus.

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import { DEMO_ACCOUNTS, clearDemoSession, signInDemo } from '../lib/demo-auth'
+import { DEMO_ACCOUNTS, clearDemoSession, isDemoModeEnabled, signInDemo } from '../lib/demo-auth'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './Auth'
 import { Profile } from './Profile'
@@ -15,6 +15,10 @@ export function Login() {
     event.preventDefault()
     if (busy) return
     if (!supabase) {
+      if (!isDemoModeEnabled()) {
+        setError('Konfigurasi Supabase tidak ditemukan. Hubungi administrator sekolah.')
+        return
+      }
       const demoSession = signInDemo(email, password)
       if (!demoSession) {
         setError('Akun demo tidak valid. Gunakan salah satu akun yang tersedia di panel demo.')
@@ -35,7 +39,7 @@ export function Login() {
   if (loading) return <section className="login" role="status">Memuat sesi…</section>
   if (session) return <Navigate to="/dashboard" replace />
   return <section className="login"><h1>Masuk SI STIR HEBAT</h1><p>Gunakan akun yang diberikan oleh administrator sekolah.</p>
-    {!supabase && <div className="status"><p>Mode demo aktif. Gunakan akun berikut:</p><div className="demo-list">{DEMO_ACCOUNTS.map((account) => <button key={account.email} type="button" className="text-button" onClick={() => { setEmail(account.email); setPassword(account.password) }}>{account.full_name} ({account.role})</button>)}</div></div>}
+    {isDemoModeEnabled() && <div className="status"><p>Mode demo aktif. Gunakan akun berikut:</p><div className="demo-list">{DEMO_ACCOUNTS.map((account) => <button key={account.email} type="button" className="text-button" onClick={() => { setEmail(account.email); setPassword(account.password) }}>{account.full_name} ({account.role})</button>)}</div></div>}
     <form onSubmit={submit}>
       <label htmlFor="email">Email</label><input id="email" type="email" autoComplete="username" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />
       <label htmlFor="password">Kata sandi</label><input id="password" type="password" autoComplete="current-password" required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} />
@@ -54,9 +58,13 @@ export function Account() {
     setBusy(true)
     setError('')
     try {
-      if (!supabase) {
+      if (isDemoModeEnabled()) {
         clearDemoSession()
         window.location.assign('/')
+        return
+      }
+      if (!supabase) {
+        setError('Konfigurasi Supabase tidak ditemukan. Hubungi administrator sekolah.')
         return
       }
       const { error: failure } = await supabase.auth.signOut({ scope: 'local' })

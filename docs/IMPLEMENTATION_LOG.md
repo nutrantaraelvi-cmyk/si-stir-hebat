@@ -359,3 +359,9 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 
 - Menambah skenario guru menyimpan draf modul ajar: pemilihan penugasan aktif, judul, tujuan, dan kegiatan; memastikan muatan POST serta pesan "Modul ajar tersimpan." dan modul tampil di daftar.
 - Verifikasi: `npm run lint` bersih; suite penuh 200/200 lulus pada desktop dan ponsel (API tiruan). Belum diuji dengan akun sekolah nyata.
+
+## Pengajuan modul ajar dan matriks cakupan - 14 November 2026 (Kilo/QA)
+
+- Menambah skenario guru mengajukan draf modul: PATCH `status: submitted` dengan revisi, pesan "Status modul diperbarui." dan status daftar menjadi "Diajukan".
+- Menambah `docs/QA_COVERAGE.md`: matriks modul terhadap skenario yang sudah ada dan yang belum tercakup.
+- Verifikasi: skenario baru lulus terarah di desktop (1/1). Suite penuh **belum** diverifikasi ulang: run terakhir (log `test-results-kilo-8.log`) baru mencapai 36/202 saat sesi dijeda. `npm run lint` bersih. UAT akun sekolah tetap terbuka.

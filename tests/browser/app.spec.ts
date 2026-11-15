@@ -1626,3 +1626,29 @@ test('teacher saves a teaching module draft for an active assignment', async ({ 
     objectives: 'Menyebutkan tujuan contoh.', activities: 'Melakukan kegiatan contoh.',
   })
 })
+
+test('teacher submits a teaching module draft for review', async ({ page }) => {
+  await mockSchool(page, { role: 'teacher' })
+  const module = {
+    id: 'module-example', title: 'Data Contoh Modul', objectives: 'Tujuan contoh',
+    activities: 'Kegiatan contoh', status: 'draft', review_note: '', revision: 0,
+    teacher_assignments: { id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } },
+  }
+  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ json: [{
+    id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' },
+  }] }))
+  await page.route('**/rest/v1/teaching_modules?*', route => {
+    if (route.request().method() === 'PATCH') {
+      expect(new URL(route.request().url()).searchParams.get('revision')).toBe('eq.0')
+      expect(route.request().postDataJSON()).toEqual({ status: 'submitted' })
+      Object.assign(module, { status: 'submitted', revision: 1 })
+      return route.fulfill({ json: [{ id: module.id }] })
+    }
+    return route.fulfill({ json: [module] })
+  })
+  await page.goto('/modul-ajar')
+  await page.getByRole('button', { name: 'Data Contoh Modul' }).click()
+  await page.getByRole('button', { name: 'Ajukan untuk diperiksa' }).click()
+  await expect(page.getByText('Status modul diperbarui.')).toBeVisible()
+  await expect(page.getByText('Diajukan', { exact: false })).toBeVisible()
+})

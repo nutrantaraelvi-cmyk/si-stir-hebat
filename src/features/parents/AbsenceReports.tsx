@@ -169,16 +169,16 @@ export function AbsenceReports() {
 
   const heading = <div className="board-heading"><div><div className="eyebrow">KETIDAKHADIRAN</div><h1>Laporan ketidakhadiran</h1><p>Wali melaporkan sakit atau izin anak; guru kelas memeriksa dan memberi catatan.</p></div></div>
 
-  if (pageState.state === 'loading') return <section className="board">{heading}<LoadingState /></section>
-  if (pageState.state === 'denied') return <section className="board">{heading}<EmptyState>Halaman ini tersedia untuk wali terverifikasi dan guru kelas.</EmptyState></section>
-  if (pageState.state === 'error') return <section className="board">{heading}<ErrorNotice onRetry={refresh}>{pageState.message}</ErrorNotice></section>
+  if (pageState.state === 'loading') return <section className="board absence-report-page">{heading}<LoadingState /></section>
+  if (pageState.state === 'denied') return <section className="board absence-report-page">{heading}<EmptyState>Halaman ini tersedia untuk wali terverifikasi dan guru kelas.</EmptyState></section>
+  if (pageState.state === 'error') return <section className="board absence-report-page">{heading}<ErrorNotice onRetry={refresh}>{pageState.message}</ErrorNotice></section>
 
   const { role, students, items, hasMore } = pageState
   const nameById = new Map(students.map(student => [student.id, student.name]))
   const parentView = isParent(role)
   const canReview = isTeacher(role)
 
-  return <section className="board">
+  return <section className="board absence-report-page">
     {heading}
     {parentView && <>
       {students.length === 0

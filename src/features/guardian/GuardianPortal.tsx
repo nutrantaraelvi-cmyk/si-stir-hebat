@@ -57,7 +57,7 @@ function GuardianAttendance({ userId }: { userId: string }) {
     setAttempt(value => value + 1)
   }
 
-  return <section className="workspace">
+  return <section className="workspace guardian-page">
     <h1>Ruang Orang Tua</h1>
     {result.state === 'loading' && <LoadingState />}
     {result.state === 'error' && <ErrorNotice onRetry={refresh}>Kehadiran gagal dimuat.</ErrorNotice>}

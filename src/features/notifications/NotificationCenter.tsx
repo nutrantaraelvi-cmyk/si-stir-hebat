@@ -100,14 +100,14 @@ export function NotificationCenter() {
 
   const heading = <div className="board-heading"><div><div className="eyebrow">PESAN PRIBADI</div><h1>Pusat notifikasi</h1><p>Kabar pengumuman, ketidakhadiran, supervisi, dan asesmen yang ditujukan untuk Anda.</p></div></div>
 
-  if (pageState.state === 'loading') return <section className="board">{heading}<LoadingState /></section>
-  if (pageState.state === 'denied') return <section className="board">{heading}<EmptyState>Pusat notifikasi tersedia setelah Anda masuk dengan akun sekolah yang terhubung.</EmptyState></section>
-  if (pageState.state === 'error') return <section className="board">{heading}<ErrorNotice onRetry={refresh}>{pageState.message}</ErrorNotice></section>
+  if (pageState.state === 'loading') return <section className="board notification-page">{heading}<LoadingState /></section>
+  if (pageState.state === 'denied') return <section className="board notification-page">{heading}<EmptyState>Pusat notifikasi tersedia setelah Anda masuk dengan akun sekolah yang terhubung.</EmptyState></section>
+  if (pageState.state === 'error') return <section className="board notification-page">{heading}<ErrorNotice onRetry={refresh}>{pageState.message}</ErrorNotice></section>
 
   const { items, hasMore } = pageState
   const unreadCount = items.filter(item => !item.read_at).length
 
-  return <section className="board">
+  return <section className="board notification-page">
     {heading}
     <p className="help" role="status">{unreadCount > 0
       ? `${unreadCount} notifikasi belum dibaca pada halaman ini.`

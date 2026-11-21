@@ -115,6 +115,17 @@
 .supervision-page .announcement-editor { border-top: 3px solid var(--brand); }
 .supervision-page .announcement-editor > h2 { margin-top: 0; color: var(--brand); }
 .supervision-page .announcement-editor .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
+.guardian-page > section.announcement-editor { border-top: 3px solid #2563EB; }
+.guardian-page > section.announcement-editor > h2 { margin-top: 0; color: #1E40AF; }
+.guardian-page > section.announcement-editor .empty { margin-top: 12px; }
+.absence-report-page > section[aria-labelledby="absence-list"] { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+.absence-report-page > section[aria-labelledby="absence-list"] > h2 { margin-top: 0; color: var(--brand); }
+.absence-report-page .announcement-list > .announcement { border-left: 3px solid var(--pink); }
+.absence-report-page .announcement > h3 { color: var(--ink); }
+.notification-page .help[role=status] { display: inline-flex; min-height: 40px; align-items: center; margin: 16px 0; padding: 8px 12px; border-radius: 999px; background: var(--lilac); color: var(--brand); font-weight: 700; }
+.notification-page .announcement-list > .announcement { border-left: 3px solid var(--sky); }
+.notification-page .announcement .text-button { margin-top: 8px; }
+.notification-page .pagination { margin-top: 18px; }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }

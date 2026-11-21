@@ -64,6 +64,10 @@
 .attendance-report fieldset { grid-template-columns: max-content minmax(0, 1fr); align-items: center; }
 .attendance-report fieldset legend { grid-column: 1 / -1; }
 .attendance-report fieldset button { grid-column: 2; justify-self: start; }
+.teacher-attendance .announcement-list > .announcement { border-left: 3px solid var(--brand-soft); }
+.teacher-attendance .announcement-meta .badge { white-space: nowrap; }
+.teacher-attendance .announcement-editor { border-top: 3px solid var(--brand-accent); }
+.teacher-attendance .board-heading p { max-width: 62ch; }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }

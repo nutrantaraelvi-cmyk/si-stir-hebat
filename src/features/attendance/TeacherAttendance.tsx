@@ -222,9 +222,9 @@ export function TeacherAttendance() {
 
   const heading = <div className="board-heading"><div><div className="eyebrow">KEHADIRAN GURU</div><h1>Absensi guru</h1><p>Catat jam masuk dan keluar; koreksi diajukan guru dan disetujui kepala sekolah.</p></div></div>
 
-  if (pageState.state === 'loading') return <section className="board">{heading}<LoadingState /></section>
-  if (pageState.state === 'denied') return <section className="board">{heading}<EmptyState>Halaman ini tersedia untuk guru, kepala sekolah, dan administrator.</EmptyState></section>
-  if (pageState.state === 'error') return <section className="board">{heading}<ErrorNotice onRetry={refresh}>{pageState.message}</ErrorNotice></section>
+  if (pageState.state === 'loading') return <section className="board teacher-attendance">{heading}<LoadingState /></section>
+  if (pageState.state === 'denied') return <section className="board teacher-attendance">{heading}<EmptyState>Halaman ini tersedia untuk guru, kepala sekolah, dan administrator.</EmptyState></section>
+  if (pageState.state === 'error') return <section className="board teacher-attendance">{heading}<ErrorNotice onRetry={refresh}>{pageState.message}</ErrorNotice></section>
 
   const { role, items, hasMore, corrections, correctionsHasMore } = pageState
   const recorder = canCheckInTeacherAttendance(role)
@@ -232,7 +232,7 @@ export function TeacherAttendance() {
   const today = schoolToday()
   const todayRow = items.find(row => row.attendance_on === today)
 
-  return <section className="board">
+  return <section className="board teacher-attendance">
     {heading}
     {success && <p className="status" role="status">{success}</p>}
     {error && <p className="error" role="alert">{error}</p>}

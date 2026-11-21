@@ -1,12 +1,3 @@
-:root {
-  --brand: #40206f;
-  --brand-accent: #6842a3;
-  --brand-soft: #d8c8f2;
-  --bg: #f8f7fc;
-  --line: #e3dfeb;
-  --ink: #211c30;
-  --ink-soft: #4b465b;
-}
 body { background: var(--bg); color: var(--ink); }
 .header { border-bottom: 1px solid var(--line); background: #fff; }
 .brand .logo { background: var(--brand); color: #fff; }

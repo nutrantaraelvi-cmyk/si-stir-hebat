@@ -68,6 +68,14 @@
 .teacher-attendance .announcement-meta .badge { white-space: nowrap; }
 .teacher-attendance .announcement-editor { border-top: 3px solid var(--brand-accent); }
 .teacher-attendance .board-heading p { max-width: 62ch; }
+.journals-page .journal-fields { grid-template-columns: max-content minmax(0, 1fr); align-items: center; border-color: var(--line); border-radius: var(--radius-md); background: var(--paper); }
+.journals-page .journal-fields legend, .journals-page .journal-fields > p { grid-column: 1 / -1; }
+.journals-page .journal-fields label { margin-block: 4px; }
+.journals-page .journal-fields :is(input, select, textarea) { min-width: 0; }
+.journals-page .journal-fields textarea { grid-column: 1 / -1; }
+.journals-page .journal-fields .actions { grid-column: 1 / -1; }
+.journals-page .announcement > time { color: var(--brand); font-size: .8rem; font-weight: 800; }
+.journals-page .announcement h3 { margin: 18px 0 6px; color: var(--brand); font-size: .95rem; }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }
@@ -78,4 +86,6 @@
   .attendance-report fieldset { grid-template-columns: minmax(0, 1fr); }
   .attendance-report fieldset legend, .attendance-report fieldset button { grid-column: 1; }
   .attendance .attendance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .journals-page .journal-fields { grid-template-columns: minmax(0, 1fr); }
+  .journals-page .journal-fields legend, .journals-page .journal-fields > p, .journals-page .journal-fields textarea, .journals-page .journal-fields .actions { grid-column: 1; }
 }

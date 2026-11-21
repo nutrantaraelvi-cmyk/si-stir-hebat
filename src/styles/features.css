@@ -95,6 +95,17 @@
 .assessment-detail > article.announcement-editor > p:first-of-type { color: var(--muted); font-size: .85rem; font-weight: 700; }
 .assessment-detail [aria-label="Riwayat perubahan nilai"] { margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
 .assessment-detail [aria-label="Riwayat perubahan nilai"] article { padding-block: 10px; border-bottom: 1px solid var(--line); }
+.schedule-page > fieldset { grid-template-columns: max-content minmax(0, 1fr); align-items: center; }
+.schedule-page > fieldset > p, .schedule-page > fieldset > .reference-notice { grid-column: 1 / -1; }
+.schedule-page > fieldset > button { grid-column: 2; justify-self: start; }
+.schedule-page > form { margin-block: 20px; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
+.schedule-page > form > h2 { margin-top: 0; color: var(--brand); }
+.schedule-page > article.tile { border-left: 3px solid var(--brand-accent); }
+.schedule-page > article.tile h2, .schedule-page > section > h2 { color: var(--brand); }
+.schedule-page > section { margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--line); }
+.schedule-page > section > article.tile { border-left-color: #2563EB; }
+.schedule-page [aria-label="Riwayat perubahan jadwal"] { margin-top: 16px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
+.schedule-page [aria-label="Riwayat perubahan jadwal"] article { margin: 0; border-color: var(--line); }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }
@@ -107,4 +118,6 @@
   .attendance .attendance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .journals-page .journal-fields { grid-template-columns: minmax(0, 1fr); }
   .journals-page .journal-fields legend, .journals-page .journal-fields > p, .journals-page .journal-fields textarea, .journals-page .journal-fields .actions { grid-column: 1; }
+  .schedule-page > fieldset { grid-template-columns: minmax(0, 1fr); }
+  .schedule-page > fieldset > p, .schedule-page > fieldset > .reference-notice, .schedule-page > fieldset > button { grid-column: 1; }
 }

@@ -101,7 +101,7 @@ function Workspace({ userId }: { userId: string }) {
     finally { setBusy(false) }
   }
   const draft = editing && editing !== 'new' ? editing : null
-  return <section className="workspace"><h1>Jadwal Pelajaran</h1><p>Jadwal mingguan berlaku pada rentang tanggal yang ditetapkan admin. Jam mengikuti waktu lokal sekolah.</p>
+  return <section className="workspace schedule-page"><h1>Jadwal Pelajaran</h1><p>Jadwal mingguan berlaku pada rentang tanggal yang ditetapkan admin. Jam mengikuti waktu lokal sekolah.</p>
     {loading ? <LoadingState /> : failed ? <ErrorNotice onRetry={reload}>Jadwal gagal dimuat.</ErrorNotice> : !canReadAnnouncements(role) ? <p>Akun ini belum memiliki akses jadwal.</p> : <>
       <fieldset disabled={busy}><label>Tanggal jadwal<input type="date" value={date} onChange={event => { setDate(event.target.value); setPage(0); setEditing(null) }} /></label>
         <label>Kelas jadwal<select value={classId} onChange={event => { setClassId(event.target.value); setPage(0); setEditing(null); setError('') }}><option value="">Semua kelas yang dapat diakses</option>{classes.map(item => <option key={item.id} value={item.id}>{item.name} · {item.academic_years.name}</option>)}</select></label>

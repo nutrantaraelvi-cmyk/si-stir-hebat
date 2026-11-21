@@ -1,0 +1,38 @@
+/* Shared page rhythm for operational screens. */
+.board, .workspace { width: 100%; min-width: 0; }
+.workspace { overflow-wrap: anywhere; }
+.board-heading { min-width: 0; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.board-heading > div { min-width: 0; }
+.board-heading .eyebrow, .page-header .eyebrow { display: block; margin: 0 0 6px; color: var(--brand-accent); font-size: .72rem; font-weight: 800; letter-spacing: .1em; }
+.board h1, .workspace > h1 { font-size: clamp(1.75rem, 4vw, 2.35rem); line-height: 1.15; overflow-wrap: anywhere; }
+.board-heading > a:not(.button) { display: inline-flex; min-height: var(--touch); align-items: center; color: var(--brand); font-weight: 700; text-underline-offset: .25em; }
+.workspace > p:first-of-type { color: var(--ink-soft); }
+.board :is(.announcement-editor, .announcement), .workspace :is(.announcement-editor, .announcement) { min-width: 0; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper); box-shadow: var(--shadow-card); overflow-wrap: anywhere; }
+.board .announcement-editor, .workspace .announcement-editor { gap: 14px; }
+.board .announcement-list, .workspace .announcement-list { gap: 14px; }
+.board .announcement h2, .workspace .announcement h2 { margin-block: 10px; color: var(--ink); font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.35; }
+.board .announcement-body, .workspace .announcement-body { color: var(--ink-soft); line-height: 1.75; overflow-wrap: anywhere; }
+.board .announcement-meta, .workspace .announcement-meta { gap: 8px 12px; color: var(--muted); }
+.board .badge, .workspace .badge { display: inline-flex; min-height: 28px; align-items: center; padding: 4px 10px; border: 1px solid var(--brand-soft); background: var(--lilac); color: var(--brand); }
+.board .badge.published, .workspace .badge.published { border-color: #86C99A; background: var(--success-bg); color: #166534; }
+.board .badge.archived, .workspace .badge.archived { border-color: var(--line); background: var(--surface); color: var(--muted); }
+.board :is(.empty, .status), .workspace :is(.empty, .status) { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink-soft); line-height: 1.6; overflow-wrap: anywhere; }
+.board .error, .workspace .error { border: 1px solid #F0A4B2; background: var(--danger-bg); color: #991B1B; line-height: 1.6; }
+.board .actions, .workspace .actions, .button-row { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 8px; }
+.board .actions > *, .workspace .actions > *, .button-row > * { max-width: 100%; }
+.board .pagination, .workspace .pagination { min-width: 0; flex-wrap: wrap; padding-block: 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.board .table-scroll, .workspace .table-scroll { width: 100%; max-width: 100%; overflow-x: auto; border-radius: var(--radius-md); background: var(--paper); scrollbar-color: var(--brand-soft) var(--surface); }
+.board .table-scroll table, .workspace .table-scroll table { min-width: 100%; color: var(--ink); }
+.board .table-scroll caption, .workspace .table-scroll caption { color: var(--ink); }
+.board .table-scroll th, .workspace .table-scroll th { color: var(--ink-soft); font-size: .72rem; letter-spacing: .04em; }
+.board .table-scroll td, .workspace .table-scroll td { border-color: var(--line); }
+.workspace fieldset { min-width: 0; border-color: var(--line); border-radius: var(--radius-md); background: var(--paper); }
+.workspace legend { padding-inline: 8px; color: var(--brand); font-weight: 800; }
+.workspace > :is(section, article), .board > :is(section, article) { min-width: 0; }
+@media (max-width: 600px) {
+  .board-heading { padding-bottom: 14px; }
+  .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }
+  .board .actions, .workspace .actions, .button-row { align-items: stretch; }
+  .board .table-scroll, .workspace .table-scroll { margin-block: 18px; }
+  .board .table-scroll th, .board .table-scroll td, .workspace .table-scroll th, .workspace .table-scroll td { padding: 10px; }
+}

@@ -178,7 +178,7 @@ function SupervisionWorkspace({ userId }: { userId: string }) {
   const hasPendingObservation = Boolean(observationDraft)
   const navigationLocked = busy || autosaving || hasPendingObservation || evidenceBusy
 
-  return <section className="workspace">
+  return <section className="workspace supervision-page">
     <h1>Supervisi Akademik</h1>
     {loading ? <LoadingState /> : loadError ? <ErrorNotice onRetry={reload}>Supervisi gagal dimuat.</ErrorNotice>
       : !principal && !isTeacher(role) ? <EmptyState>Halaman ini tersedia untuk kepala sekolah dan guru.</EmptyState>

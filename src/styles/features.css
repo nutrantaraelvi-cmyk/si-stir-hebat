@@ -106,6 +106,15 @@
 .schedule-page > section > article.tile { border-left-color: #2563EB; }
 .schedule-page [aria-label="Riwayat perubahan jadwal"] { margin-top: 16px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
 .schedule-page [aria-label="Riwayat perubahan jadwal"] article { margin: 0; border-color: var(--line); }
+.supervision-page > details { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+.supervision-page > details > summary { display: flex; min-height: var(--touch); align-items: center; color: var(--brand); font-weight: 800; }
+.supervision-page > details[open] { padding-bottom: 18px; }
+.supervision-page > ul { display: grid; gap: 6px; margin: 16px 0; padding: 0; list-style: none; }
+.supervision-page > ul li { min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-left: 3px solid var(--brand-soft); border-radius: var(--radius-sm); background: var(--paper); color: var(--muted); overflow-wrap: anywhere; }
+.supervision-page > ul li:has([aria-pressed=true]) { border-color: var(--brand-soft); background: var(--lilac); }
+.supervision-page .announcement-editor { border-top: 3px solid var(--brand); }
+.supervision-page .announcement-editor > h2 { margin-top: 0; color: var(--brand); }
+.supervision-page .announcement-editor .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }

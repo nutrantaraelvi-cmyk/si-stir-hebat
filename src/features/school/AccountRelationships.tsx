@@ -118,7 +118,7 @@ function RelationshipForm({ userId }: { userId: string }) {
     }
   }
 
-  return <section className="workspace">
+  return <section className="workspace account-relationships">
     <h1>Tautan akun sekolah</h1>
     {access === 'loading' && <p role="status">Memeriksa izin…</p>}
     {access === 'error' && <p role="alert">Izin gagal dimuat. Silakan muat ulang halaman.</p>}

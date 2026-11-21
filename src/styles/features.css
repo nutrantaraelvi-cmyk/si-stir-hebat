@@ -39,6 +39,10 @@
 .master-data .master-field label { color: var(--ink); }
 .master-data .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
 .master-data .table-scroll { margin-top: 20px; }
+.account-relationships > p:first-of-type { max-width: 68ch; padding: 14px 16px; border-left: 3px solid var(--brand-accent); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; background: var(--sky-soft); color: var(--ink-soft); line-height: 1.7; }
+.account-relationships .announcement-editor { max-width: 760px; }
+.account-relationships .announcement-editor fieldset { gap: 8px; }
+.account-relationships .confirm-panel { max-width: 760px; border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }

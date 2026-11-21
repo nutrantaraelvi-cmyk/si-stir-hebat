@@ -18,7 +18,7 @@ const roleSpaces: Record<string, { title: string; description: string }> = {
 }
 
 function QuickLink({ to, icon: Icon, title, detail }: { to: string; icon: LucideIcon; title: string; detail: string }) {
-  return <Link to={to}><Icon size={20} aria-hidden="true"/><span className="quick-copy"><strong>{title}</strong><small>{detail}</small></span></Link>
+  return <Link to={to} data-reveal><Icon size={20} aria-hidden="true"/><span className="quick-copy"><strong>{title}</strong><small>{detail}</small></span></Link>
 }
 
 export function Dashboard() {
@@ -36,6 +36,24 @@ function SchoolDashboard({ userId }: { userId: string }) {
   const [profileError, setProfileError] = useState('')
   const [newsError, setNewsError] = useState('')
   const [attempt, setAttempt] = useState(0)
+
+  useEffect(() => {
+    if (loading || !profile || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return
+    const targets = document.querySelectorAll<HTMLElement>('.dashboard [data-reveal]')
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.add('is-visible')
+        observer.unobserve(entry.target)
+      })
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' })
+    targets.forEach((target, index) => {
+      target.classList.add('reveal-ready')
+      target.style.setProperty('--reveal-delay', `${Math.min(index, 5) * 45}ms`)
+      observer.observe(target)
+    })
+    return () => observer.disconnect()
+  }, [loading, profile])
 
   useEffect(() => {
     let active = true
@@ -109,7 +127,7 @@ function SchoolDashboard({ userId }: { userId: string }) {
     {loading ? <p role="status">Menyiapkan dashboard…</p> : <>
       {profileError && <p className="error" role="alert">{profileError}</p>}
       {profile && <p className="role-strip"><span>Anda masuk sebagai</span><strong>{schoolRoleLabels[profile.role] ?? 'Belum tersedia'}</strong></p>}
-      {profile && roleSpaces[profile.role] && <section className={`role-space role-space--${profile.role}`} aria-labelledby="role-space-title">
+      {profile && roleSpaces[profile.role] && <section className={`role-space role-space--${profile.role}`} data-reveal aria-labelledby="role-space-title">
         <p className="role-space-label">SDN 03 Wonosari</p>
         <h2 id="role-space-title">{roleSpaces[profile.role].title}</h2>
         <p>{roleSpaces[profile.role].description}</p>
@@ -122,12 +140,12 @@ function SchoolDashboard({ userId }: { userId: string }) {
           <h2 id="school-overview">Ringkasan data sekolah</h2>
           <p>Jumlah registri aktif dari layanan ringkasan dashboard.</p>
           <div className="dashboard-stats">
-            <article aria-label="Siswa aktif"><span>Siswa aktif</span><strong>{overview.active.students}</strong><Link to="/sekolah/students">Lihat siswa aktif</Link></article>
-            <article aria-label="Guru aktif"><span>Guru aktif</span><strong>{overview.active.teachers}</strong><Link to="/sekolah/teachers">Lihat guru aktif</Link></article>
-            <article aria-label="Kelas aktif"><span>Kelas aktif</span><strong>{overview.active.classes}</strong><Link to="/sekolah/school_classes">Lihat kelas aktif</Link></article>
+            <article data-reveal aria-label="Siswa aktif"><span>Siswa aktif</span><strong>{overview.active.students}</strong><Link to="/sekolah/students">Lihat siswa aktif</Link></article>
+            <article data-reveal aria-label="Guru aktif"><span>Guru aktif</span><strong>{overview.active.teachers}</strong><Link to="/sekolah/teachers">Lihat guru aktif</Link></article>
+            <article data-reveal aria-label="Kelas aktif"><span>Kelas aktif</span><strong>{overview.active.classes}</strong><Link to="/sekolah/school_classes">Lihat kelas aktif</Link></article>
           </div>
         </section>}
-        {overview && isPrincipal(profile?.role) && <section className="principal-overview" aria-labelledby="principal-overview-title">
+        {overview && isPrincipal(profile?.role) && <section className="principal-overview" data-reveal aria-labelledby="principal-overview-title">
           <h2 id="principal-overview-title">Ringkasan kepala sekolah</h2>
           <p>Jumlah sesi menurut tahap terakhir dan modul ajar yang perlu ditinjau. Draf pribadi guru tidak dihitung.</p>
           <div className="principal-metrics">
@@ -143,7 +161,7 @@ function SchoolDashboard({ userId }: { userId: string }) {
         <div className="dashboard-stats"><article><span>Pengumuman terbit</span><strong>{publishedCount ?? 'N/A'}</strong></article>{canManage && <article><span>Draf pengumuman</span><strong>{draftCount ?? 'N/A'}</strong></article>}</div>
         {newsError && <p className="error" role="alert">{newsError}</p>}
         <section className="dashboard-news" aria-labelledby="latest-news"><div className="board-heading"><h2 id="latest-news">Kabar terbaru</h2><Link to="/pengumuman">Lihat semua</Link></div>
-          {recent.length ? recent.map(item => <article className="news-preview" key={item.id}><time dateTime={item.created_at}>{new Date(item.created_at).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' })}</time><h3>{item.title}</h3><p>{item.body.length > 220 ? `${item.body.slice(0, 220)}…` : item.body}</p></article>) : !newsError && <p className="empty">Belum ada pengumuman terbit. Kabar sekolah akan tampil di sini.</p>}
+          {recent.length ? recent.map(item => <article className="news-preview" data-reveal key={item.id}><time dateTime={item.created_at}>{new Date(item.created_at).toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' })}</time><h3>{item.title}</h3><p>{item.body.length > 220 ? `${item.body.slice(0, 220)}…` : item.body}</p></article>) : !newsError && <p className="empty">Belum ada pengumuman terbit. Kabar sekolah akan tampil di sini.</p>}
         </section>
       </>}
     </>}

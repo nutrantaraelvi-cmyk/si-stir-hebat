@@ -133,7 +133,7 @@ function ModuleWorkspace({ userId }: { userId: string }) {
     }
   }
 
-  return <section className="workspace">
+  return <section className="workspace teaching-modules">
     <h1>Modul Ajar</h1>
     {loading ? <LoadingState /> : loadError ? <ErrorNotice onRetry={reload}>Modul gagal dimuat.</ErrorNotice>
       : !canReadTeachingModules(role) ? <EmptyState>Halaman ini tersedia untuk guru dan staf sekolah yang berwenang.</EmptyState>

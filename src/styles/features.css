@@ -76,6 +76,16 @@
 .journals-page .journal-fields .actions { grid-column: 1 / -1; }
 .journals-page .announcement > time { color: var(--brand); font-size: .8rem; font-weight: 800; }
 .journals-page .announcement h3 { margin: 18px 0 6px; color: var(--brand); font-size: .95rem; }
+.class-materials > article.announcement-editor { border-top: 3px solid var(--brand-accent); }
+.class-materials--task > article.announcement-editor { border-top-color: #DB2777; }
+.class-materials--task > article.announcement-editor time { color: #9D174D; font-weight: 800; }
+.class-materials > article.announcement-editor > p:first-of-type { color: var(--muted); font-size: .85rem; font-weight: 700; }
+.class-materials .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
+.teaching-modules > ul { display: grid; gap: 6px; margin: 16px 0; padding: 0; list-style: none; }
+.teaching-modules > ul li { min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--paper); color: var(--ink-soft); overflow-wrap: anywhere; }
+.teaching-modules > ul li:has([aria-pressed=true]) { border-color: var(--brand-soft); background: var(--lilac); }
+.teaching-modules > h2 { margin-top: 28px; color: var(--brand); }
+.teaching-modules > article.announcement-editor h3 { margin: 18px 0 6px; color: var(--brand); font-size: .95rem; }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }

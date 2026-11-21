@@ -136,7 +136,7 @@ function MaterialWorkspace({ userId, kind }: { userId: string; kind: Kind }) {
     }
   }
 
-  return <section className="workspace">
+  return <section className={`workspace class-materials class-materials--${kind}`}>
     <h1>{heading}</h1>
     {loading ? <LoadingState /> : loadError ? <ErrorNotice onRetry={reload}>{heading} gagal dimuat.</ErrorNotice>
       : !canReadLearningData(role) ? <EmptyState>Akun ini belum memiliki akses ke {itemLabel} kelas.</EmptyState> : <>

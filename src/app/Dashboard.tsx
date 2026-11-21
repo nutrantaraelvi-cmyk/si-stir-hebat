@@ -10,10 +10,11 @@ import { getDashboardOverview, type DashboardOverview } from '../lib/dashboard-o
 
 type SchoolProfile = { full_name: string; role: string }
 const roleSpaces: Record<string, { title: string; description: string }> = {
-  teacher: { title: 'Ruang Guru', description: 'Kelola pembelajaran, kehadiran, dan komunikasi dengan keluarga sesuai penugasan Anda.' },
+  administrator: { title: 'Ruang Admin', description: 'Ringkasan sekolah, data master, dan tautan akun yang tersedia untuk dikelola.' },
+  teacher: { title: 'Ruang Guru', description: 'Akses absensi, jurnal, modul ajar, materi, tugas, asesmen, dan jadwal sesuai penugasan.' },
   student: { title: 'Ruang Murid', description: 'Temukan materi, tugas, jadwal, dan hasil belajar yang tersedia untuk Anda.' },
-  parent: { title: 'Ruang Orang Tua', description: 'Pantau kehadiran anak yang terhubung dan berkomunikasi dengan guru.' },
-  principal: { title: 'Ruang Kepala Sekolah', description: 'Pantau kegiatan sekolah, supervisi, dan dokumen yang memerlukan tinjauan.' },
+  parent: { title: 'Ruang Orang Tua', description: 'Pantau kehadiran anak yang terhubung, pengumuman, jadwal, dan informasi belajar.' },
+  principal: { title: 'Ruang Kepala Sekolah', description: 'Pantau supervisi, modul ajar yang perlu ditinjau, pengumuman, dan jadwal sekolah.' },
 }
 
 function QuickLink({ to, icon: Icon, title, detail }: { to: string; icon: LucideIcon; title: string; detail: string }) {
@@ -108,7 +109,7 @@ function SchoolDashboard({ userId }: { userId: string }) {
     {loading ? <p role="status">Menyiapkan dashboard…</p> : <>
       {profileError && <p className="error" role="alert">{profileError}</p>}
       {profile && <p className="role-strip"><span>Anda masuk sebagai</span><strong>{schoolRoleLabels[profile.role] ?? 'Belum tersedia'}</strong></p>}
-      {profile && roleSpaces[profile.role] && <section className="role-space" aria-labelledby="role-space-title">
+      {profile && roleSpaces[profile.role] && <section className={`role-space role-space--${profile.role}`} aria-labelledby="role-space-title">
         <p className="role-space-label">SDN 03 Wonosari</p>
         <h2 id="role-space-title">{roleSpaces[profile.role].title}</h2>
         <p>{roleSpaces[profile.role].description}</p>

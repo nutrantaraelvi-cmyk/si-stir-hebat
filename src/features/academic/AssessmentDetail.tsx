@@ -89,7 +89,7 @@ export function AssessmentDetail({ id, role, onBack }: { id: string; role: strin
   }
 
   const formOpen = Boolean(editing || metadata || confirm)
-  return <section className="workspace">
+  return <section className="workspace assessment-detail">
     <button className="button secondary" type="button" disabled={busy} onClick={onBack}>Kembali ke asesmen</button>
     {loading ? <LoadingState /> : loadError ? <ErrorNotice onRetry={reload}>Hasil asesmen gagal dimuat.</ErrorNotice>
       : !assessment ? <EmptyState>Asesmen tidak tersedia untuk akun ini.</EmptyState> : <>

@@ -59,11 +59,11 @@
 .attendance-import .file-label input { min-height: var(--touch); padding: 8px; border: 1px dashed var(--brand-soft); border-radius: var(--radius-sm); background: var(--lilac); }
 .attendance-import .import-preview { min-width: 0; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
 .attendance-import .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
-.attendance-report { border-top: 3px solid var(--brand-accent)!important; }
-.attendance-report > h2 { margin-top: 0; color: var(--brand); }
-.attendance-report fieldset { grid-template-columns: max-content minmax(0, 1fr); align-items: center; }
-.attendance-report fieldset legend { grid-column: 1 / -1; }
-.attendance-report fieldset button { grid-column: 2; justify-self: start; }
+.attendance .attendance-report { border-top: 3px solid var(--brand-accent)!important; }
+.attendance .attendance-report > h2 { margin-top: 0; color: var(--brand); }
+.attendance .attendance-report fieldset { grid-template-columns: max-content minmax(0, 1fr); align-items: center; }
+.attendance .attendance-report fieldset legend { grid-column: 1 / -1; }
+.attendance .attendance-report fieldset button { grid-column: 2; justify-self: start; }
 .teacher-attendance .announcement-list > .announcement { border-left: 3px solid var(--brand-soft); }
 .teacher-attendance .announcement-meta .badge { white-space: nowrap; }
 .teacher-attendance .announcement-editor { border-top: 3px solid var(--brand-accent); }
@@ -86,6 +86,15 @@
 .teaching-modules > ul li:has([aria-pressed=true]) { border-color: var(--brand-soft); background: var(--lilac); }
 .teaching-modules > h2 { margin-top: 28px; color: var(--brand); }
 .teaching-modules > article.announcement-editor h3 { margin: 18px 0 6px; color: var(--brand); font-size: .95rem; }
+.assessments-page > details { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+.assessments-page > details > summary { display: flex; min-height: var(--touch); align-items: center; color: var(--brand); font-weight: 800; text-underline-offset: .2em; }
+.assessments-page > details[open] { padding-bottom: 18px; }
+.assessments-page > article.announcement-editor, .assessment-detail > article.announcement-editor { border-top: 3px solid var(--brand-accent); }
+.assessment-detail > h1 { margin-top: 18px; }
+.assessment-detail > article.announcement-editor > h2 { margin-top: 0; }
+.assessment-detail > article.announcement-editor > p:first-of-type { color: var(--muted); font-size: .85rem; font-weight: 700; }
+.assessment-detail [aria-label="Riwayat perubahan nilai"] { margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
+.assessment-detail [aria-label="Riwayat perubahan nilai"] article { padding-block: 10px; border-bottom: 1px solid var(--line); }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }
@@ -93,8 +102,8 @@
   .board .table-scroll, .workspace .table-scroll { margin-block: 18px; }
   .board .table-scroll th, .board .table-scroll td, .workspace .table-scroll th, .workspace .table-scroll td { padding: 10px; }
   .master-data .master-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .attendance-report fieldset { grid-template-columns: minmax(0, 1fr); }
-  .attendance-report fieldset legend, .attendance-report fieldset button { grid-column: 1; }
+  .attendance .attendance-report fieldset { grid-template-columns: minmax(0, 1fr); }
+  .attendance .attendance-report fieldset legend, .attendance .attendance-report fieldset button { grid-column: 1; }
   .attendance .attendance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .journals-page .journal-fields { grid-template-columns: minmax(0, 1fr); }
   .journals-page .journal-fields legend, .journals-page .journal-fields > p, .journals-page .journal-fields textarea, .journals-page .journal-fields .actions { grid-column: 1; }

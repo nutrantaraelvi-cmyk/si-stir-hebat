@@ -92,7 +92,7 @@ function AssessmentWorkspace({ userId }: { userId: string }) {
 
   function reload() { setAttempt(value => value + 1); setError(''); setCreating(null) }
   if (selected) return <AssessmentDetail key={selected} id={selected} role={role} onBack={() => { setSelected(null); reload() }} />
-  return <section className="workspace">
+  return <section className="workspace assessments-page">
     <h1>Asesmen dan Nilai</h1>
     <p>Skema sementara: nilai maksimum ditentukan per asesmen dan hasil dibagikan setelah guru menerbitkannya. Perhitungan rapor menunggu skema resmi sekolah.</p>
     {loading ? <LoadingState /> : loadError ? <ErrorNotice onRetry={reload}>Asesmen gagal dimuat.</ErrorNotice>

@@ -43,6 +43,27 @@
 .account-relationships .announcement-editor { max-width: 760px; }
 .account-relationships .announcement-editor fieldset { gap: 8px; }
 .account-relationships .confirm-panel { max-width: 760px; border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
+.attendance .attendance-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
+.attendance .attendance-summary > span { display: flex; min-width: 0; min-height: 60px; flex-direction: column; justify-content: space-between; gap: 6px; border: 1px solid var(--line); color: var(--ink-soft); }
+.attendance .attendance-summary > span strong { color: var(--ink); font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.attendance .attendance-summary > span:nth-child(1) { border-color: #86C99A; background: var(--success-bg); }
+.attendance .attendance-summary > span:nth-child(2) { border-color: #D6A547; background: var(--warning-bg); }
+.attendance .attendance-summary > span:nth-child(3) { border-color: #93BDF0; background: var(--info-bg); }
+.attendance .attendance-summary > span:nth-child(4) { border-color: #F0A4B2; background: var(--danger-bg); }
+.attendance .attendance-summary > span:last-child { border-color: var(--line); background: var(--surface); }
+.attendance .session-picker { min-height: var(--touch); border-color: var(--line); background: var(--paper); }
+.attendance .attendance-history li { border-color: var(--line); border-left: 3px solid var(--brand-soft); border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
+.attendance .attendance-import { margin-block: 24px; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--paper); box-shadow: var(--shadow-card); }
+.attendance-import h2 { margin-top: 0; color: var(--brand); }
+.attendance-import .file-label { min-width: min(100%, 260px); color: var(--ink); }
+.attendance-import .file-label input { min-height: var(--touch); padding: 8px; border: 1px dashed var(--brand-soft); border-radius: var(--radius-sm); background: var(--lilac); }
+.attendance-import .import-preview { min-width: 0; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.attendance-import .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
+.attendance-report { border-top: 3px solid var(--brand-accent)!important; }
+.attendance-report > h2 { margin-top: 0; color: var(--brand); }
+.attendance-report fieldset { grid-template-columns: max-content minmax(0, 1fr); align-items: center; }
+.attendance-report fieldset legend { grid-column: 1 / -1; }
+.attendance-report fieldset button { grid-column: 2; justify-self: start; }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }
@@ -50,4 +71,7 @@
   .board .table-scroll, .workspace .table-scroll { margin-block: 18px; }
   .board .table-scroll th, .board .table-scroll td, .workspace .table-scroll th, .workspace .table-scroll td { padding: 10px; }
   .master-data .master-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .attendance-report fieldset { grid-template-columns: minmax(0, 1fr); }
+  .attendance-report fieldset legend, .attendance-report fieldset button { grid-column: 1; }
+  .attendance .attendance-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

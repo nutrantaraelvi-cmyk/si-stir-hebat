@@ -688,3 +688,9 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - vite.config.ts ditemukan kosong dan memicu pesan config must export or return an object. Tidak ditemukan salinan lokal di proyek; berkas dipulihkan dari versi Git yang terlacak.
 - Konfigurasi berhasil dimuat oleh Vite. Permintaan halaman lokal membalas HTTP 200 pada port 5173 (server yang sudah berjalan) dan 5174 (server konfirmasi sementara, kemudian dihentikan).
 - git diff --check lulus untuk berkas yang diperbaiki. Tes aplikasi tidak dijalankan.
+
+## Restyling UI dan ruang peran - 22 November 2026
+
+- Commit `e9478f2` menyatukan token warna/typografi dan mencatat pola umum dari referensi Kemendikdasmen serta INI LHO ITS. Commit `d8817f9` menambahkan presentasi lima ruang peran pada dashboard. Commit `db2e940` menyelaraskan kontrol bersama dan menambahkan scroll reveal dashboard yang menghormati `prefers-reduced-motion`.
+- Lint dan `npx tsc --noEmit` lulus di Node v24.22.3. `npm run check` standar gagal sebelum build karena proses tes Node berhenti dengan fatal out-of-memory `Zone`; 140 tes lain lulus tanpa assertion gagal. Tes konfigurasi sekolah terisolasi serial lulus 9/9. Percobaan full suite serial juga menemui OOM pada `tests/database.test.mjs`; perubahan sementara concurrency di `package.json` telah dipulihkan dan tidak masuk commit.
+- Suite browser tidak dijalankan karena gate kritis belum bersih. Belum ada audit visual ukuran 390×844 dan 1280×900. Fase restyling seluruh halaman fitur belum selesai. Tidak ada perubahan database, akses, atau Supabase hosted.

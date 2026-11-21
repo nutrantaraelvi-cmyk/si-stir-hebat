@@ -1,12 +1,14 @@
 # Status SI STIR HEBAT
 
+- **Restyling UI 22 November 2026:** token warna/typografi disatukan, lima variasi ruang peran tersedia, dan komponen dashboard/formulir/status mendapat interaksi ringan dengan dukungan `prefers-reduced-motion`. Catatan pola referensi ada di `docs/UI_REFERENSI_NOTES.md`. Pemeriksaan lint dan TypeScript lulus pada Node 24.22.3. `npm run check` belum lulus: runner tes Node berakhir dengan fatal out-of-memory `Zone` pada tes database; tes konfigurasi sekolah serial lulus 9/9. Suite browser belum dijalankan karena gate check belum bersih. Pekerjaan restyling halaman lain dan audit visual 390×844/1280×900 belum selesai.
+
 - **Login sesuai ruang peran:** halaman masuk kini menyediakan pilihan Murid, Orang tua, Guru, Kepala Sekolah, dan Administrator. Pilihan mengganti sapaan, ikon, dan aksen panel; akun Supabase serta profil tetap menentukan sesi dan hak akses. Ruang Murid memakai ikon dan ornamen ceria responsif. Belum diuji secara visual/browser pada perubahan ini.
 
 - **Beranda terinspirasi ITS dan Kemendikdasmen:** hero ilustratif dan pita layanan bergerak dipadukan dengan struktur informasi sekolah dan kartu ruang peran. Tautan peran membuka login dengan pilihan ruang yang cocok. Pratinjau desktop sudah ditinjau pada Vite lokal port 5173; tes responsif otomatis dan UAT belum dijalankan.
 
 - **Vite:** konfigurasi kosong dipulihkan dari Git; server lokal yang sudah berjalan pada port 5173 merespons HTTP 200. Tes aplikasi belum dijalankan.
 
-Diperbarui: 21 November 2026 (Asia/Jakarta). Workspace: `D:/code/SI_STIR_HEBAT_Starter/si-stir-hebat`.
+Diperbarui: 22 November 2026 (Asia/Jakarta). Workspace: `D:/code/SI_STIR_HEBAT_Starter/si-stir-hebat`.
 
 ## Ringkasan
 

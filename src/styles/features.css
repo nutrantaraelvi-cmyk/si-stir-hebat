@@ -29,10 +29,21 @@
 .workspace fieldset { min-width: 0; border-color: var(--line); border-radius: var(--radius-md); background: var(--paper); }
 .workspace legend { padding-inline: 8px; color: var(--brand); font-weight: 800; }
 .workspace > :is(section, article), .board > :is(section, article) { min-width: 0; }
+
+/* Data sekolah: clear navigation between the existing master registries. */
+.master-data .master-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 20px 0 24px; }
+.master-data .master-tabs a { display: flex; min-width: 0; min-height: var(--touch); align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink-soft); font-weight: 700; line-height: 1.35; }
+.master-data .master-tabs a:hover { border-color: var(--brand-soft); background: var(--lilac); color: var(--brand); }
+.master-data .master-tabs a.active, .master-data .master-tabs a[aria-current=page] { border-color: var(--brand); background: var(--brand); color: #fff; }
+.master-data .master-field { min-width: 0; gap: 6px; }
+.master-data .master-field label { color: var(--ink); }
+.master-data .confirm-panel { border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
+.master-data .table-scroll { margin-top: 20px; }
 @media (max-width: 600px) {
   .board-heading { padding-bottom: 14px; }
   .board .announcement-editor, .board .announcement, .workspace .announcement-editor, .workspace .announcement { padding: 16px; }
   .board .actions, .workspace .actions, .button-row { align-items: stretch; }
   .board .table-scroll, .workspace .table-scroll { margin-block: 18px; }
   .board .table-scroll th, .board .table-scroll td, .workspace .table-scroll th, .workspace .table-scroll td { padding: 10px; }
+  .master-data .master-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

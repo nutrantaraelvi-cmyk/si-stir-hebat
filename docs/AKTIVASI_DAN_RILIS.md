@@ -49,7 +49,7 @@ returning id, role;
 ```
 
 4. Buka aplikasi, masuk dengan akun itu, lalu isi nama profil melalui menu Akun. Dashboard harus menampilkan Administrator. Jika tetap pending, keluar dan masuk ulang. Jika SQL tidak mengembalikan baris, periksa UID/proyek dan profil; jangan mengubah akun lain sebagai percobaan.
-5. Untuk akun kepala sekolah, guru, siswa atau wali, ulangi proses pembuatan akun, lalu tetapkan peran yang sesuai (`principal`, `teacher`, `student`, `parent`) oleh operator proyek. Penetapan peran belum tersedia melalui UI aplikasi.
+5. Setelah fitur akun sekolah dan migration terkait diterapkan, masuk sebagai administrator dan buka **Akun sekolah**. Cari nama atau email, cocokkan identitas dengan data sekolah, pilih peran, lalu centang konfirmasi dan tetapkan. Jika akun belum muncul, minta pemilik akun memverifikasi email dan muat ulang daftar. Akun guru, siswa, dan wali tetap perlu ditautkan ke data sekolah yang sesuai.
 
 ## Urutan persiapan sekolah
 

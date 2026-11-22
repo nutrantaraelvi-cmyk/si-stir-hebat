@@ -1,0 +1,44 @@
+@reference "tailwindcss";
+
+/* Shared operational surfaces keep every feature visually consistent. */
+.board, .workspace {
+  @apply min-w-0 text-slate-900;
+}
+.board-heading, .page-header {
+  @apply flex flex-wrap items-start justify-between gap-4 border-b border-violet-100 pb-5;
+}
+.board-heading h1, .page-header h1, .workspace > h1 {
+  @apply font-bold tracking-tight text-slate-900;
+}
+.board :is(.announcement, .announcement-editor), .workspace :is(.announcement, .announcement-editor) {
+  @apply rounded-2xl border border-violet-100 bg-white shadow-sm;
+}
+.board :is(.status, .empty), .workspace :is(.status, .empty) {
+  @apply rounded-xl border border-violet-100 bg-violet-50 text-slate-700;
+}
+.board .error, .workspace .error {
+  @apply rounded-xl border border-rose-200 bg-rose-50 p-4 text-red-800;
+}
+.board :is(input:not([type=checkbox]):not([type=radio]), select, textarea),
+.workspace :is(input:not([type=checkbox]):not([type=radio]), select, textarea) {
+  @apply max-w-full rounded-xl border border-violet-200 bg-white px-3 py-2 text-slate-900;
+}
+.board :is(input, select, textarea, button, a):focus-visible,
+.workspace :is(input, select, textarea, button, a):focus-visible {
+  @apply outline-2 outline-offset-2 outline-violet-700;
+}
+.board :is(input, select, textarea):disabled, .workspace :is(input, select, textarea):disabled {
+  @apply cursor-not-allowed bg-slate-100 text-slate-600;
+}
+.board .table-scroll, .workspace .table-scroll {
+  @apply overflow-x-auto rounded-2xl border border-violet-100 bg-white;
+}
+.board .table-scroll th, .workspace .table-scroll th {
+  @apply bg-violet-50 text-slate-700;
+}
+.board .confirm-panel, .workspace .confirm-panel {
+  @apply rounded-2xl border border-violet-200 bg-violet-50 p-4;
+}
+.board .button, .workspace .button, .board .refresh-button, .workspace .refresh-button {
+  @apply transition-colors motion-reduce:transition-none;
+}

@@ -141,9 +141,9 @@ function ModuleWorkspace({ userId }: { userId: string }) {
         {message && <p role="status">{message}</p>}
         {error && <ErrorNotice onRetry={() => { setError(''); setEditor(null); setSelected(null); reload() }}>{error}</ErrorNotice>}
         {isTeacher(role) && <ReferenceNotice truncated={optionsTruncated}/>}
-        {isTeacher(role) && !editor && <button className="button" type="button" disabled={!assignments.length || busy}
+        {isTeacher(role) && !editor && <button className="button" type="button" disabled={busy}
           onClick={() => { setSelected(null); setEditor({ id: crypto.randomUUID(), assignmentId: '', title: '', objectives: '', activities: '' }) }}>Buat modul</button>}
-        {isTeacher(role) && !assignments.length && <p>Belum ada penugasan aktif untuk membuat modul.</p>}
+        {isTeacher(role) && !assignments.length && <p>Belum ada penugasan aktif. Minta administrator menautkan akun dan menambahkan penugasan sebelum menyimpan modul.</p>}
         {editor && <form className="announcement-editor" onSubmit={saveDraft}>
           <h2>{editor.revision === undefined ? 'Modul baru' : 'Edit modul'}</h2>
           <fieldset disabled={busy}>
@@ -160,7 +160,7 @@ function ModuleWorkspace({ userId }: { userId: string }) {
             <textarea id="module-objectives" value={editor.objectives} maxLength={4000} required onChange={event => setEditor({ ...editor, objectives: event.target.value })} />
             <label htmlFor="module-activities">Kegiatan pembelajaran</label>
             <textarea id="module-activities" value={editor.activities} maxLength={8000} required onChange={event => setEditor({ ...editor, activities: event.target.value })} />
-            <button className="button" type="submit">Simpan modul</button>
+            <button className="button" type="submit" disabled={editor.revision === undefined && !assignments.length}>Simpan modul</button>
             <button className="button secondary" type="button" onClick={() => setEditor(null)}>Batal</button>
           </fieldset>
         </form>}

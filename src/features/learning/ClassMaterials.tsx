@@ -144,10 +144,10 @@ function MaterialWorkspace({ userId, kind }: { userId: string; kind: Kind }) {
         {error && <ErrorNotice onRetry={() => { setError(''); setEditing(null); setConfirm(null); reload() }}>{error}</ErrorNotice>}
         {isTeacher(role) && <ReferenceNotice truncated={optionsTruncated}/>}
         {isTeacher(role) && !editing && !confirm && <button className="button" type="button"
-          disabled={!assignments.length} onClick={() => { setDraftId(crypto.randomUUID()); setEditing('new'); setMessage(''); setError('') }}>
+          onClick={() => { setDraftId(crypto.randomUUID()); setEditing('new'); setMessage(''); setError('') }}>
           Buat {itemLabel}
         </button>}
-        {isTeacher(role) && !assignments.length && <p>Belum ada penugasan aktif untuk membuat {itemLabel}.</p>}
+        {isTeacher(role) && !assignments.length && <p>Belum ada penugasan aktif. Minta administrator menautkan akun dan menambahkan penugasan sebelum menyimpan {itemLabel}.</p>}
         {editing && <form className="announcement-editor" onSubmit={save} key={editing}>
           <h2>{draft ? 'Edit draf' : task ? 'Tugas baru' : 'Materi baru'}</h2>
           <fieldset disabled={busy}>
@@ -166,7 +166,7 @@ function MaterialWorkspace({ userId, kind }: { userId: string; kind: Kind }) {
               <label htmlFor="material-due">Tenggat tugas</label>
               <input id="material-due" name="due" type="date" defaultValue={draft?.due_on ?? ''} required />
             </>}
-            <button className="button" type="submit">Simpan draf</button>
+            <button className="button" type="submit" disabled={!draft && !assignments.length}>Simpan draf</button>
             <button className="button secondary" type="button" onClick={() => setEditing(null)}>Batal</button>
           </fieldset>
         </form>}

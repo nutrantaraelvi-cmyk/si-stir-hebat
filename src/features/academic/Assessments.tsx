@@ -100,9 +100,9 @@ function AssessmentWorkspace({ userId }: { userId: string }) {
         <details><summary>Rekap dan perkembangan akademik</summary><AcademicReport role={role} /></details>
         {isTeacher(role) && <ReferenceNotice truncated={optionsTruncated}/>}
         {error && <ErrorNotice onRetry={reload}>{error}</ErrorNotice>}
-        {isTeacher(role) && !creating && <button className="button" type="button" disabled={!assignments.length}
+        {isTeacher(role) && !creating && <button className="button" type="button"
           onClick={() => setCreating(crypto.randomUUID())}>Buat asesmen</button>}
-        {isTeacher(role) && !assignments.length && <p>Belum ada penugasan aktif.</p>}
+        {isTeacher(role) && !assignments.length && <p>Belum ada penugasan aktif. Minta administrator menautkan akun guru dan menambahkan penugasan kelas sebelum menyimpan asesmen.</p>}
         {creating && <form className="announcement-editor" onSubmit={create}>
           <h2>Asesmen baru</h2>
           <p>Peserta diambil dari siswa aktif di kelas saat asesmen dibuat. Nilai kosong berarti belum dinilai.</p>
@@ -114,7 +114,7 @@ function AssessmentWorkspace({ userId }: { userId: string }) {
             <label>Jenis asesmen<select name="type">{Object.entries(assessmentTypes).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
             <label>Tanggal asesmen<input name="date" type="date" required /></label>
             <label>Nilai maksimum<input name="maximum" type="number" required min="0.01" max="100000" step="0.01" /></label>
-            <button className="button" type="submit">Simpan asesmen</button>
+            <button className="button" type="submit" disabled={!assignments.length}>Simpan asesmen</button>
             <button className="button secondary" type="button" onClick={() => setCreating(null)}>Batal</button>
           </fieldset>
         </form>}

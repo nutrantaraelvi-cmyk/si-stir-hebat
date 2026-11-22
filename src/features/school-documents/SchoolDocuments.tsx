@@ -13,6 +13,7 @@ import {
   riwayatVersiDokumen,
   tambahVersiDokumenSekolah,
   tindakLanjutDokumen,
+  unduhBerkasDokumen,
   type DocumentCategory,
   type SchoolDocument,
   type SchoolDocumentCategory,
@@ -56,6 +57,10 @@ function formatDate(value: string) {
 function formatSize(bytes: number) {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   return `${Math.max(1, Math.round(bytes / 1024))} KB`
+}
+
+function originalFileName(filePath: string) {
+  return (filePath.split('/').pop() ?? 'dokumen').replace(/^[0-9a-f-]{36}-/i, '') || 'dokumen'
 }
 
 function categoryLabel(categories: SchoolDocumentCategory[], key: DocumentCategory) {
@@ -243,6 +248,29 @@ export function SchoolDocuments() {
     }
   }
 
+  async function downloadFile(item: SchoolDocument, filePath: string) {
+    const client = supabase
+    if (!client || busy) return
+    setBusy(`download:${item.id}`)
+    setActionError('')
+    try {
+      const blob = await unduhBerkasDokumen(client, item.id, filePath)
+      const objectUrl = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = objectUrl
+      anchor.download = originalFileName(filePath)
+      anchor.hidden = true
+      document.body.append(anchor)
+      anchor.click()
+      anchor.remove()
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
+    } catch {
+      setActionError(`Berkas “${item.title}” tidak dapat diunduh. Periksa akses dokumen atau coba lagi.`)
+    } finally {
+      setBusy('')
+    }
+  }
+
   const heading = <div className="board-heading"><div><div className="eyebrow">ADMINISTRASI DOKUMEN</div><h1>Dokumen sekolah</h1><p>Guru mengunggah dokumen miliknya; kepala sekolah memeriksa dan menyetujui.</p></div></div>
 
   if (pageState.state === 'loading') return <section className="board">{heading}<LoadingState /></section>
@@ -308,6 +336,9 @@ export function SchoolDocuments() {
             <h3>{item.title}</h3>
             {item.description && <p className="announcement-body">{item.description}</p>}
             {item.review_note && <p className="help">Catatan pemeriksa: {item.review_note}</p>}
+            <button className="text-button" type="button" disabled={Boolean(busy)} onClick={() => void downloadFile(item, item.file_path)}>
+              {busy === `download:${item.id}` ? 'Mengunduh…' : 'Unduh berkas dokumen'}
+            </button>
             {isOwner && (item.status === 'draft' || item.status === 'needs_revision') && <div className="announcement-editor">
               <label htmlFor={`version-file-${item.id}`}>Ganti berkas dengan versi baru</label>
               <input id={`version-file-${item.id}`} type="file" accept={acceptedFiles} disabled={Boolean(busy)} onChange={event => setVersionFiles(current => ({ ...current, [item.id]: event.target.files?.[0] ?? null }))} />
@@ -341,7 +372,15 @@ export function SchoolDocuments() {
               {historyLoading === item.id ? 'Memuat riwayat…' : history[item.id] ? 'Sembunyikan riwayat' : 'Lihat riwayat versi & tinjauan'}
             </button>
             {history[item.id] && <div className="help">
-              <p>Versi berkas: {history[item.id].versions.length === 0 ? 'belum ada catatan versi.' : history[item.id].versions.map(version => `${version.version_number} (${formatSize(version.file_size)}, ${formatDate(version.created_at)})`).join('; ')}</p>
+              <p>Versi berkas:</p>
+              {history[item.id].versions.length === 0 ? <p>Belum ada catatan versi.</p> : <ul>
+                {history[item.id].versions.map(version => <li key={version.id}>
+                  Versi {version.version_number} ({formatSize(version.file_size)}, {formatDate(version.created_at)}){' '}
+                  <button className="text-button" type="button" disabled={Boolean(busy)} onClick={() => void downloadFile(item, version.file_path)}>
+                    Unduh versi {version.version_number}
+                  </button>
+                </li>)}
+              </ul>}
               <p>Tinjauan: {history[item.id].reviews.length === 0 ? 'belum ada keputusan pemeriksaan.' : history[item.id].reviews.map(review => `${statusLabels[review.from_status]} → ${statusLabels[review.to_status]} (${formatDate(review.created_at)})${review.note ? `: ${review.note}` : ''}`).join('; ')}</p>
             </div>}
           </article>

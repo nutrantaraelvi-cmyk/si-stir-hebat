@@ -62,6 +62,17 @@ function validatePage(page: number) {
   if (!Number.isSafeInteger(page) || page < 0 || page > 10000) throw new Error('Halaman dokumen tidak valid.')
 }
 
+export async function unduhBerkasDokumen(client: SupabaseClient, documentId: string, filePath: string): Promise<Blob> {
+  const [folder, objectName, ...extra] = filePath.split('/')
+  if (!documentId.trim() || documentId.includes('/') || folder !== documentId
+    || !objectName || objectName === '.' || objectName === '..' || extra.length > 0) {
+    throw new Error('Lokasi berkas dokumen tidak valid.')
+  }
+  const { data, error } = await client.storage.from('school-documents').download(filePath, {}, { cache: 'no-store' })
+  if (error) throw error
+  return data
+}
+
 export async function daftarDokumenSekolah(client: SupabaseClient, page = 0, status?: SchoolDocumentStatus): Promise<{ items: SchoolDocument[]; hasMore: boolean }> {
   validatePage(page)
   let query = client.from('school_documents').select(documentColumns).order('updated_at', { ascending: false }).order('id', { ascending: false }).range(page * 25, page * 25 + 25)

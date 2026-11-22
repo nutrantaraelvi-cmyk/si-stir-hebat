@@ -1,3 +1,19 @@
+## Pemeriksaan workspace - 22 November 2026
+
+- Tidak ada konflik Git aktif atau penanda konflik sumber. Tes kebiasaan diperbaiki untuk menguji perubahan status terlarang dan hasil nol baris RLS; `npm run check` lulus 149 tes, lint, typecheck dan build terisolasi. Audit menyeluruh dan UAT hosted belum selesai.
+
+## Gaya bersama Tailwind - 22 November 2026
+
+- Mengaktifkan plugin Tailwind Vite dan menambahkan gaya bersama untuk permukaan fitur, formulir, tabel, status, fokus, dan konfirmasi. Build terisolasi lulus (1.795 modul), lint dan typecheck lulus. `npm run check` gagal pada tes database kebiasaan `tests/database.test.mjs:1257`; peninjauan visual semua fitur belum dilakukan.
+
+## Daftar kebiasaan ruang murid - 22 November 2026
+
+- Menambahkan daftar interaktif tujuh kebiasaan di dashboard murid beserta indikator kemajuan, tautan catatan, dan dukungan reduced motion. Centang bersifat sementara dan tidak mengubah catatan resmi wali.
+
+## Formulir saat data kosong - 22 November 2026
+
+- Membuka formulir asesmen, materi, tugas, modul ajar, jurnal, dan laporan ketidakhadiran saat data prasyarat kosong, dengan penjelasan langkah persiapan. Halaman lain masih memerlukan peninjauan.
+
 ## Rerun dependency dan check - 20 November 2026
 
 - `npm ci` gagal pada Node default v26.13.0 karena binary esbuild terkunci (`EPERM`); retry via Node 24.22.3 gagal saat unlink binary Rollup terkunci. `npm install --ignore-scripts --prefer-offline --no-audit --no-fund` EXIT 0, dengan cleanup warnings untuk dua binary terkunci. `package-lock.json` tidak berubah.
@@ -725,3 +741,71 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Metadata read-only dari proyek yang cocok dengan `supabase/config.toml`: riwayat 23/39 migrasi. Inventaris objek untuk 16 migrasi tertinggal mencakup tabel, kolom, constraint, policy, fungsi, index, trigger, dan bucket Storage.
 - Ditemukan tabel fitur yang belum ada (kebiasaan, komunikasi, laporan wali, notifikasi, dokumen, absensi guru) serta tabel konfigurasi/deletion requests yang sudah ada dengan constraint, policy, kategori retensi, dan perilaku berbeda dari migration lokal. Ini memerlukan migrasi rekonsiliasi forward-only setelah pilihan kanonis ditetapkan.
 - `npm run check:supabase` lulus pada Auth dan tabel lama sampai gagal `habit_records` HTTP 404. Security Advisor masih WARN; backup/restore dan Supabase lokal belum diverifikasi. Tidak ada DDL atau status migration hosted yang ditulis. Laporan: `docs/HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md`.
+
+## Kebiasaan, dokumen, dan verifikasi enam fitur - 22 November 2026
+
+- Selaras dengan D6, submit kebiasaan menjadi khusus wali pada fungsi izin UI dan policy migration lokal; siswa tetap dapat membaca catatan/re kapnya. Tes database menolak INSERT siswa dan browser menguji siswa baca-saja serta wali submit.
+- Dokumen sekolah mendapat tindakan unduh berkas aktif/versi melalui bucket privat; API memeriksa bahwa path milik ID dokumen sebelum memanggil Storage. Tes unggah versi lokal tersedia; verifikasi unduh browser masih belum tuntas karena harness belum menangkap request Storage SDK.
+- Browser desktop kebiasaan: 6/6 lulus; lint dan typecheck lulus. Database tes terfokus menemukan dua assertion lama/baru yang salah; ditinjau dan dibersihkan, perlu rerun untuk angka final. Tes unduh dokumen terfokus masih perlu dibetulkan.
+- Komunikasi, pusat notifikasi, laporan wali, dan absensi guru dipertahankan pada implementasi UI/API/migration lokal yang sudah ada. Tidak ada migration hosted dijalankan: Advisor WARN, fitur belum ada hosted, skema konfigurasi drift, Supabase lokal dan backup/restore belum terbukti.
+
+## Pendaftaran akun mandiri - 22 November 2026
+
+- Halaman `/daftar` ditambahkan dan ditautkan dari beranda/login; formulir memakai Supabase Auth, meminta email verifikasi, menyimpan nama tampilan, serta mensyaratkan kata sandi minimal 8 karakter.
+- Migration lokal `20261122000100_signup_profile_name.sql` memperbarui trigger pembuatan profil agar mengambil nama dari metadata Auth dan selalu menetapkan `pending`. Hak akses tidak pernah berasal dari pilihan/metadata pendaftar. Administrator masih perlu memverifikasi/mengaitkan identitas sekolah.
+- `npm run lint`, `npm run typecheck`, migration name/order check, dan `git diff --check` lulus. Browser/Auth email UAT belum dijalankan; migration tidak diterapkan ke hosted.
+
+## Pilihan peran login dan pendaftaran - 22 November 2026
+
+- Login menampilkan "Masuk sebagai" dan meneruskan pilihan peran ke tautan pendaftaran. Pendaftaran menampilkan "Daftar sebagai" dan kembali ke login dengan pilihan yang sama.
+- Pemilihan peran hanya membantu pengguna memilih ruang yang dimaksud; akses tetap mengikuti peran yang ditetapkan dan diverifikasi sekolah. Tidak ada role yang ditambahkan ke metadata Auth.
+- `npm run typecheck`, `npm run lint -- --no-warn-ignored`, dan `git diff --check` lulus. Pemeriksaan browser belum dijalankan.
+
+## Diagnostik kegagalan pendaftaran - 22 November 2026
+
+- Pesan generik pendaftaran diganti dengan panduan aman untuk signup nonaktif, email sudah terdaftar, rate limit, kata sandi, dan email tidak valid.
+- Signup Supabase lokal diaktifkan (`auth.enable_signup = true`); ini tidak mengubah pengaturan proyek hosted. Kegagalan hosted masih perlu diperiksa dari kode respons Auth dan konfigurasi Auth/redirect/SMTP proyek.
+- Typecheck, lint, dan `git diff --check` lulus. Tidak ada perubahan hosted atau pengujian email nyata.
+
+## Visi dan misi pada beranda - 22 November 2026
+
+- Slogan "Ruang untuk tumbuh bersama" diganti dengan identitas ekosistem digital sekolah terintegrasi. Bagian layanan beranda kini menampilkan visi resmi PRD dan tiga misi ringkas tentang supervisi, pembelajaran, perkembangan karakter, serta kolaborasi sekolah-keluarga.
+- `npm run typecheck`, `npm run lint`, dan `git diff --check` lulus.
+
+## Personalisasi dashboard administrator - 22 November 2026
+
+- Dashboard admin mendapat pusat kendali layanan dengan pencarian langsung, filter kategori Kelola sekolah/Pantau layanan/Akun, hitung hasil, tombol hapus pencarian, dan keadaan tanpa hasil.
+- Kartu responsif merangkum data sekolah, tautan akun, pengumuman, dokumen, absensi, jurnal, jadwal, modul ajar, kebiasaan, laporan, notifikasi, profil, serta keamanan. Ringkasan menggunakan tautan yang telah tersedia dan peran admin yang sudah ditentukan; tidak ada hak baru yang ditambahkan.
+- Gaya kartu, fokus, dan hover memakai warna desain sekolah, animasi reveal yang sudah ada, dan dukungan `prefers-reduced-motion`. `npm run typecheck`, `npm run lint`, dan `git diff --check` lulus; tes browser tidak dijalankan.
+
+## Ganti akun dari login dan daftar - 22 November 2026
+
+- Jika sesi masih aktif, halaman login/daftar kini menjelaskan email yang sedang masuk dan menyediakan tombol keluar lokal agar pengguna dapat beralih akun di browser yang sama.
+- Pilihan tampilan role tidak memberi atau mengganti role. Akun pendaftaran mandiri tetap `pending`; role fitur dibaca dari `profiles.role` dan harus ditetapkan lewat alur tepercaya.
+- `npm run typecheck`, `npm run lint`, dan `git diff --check` lulus. Pengujian akun hosted tidak dilakukan.
+
+## Personalisasi ruang murid - 22 November 2026
+
+- Dashboard murid memakai sapaan nama, panel sambutan belajar, dan tombol utama ke materi/tugas. Akses dibagi ke Belajar, Keseharianku, Info untukmu, dan Akun dengan keterangan singkat untuk setiap layanan.
+- Kartu memakai ilustrasi ringan dan animasi kecil; tata letak menumpuk pada layar sempit dan gerakan mengikuti `prefers-reduced-motion`. Link dan isi tetap mengikuti izin peran murid yang sudah ada.
+- `npm run typecheck`, `npm run lint`, dan `git diff --check` lulus. Browser/UAT tidak dijalankan.
+
+## Ruang guru - 22 November 2026
+
+- Dashboard guru mendapat sapaan dan panel kerja dengan pintasan utama ke absensi kelas dan jurnal mengajar. Layanan dikelompokkan menjadi Pembelajaran, Kegiatan kelas, Kegiatan profesional, dan Akun.
+- Kartu menjelaskan tindakan pada materi/tugas/asesmen, modul ajar, dokumen, komunikasi keluarga, laporan wali, supervisi, absensi guru, serta layanan baca lain. Seluruh tautan mengikuti permission role guru yang sudah ada; tidak ada akses baru.
+- Tampilan memakai palet ungu/lilac/biru, susunan responsif, interaksi kartu, dan animasi yang menghormati `prefers-reduced-motion`. Typecheck, lint, dan pemeriksaan diff lulus; browser/UAT tidak dijalankan.
+
+## Ruang kepala sekolah dan orang tua - 22 November 2026
+
+- Ruang kepala sekolah menonjolkan ringkasan supervisi dan akses ke supervisi, peninjauan modul ajar/dokumen, pemantauan absensi dan jadwal, laporan wali, pengumuman, serta akun. Keputusan laporan ketidakhadiran tetap milik guru kelas.
+- Ruang orang tua menonjolkan portal kehadiran anak tertaut, laporan izin, kebiasaan anak, materi/tugas/jadwal/asesmen, komunikasi, kabar sekolah, notifikasi, dan akun. Keterangan menyebut akses anak bergantung pada tautan terverifikasi.
+- Kedua ruang memakai layanan terkelompok, kartu responsif, tombol tindakan utama, dan gerakan yang menghormati `prefers-reduced-motion`; izin role tetap mengendalikan tautan. Typecheck, lint, dan pemeriksaan diff lulus; browser/UAT tidak dijalankan.
+
+## Penetapan peran dari aplikasi - 22 November 2026
+
+- Penyederhanaan untuk operator: pencarian nama/email, muat ulang daftar, petunjuk verifikasi email, dan konfirmasi pencocokan identitas.
+
+- Menambahkan halaman `/akun-sekolah` untuk administrator melihat akun pending terverifikasi dan menetapkan guru, kepala sekolah, murid, atau wali dengan konfirmasi.
+- RPC database memeriksa role administrator saat dipanggil, memvalidasi email terverifikasi dan status pending, menolak role administrator dari UI, serta menyimpan audit perubahan. Akun administrator pertama masih memerlukan bootstrap operator.
+- Migration lokal belum hosted; gate hosted proyek tetap berlaku. Lint dan typecheck lulus; tes otomatis/browser dan build belum dijalankan.

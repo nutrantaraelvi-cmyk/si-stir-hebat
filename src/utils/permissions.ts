@@ -77,7 +77,7 @@ export const canReviewSchoolDocuments = isPrincipal
 export const canReadNotifications = (role: RoleInput) =>
   has(role, 'administrator', 'principal', 'teacher', 'student', 'parent')
 export const canReadHabits = canReadNotifications
-export const canSubmitHabits = (role: RoleInput) => has(role, 'student', 'parent')
+export const canSubmitHabits = isParent
 export const canValidateHabits = isTeacher
 
 export const canReadDashboardOverview = (role: RoleInput) => has(role, 'administrator', 'principal')

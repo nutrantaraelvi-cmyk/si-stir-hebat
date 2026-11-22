@@ -20,7 +20,7 @@ test('migrations and database permissions', async t => {
     alter table storage.objects enable row level security;
     grant usage on schema storage to anon, authenticated;
     grant select, insert, delete on storage.objects to anon, authenticated;
-    create table auth.users (id uuid primary key);
+    create table auth.users (id uuid primary key, email text, email_confirmed_at timestamptz, raw_user_meta_data jsonb not null default '{}'::jsonb);
     create function auth.uid() returns uuid language sql stable as $$
       select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
     $$;
@@ -28,7 +28,7 @@ test('migrations and database permissions', async t => {
       language plpgsql security definer as $$ begin return; end; $$;
     grant usage on schema auth, public to anon, authenticated;
     grant execute on function auth.uid() to anon, authenticated;
-    insert into auth.users values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+    insert into auth.users (id) values ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
   `)
   const migrationDir = new URL('../supabase/migrations/', import.meta.url)
   for (const name of (await readdir(migrationDir)).filter(name => name.endsWith('.sql')).sort()) {
@@ -74,6 +74,8 @@ test('migrations and database permissions', async t => {
     const { rows } = await db.query("select role from public.profiles where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'")
     assert.equal(rows[0].role, 'pending')
     await db.exec(await readFile(new URL('../supabase/tests/profiles.sql', import.meta.url), 'utf8'))
+    await db.query("insert into auth.users (id,raw_user_meta_data) values ($1,$2)", ['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa-0010', { full_name: 'Data Contoh Pendaftar', role: 'administrator' }])
+    assert.deepEqual((await db.query('select full_name,role from public.profiles where id=$1', ['aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa-0010'])).rows, [{ full_name: 'Data Contoh Pendaftar', role: 'pending' }])
   })
   await t.test('managed event-trigger function is not executable by client roles', async () => {
     for (const role of ['anon', 'authenticated']) {
@@ -1231,7 +1233,6 @@ test('migrations and database permissions', async t => {
     await as('administrator')
     await db.query("select public.set_account_relationship('parent',$1,$2,true,'Data Contoh hubungan')", [studentOne, ids.parent])
     const pendingDay = `${today.slice(0, 4)}-11-01`
-    const validatedDay = `${today.slice(0, 4)}-11-02`
     await as('parent')
     assert.equal((await db.query('select habit_key from public.habit_catalog where active order by sort_order')).rows.length, 7)
     const parentRow = (await db.query("insert into public.habit_records (student_id,record_date,habits,notes) values ($1,$2,$3,'Data Contoh catatan wali') returning id,validation_status", [studentOne,pendingDay,[true,false,false,false,false,false,false]])).rows[0]
@@ -1243,11 +1244,9 @@ test('migrations and database permissions', async t => {
     assert.equal(weeklyForParent.bangun_pagi, 1)
     await as('student')
     assert.deepEqual((await db.query('select student_id from public.habit_records')).rows, [{ student_id: studentOne }])
-    const studentRow = (await db.query("insert into public.habit_records (student_id,record_date,habits) values ($1,$2,$3) returning validation_status", [studentOne,validatedDay,[false,true,false,false,false,false,false]])).rows[0]
-    assert.equal(studentRow.validation_status, 'pending')
-    await assert.rejects(db.query("update public.habit_records set validation_status='validated',revision=revision+1"), permissionDenied)
+    assert.equal((await db.query("update public.habit_records set validation_status='validated',revision=revision+1 returning id")).rows.length, 0)
     await as('teacher')
-    assert.equal((await db.query('select * from public.habit_records')).rows.length, 2)
+    assert.equal((await db.query('select * from public.habit_records')).rows.length, 1)
     assert.equal((await db.query("select student_id from public.habit_weekly_summary(date_trunc('week',$1::date)::date,0,null)", [pendingDay])).rows.some(row => row.student_id === studentOne), true)
     const validated = (await db.query("update public.habit_records set validation_status='validated',validation_note='Data Contoh konfirmasi',revision=revision+1 where record_date=$1 returning validation_status,validated_by,validated_at", [pendingDay])).rows[0]
     assert.equal(validated.validation_status, 'validated')
@@ -1255,7 +1254,7 @@ test('migrations and database permissions', async t => {
     assert.ok(validated.validated_at)
     await as('parent')
     assert.equal((await db.query("select validation_status from public.habit_records where record_date=$1", [pendingDay])).rows[0].validation_status, 'validated')
-    await assert.rejects(db.query("update public.habit_records set validation_status='validated',revision=revision+1"), permissionDenied)
+    await assert.rejects(db.query("update public.habit_records set validation_status='pending',revision=revision+1"), permissionDenied)
     await as('teacher')
     await db.query("update public.habit_records set validation_status='pending',revision=revision+1 where record_date=$1", [pendingDay])
     await as('parent')
@@ -1263,7 +1262,7 @@ test('migrations and database permissions', async t => {
     assert.deepEqual(pendingAgain, { validation_status: 'pending', validated_by: null, validated_at: null, validation_note: '' })
     for (const role of ['principal','administrator']) {
       await as(role)
-      assert.equal((await db.query('select * from public.habit_records')).rows.length, 2)
+      assert.equal((await db.query('select * from public.habit_records')).rows.length, 1)
       assert.equal((await db.query("update public.habit_records set validation_status='validated',revision=revision+1 returning id")).rows.length, 0)
     }
     await as('pending')

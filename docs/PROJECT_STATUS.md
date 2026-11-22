@@ -1,6 +1,63 @@
 # Status SI STIR HEBAT
 
+## Pemeriksaan workspace - 22 November 2026
+
+- Tidak ada konflik Git aktif atau penanda konflik pada berkas sumber. Ekspektasi tes validasi kebiasaan disesuaikan untuk memeriksa perubahan status terlarang dan pembaruan yang ditolak RLS. `npm run check` lulus: 149 tes, lint, typecheck, dan build terisolasi. Ini bukan audit menyeluruh seluruh kode atau UAT hosted.
+
+## Gaya bersama Tailwind - 22 November 2026
+
+- Plugin Tailwind Vite diaktifkan dan gaya bersama diterapkan pada halaman fitur, formulir, tabel, status, fokus, dan konfirmasi. Build terisolasi, lint, dan typecheck lulus; tampilan setiap halaman belum ditinjau visual. `npm run check` gagal pada tes database kebiasaan di `tests/database.test.mjs:1257` (ekspektasi penolakan tidak terjadi), sehingga rangkaian lengkap belum lulus.
+
+## Daftar kebiasaan ruang murid - 22 November 2026
+
+- Dashboard murid menampilkan tujuh kebiasaan sebagai daftar interaktif sementara, dengan penghitung dan animasi kemajuan. Pilihan hanya berlaku selama halaman terbuka; catatan resmi tetap diisi wali dan divalidasi guru.
+
+## Formulir saat data kosong - 22 November 2026
+
+- Formulir asesmen, materi, tugas, modul ajar, jurnal, dan laporan ketidakhadiran dapat dibuka meskipun penugasan atau hubungan anak belum tersedia. Penyimpanan tetap memerlukan data dan izin yang sah. Halaman lain belum diaudit seluruhnya untuk kebutuhan ini.
+
+## Penetapan peran akun - 22 November 2026
+
+- Halaman operator menyediakan pencarian nama/email, tombol muat ulang, petunjuk akun yang belum muncul, dan konfirmasi pencocokan identitas sebelum peran ditetapkan.
+
+- Dashboard administrator dan navigasi kini memuat halaman Akun sekolah untuk menetapkan peran pada akun `pending` dengan email terverifikasi. Admin mencocokkan nama/email, memilih guru, kepala sekolah, murid, atau orang tua/wali, lalu mengonfirmasi perubahan.
+- Migration lokal `20261122000200_admin_role_assignment.sql` menambahkan RPC yang memeriksa role administrator di database, menolak akun belum terverifikasi atau sudah diproses, membatasi role yang dapat ditetapkan, dan mencatat perubahan peran. Akun administrator pertama tetap perlu bootstrap operator karena belum ada admin yang dapat membuka halaman.
+- Migration belum diterapkan ke Supabase hosted sesuai gate proyek. Perlu bootstrap administrator pertama dan penerapan migration setelah semua gate hosted lolos. Verifikasi otomatis belum dijalankan.
+
+## Ruang kepala sekolah dan orang tua - 22 November 2026
+
+Dashboard kepala sekolah dan orang tua kini dipersonalisasi dengan panel sambutan, tindakan utama, dan layanan terkelompok sesuai kewenangan. Fitur wali menegaskan hubungan anak harus sudah tertaut; keputusan laporan izin tetap dilakukan guru. Typecheck/lint lulus; browser/UAT belum dijalankan.
+
+## Ruang guru - 22 November 2026
+
+Dashboard guru memiliki panel kerja personal dan pintasan terkelompok untuk pembelajaran, kegiatan kelas, kegiatan profesional, serta akun. Tautan menjelaskan fungsi ringkas dan tetap mengikuti permission guru yang berlaku. Gaya responsif dan animasi mendukung reduced motion. Typecheck/lint lulus; browser/UAT belum dijalankan.
+
+## Ruang murid - 22 November 2026
+
+Dashboard murid dipersonalisasi dengan sapaan nama, sambutan belajar, pintasan materi/tugas, serta layanan terkelompok untuk belajar, keseharian, informasi, dan akun. Gaya responsif dengan gerakan reduced-motion. Typecheck, lint, dan pemeriksaan diff lulus; browser/UAT belum dijalankan.
+
+## Pergantian akun untuk UAT peran - 22 November 2026
+
+Halaman login dan daftar kini memberi tindakan keluar saat sesi masih aktif, agar akun uji lain dapat digunakan dari browser yang sama. Role tetap berasal dari `profiles.role`; label peran pada form hanya tampilan, sementara pendaftaran mandiri berstatus `pending`. Typecheck/lint lulus. UAT hosted belum dijalankan.
+
+## Dashboard administrator - 22 November 2026
+
+Dashboard administrator kini menyediakan pusat kendali dengan pencarian layanan, filter kategori, kartu akses responsif, dan interaksi ringan yang menghormati reduced motion. Daftar mengikuti layanan yang sudah tersedia untuk administrator; otorisasi aplikasi/database tidak berubah. Typecheck, lint, dan pemeriksaan diff lulus. Tes browser untuk perubahan ini belum dijalankan.
+
 ## Infrastruktur dan kapasitas - 22 November 2026
+
+## Pendaftaran akun mandiri - 22 November 2026
+
+- Ditambahkan halaman `/daftar` untuk nama, email, dan kata sandi; tautan tersedia dari beranda dan login. Pendaftaran menggunakan Supabase Auth `signUp` dan meminta verifikasi email.
+- Migration lokal `20261122000100_signup_profile_name.sql` menyimpan nama profil dari metadata Auth yang diberikan pengguna dan selalu membuat peran `pending`; metadata role yang dikirim pengguna diabaikan. Sekolah tetap harus memverifikasi/mengaitkan akun ke data siswa/guru melalui alur tautan akun.
+- Ini mengurangi pembuatan akun Auth manual, tetapi belum menghapus kebutuhan verifikasi/tautan oleh admin. Migration baru belum diterapkan ke Supabase hosted sesuai gate proyek. Lint/typecheck lulus; tes otomatis hasil lengkap belum diperoleh.
+
+## Penyelesaian fitur yang belum lengkap secara hosted - 22 November 2026
+
+- Kebiasaan kini mengikuti D6: wali yang mengisi, murid hanya membaca catatan dan rekap sendiri, guru memvalidasi. Hak submit UI dan fungsi RLS lokal sudah wali saja; tes database memastikan murid tidak dapat INSERT.
+- Dokumen sekolah kini menyediakan unduhan berkas aktif dan tiap versi historis melalui Storage privat, dengan pemeriksaan bahwa path satu tingkatnya berada di folder dokumen tersebut. Uji upload versi lulus; uji unduhan browser belum tuntas karena route mock Storage SDK tidak menangkap request.
+- Komunikasi, notifikasi, laporan wali, absensi guru dan sebagian besar administrasi dokumen sudah memiliki route/API, migration lokal, serta tes browser terdahulu. Cakupan yang belum ada tetap tercantum di `QA_COVERAGE.md`.
+- Hosted belum berubah: tabel keenam fitur tidak ada di project Supabase, perbedaan konfigurasi sekolah/deletion request memerlukan rekonsiliasi, Security Advisor masih memperingatkan perlindungan password bocor nonaktif, Supabase lokal dan bukti backup/restore belum tersedia. Oleh karena itu migration tidak dijalankan remote.
 
 - **Rekonsiliasi migrasi hosted 22 November 2026:** metadata katalog Supabase kini dicocokkan untuk semua 16 file lokal yang tidak tercatat—tabel/kolom, constraint, policy, fungsi, index, trigger, dan bucket. Objek fitur kebiasaan/komunikasi/laporan wali/notifikasi/dokumen/absensi guru belum ada; lima tabel konfigurasi plus `deletion_requests` sudah ada dengan semantik dan constraint berbeda. `npm run check:supabase` mengonfirmasi Auth aktif dan penolakan anonim tabel lama, lalu gagal HTTP 404 pada `habit_records`. Tidak ada DDL/metadata migration hosted ditulis. Rincian, perbandingan semantik, dan gate tersisa: [HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md](HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md). Migrasi hosted masih tertahan oleh drift, Advisor, dan backup/restore + Supabase lokal yang belum terverifikasi.
 

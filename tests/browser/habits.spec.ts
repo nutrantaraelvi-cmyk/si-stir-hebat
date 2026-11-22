@@ -199,37 +199,22 @@ test('pending account cannot open habits', async ({ page }) => {
   expect(rosterCalls).toBe(0)
 })
 
-test('student taps habits and saves a daily record', async ({ page }) => {
+test('student can see own habit recap but cannot submit a daily record', async ({ page }) => {
   const state = await setupStudent(page)
 
   await page.goto('/kebiasaan')
   await expect(page.getByRole('heading', { name: '7 Kebiasaan Anak Indonesia Hebat' })).toBeVisible()
-  await expect(page.getByText('Catatan harian: belum diisi', { exact: true })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Bangun pagi/ })).toHaveAttribute('aria-pressed', 'false')
+  await expect(page.getByText('Wali mengisi catatan harian untuk anak. Anda dapat melihat catatan milik sendiri dan rekap yang diizinkan.')).toBeVisible()
+  await expect(page.getByText('Catatan harian: belum diisi', { exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /Bangun pagi/ })).toHaveCount(0)
+  await expect(page.getByLabel('Catatan tambahan')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Simpan catatan' })).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Rekap minggu ini' })).toBeVisible()
   await expect(page.getByText(/Minggu ini 3 dari 5 hari terisi\./)).toBeVisible()
   await expect(page.getByText(/2 hari belum diisi, bukan berarti tidak dilakukan/)).toBeVisible()
   expect(state.weeklyTargets[0]).toBe('student-one')
 
-  await page.getByRole('button', { name: /Bangun pagi/ }).click()
-  await expect(page.getByRole('button', { name: /Bangun pagi/ })).toHaveAttribute('aria-pressed', 'true')
-  await expect(page.getByText(/1 dari 7 kebiasaan ditandai/)).toBeVisible()
-
-  await page.getByLabel('Catatan tambahan').fill('Data Contoh bangun sendiri')
-  await page.getByRole('button', { name: 'Simpan catatan' }).click()
-
-  await expect(page.getByText(/tersimpan dan menunggu validasi guru/)).toBeVisible()
-  await expect(page.getByRole('article').filter({ hasText: 'Bangun pagi: dilakukan' })).toBeVisible()
-  await expect(page.getByText('Catatan harian: sudah diisi', { exact: true })).toBeVisible()
-  await expect(page.getByText('Menunggu validasi guru', { exact: true })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Rekap 1 catatan terakhir' })).toBeVisible()
-  await expect(page.getByText('1 dari 1 catatan', { exact: true })).toBeVisible()
-
-  expect(state.saved).toHaveLength(1)
-  expect(state.saved[0].student_id).toBe('student-one')
-  expect(state.saved[0].record_date).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-  expect(state.saved[0].habits).toEqual([true, false, false, false, false, false, false])
-  expect(state.saved[0].notes).toBe('Data Contoh bangun sendiri')
+  expect(state.saved).toHaveLength(0)
   await expectNoHorizontalOverflow(page)
 })
 
@@ -264,12 +249,11 @@ test('empty date is shown as belum diisi and an all-empty checklist is not saved
   const state = await setupStudent(page)
 
   await page.goto('/kebiasaan')
-  await expect(page.getByText('Catatan harian: belum diisi', { exact: true })).toBeVisible()
-  await expect(page.getByText('Tanggal ini belum diisi. Ketuk kebiasaan yang sudah dilakukan; tanggal tanpa catatan berarti belum diisi, bukan berarti tidak dilakukan.')).toBeVisible()
+  await expect(page.getByText('Wali mengisi catatan harian', { exact: false })).toHaveCount(0)
+  await expect(page.getByText('Catatan harian: belum diisi', { exact: true })).toHaveCount(0)
   await expect(page.getByText('Belum ada catatan kebiasaan. Tanggal tanpa catatan berarti belum diisi, bukan berarti tidak dilakukan.')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Simpan catatan' }).click()
-  await expect(page.getByText('Pilih dulu minimal satu kebiasaan yang sudah dilakukan hari ini. Jika belum ada yang bisa dicatat, biarkan tanggal ini belum diisi.')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Simpan catatan' })).toHaveCount(0)
   expect(state.saved).toHaveLength(0)
   await expectNoHorizontalOverflow(page)
 })

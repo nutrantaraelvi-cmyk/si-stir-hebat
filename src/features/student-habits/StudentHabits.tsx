@@ -186,13 +186,14 @@ function HabitsWorkspace({ userId }: { userId: string }) {
   const recent = page === 0 ? rows.slice(0, 7) : []
 
   return <section className="board">
-    <div className="board-heading"><div><div className="eyebrow">RUANG MURID</div><h1>7 Kebiasaan Anak Indonesia Hebat</h1><p>Catatan harian diisi murid atau wali, lalu dikonfirmasi guru setelah bertanya kepada orang tua.</p></div><Link to="/dashboard">Dashboard</Link></div>
+    <div className="board-heading"><div><div className="eyebrow">RUANG KEBIASAAN</div><h1>7 Kebiasaan Anak Indonesia Hebat</h1><p>Wali mencatat kebiasaan anak; guru memvalidasi setelah melakukan konfirmasi.</p></div><Link to="/dashboard">Dashboard</Link></div>
     {message && <p className="status" role="status">{message}</p>}
     {actionError && <p className="error" role="alert">{actionError}</p>}
     {loading ? <LoadingState /> : denied ? <EmptyState>Halaman kebiasaan tidak tersedia untuk peran ini.</EmptyState> : rosterError ? <ErrorNotice onRetry={() => void loadRoster()}>{rosterError}</ErrorNotice> : <>
       <p className="help">Catatan yang sudah tervalidasi dapat dilihat oleh murid, guru, wali, dan kepala sekolah sesuai relasi serta RLS.</p>
       {(isParent(role) || isTeacher(role)) && students.length > 1 && <label className="habit-picker" htmlFor="habit-student">Pilih murid<select id="habit-student" value={studentId} onChange={event => pickStudent(event.target.value)}>{students.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}
       {students.length === 0 && <EmptyState>{isTeacher(role) ? 'Belum ada murid pada kelas penugasan Anda.' : 'Belum ada murid yang tertaut ke akun ini.'}</EmptyState>}
+      {students.length > 0 && isStudent(role) && <p className="help">Wali mengisi catatan harian untuk anak. Anda dapat melihat catatan milik sendiri dan rekap yang diizinkan.</p>}
       {students.length > 0 && canWrite && <form className="announcement-editor habit-editor" onSubmit={event => { event.preventDefault(); void save() }}>
         <fieldset className="journal-fields"><legend>Catatan harian: {existingDraft ? 'sudah diisi' : 'belum diisi'}</legend>
           <label htmlFor="habit-date">Tanggal</label>

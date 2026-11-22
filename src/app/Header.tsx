@@ -14,6 +14,7 @@ function navItems(role: string | null): NavItem[] {
     { to: '/dashboard', label: 'Dashboard' },
   ]
   if (canReadMasterData('school_settings', role)) items.push({ to: '/sekolah', label: 'Data sekolah' })
+  if (role === 'administrator') items.push({ to: '/akun-sekolah', label: 'Akun sekolah' })
   if (canReadAttendance(role)) items.push({ to: '/absensi', label: 'Absensi' })
   if (canReadTeacherAttendance(role)) items.push({ to: '/absensi-guru', label: 'Absensi guru' })
   if (canReadJournals(role)) items.push({ to: '/jurnal', label: 'Jurnal' })

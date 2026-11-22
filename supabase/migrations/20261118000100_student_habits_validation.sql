@@ -25,9 +25,7 @@ create or replace function school_private.can_write_habits(target uuid) returns 
 language sql stable security definer set search_path='' as $$
   select exists(select 1 from public.profiles p join public.parent_student_relationships r on r.parent_profile_id=p.id
     join public.students s on s.id=r.student_id and s.is_active
-    where p.id=(select auth.uid()) and p.role='parent' and s.id=target)
-    or exists(select 1 from public.students s join public.profiles p on p.id=(select auth.uid())
-      where s.id=target and s.is_active and p.role='student' and s.profile_id=p.id);
+    where p.id=(select auth.uid()) and p.role='parent' and s.id=target);
 $$;
 
 create or replace function school_private.can_validate_habits(target uuid) returns boolean

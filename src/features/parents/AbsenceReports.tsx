@@ -181,11 +181,12 @@ export function AbsenceReports() {
   return <section className="board absence-report-page">
     {heading}
     {parentView && <>
-      {students.length === 0
-        ? <EmptyState>Belum ada anak tertaut aktif. Hubungi administrator sekolah untuk verifikasi relasi.</EmptyState>
-        : <form className="announcement-editor" onSubmit={submit}>
+      {students.length === 0 && <EmptyState>Belum ada anak tertaut aktif. Hubungi administrator sekolah untuk verifikasi relasi sebelum mengirim laporan.</EmptyState>}
+        <form className="announcement-editor" onSubmit={submit}>
+          <h2>Laporkan ketidakhadiran</h2>
           <label htmlFor="absence-student">Anak</label>
           <select id="absence-student" value={studentId} onChange={event => setStudentId(event.target.value)} disabled={saving || Boolean(pendingRequest)}>
+            {students.length === 0 && <option value="">Belum ada anak tertaut</option>}
             {students.map(student => <option key={student.id} value={student.id}>{student.name}</option>)}
           </select>
           <label htmlFor="absence-date">Tanggal tidak hadir</label>
@@ -194,13 +195,13 @@ export function AbsenceReports() {
           <textarea id="absence-reason" rows={4} maxLength={1000} value={reason} onChange={event => setReason(event.target.value)} disabled={saving || Boolean(pendingRequest)} placeholder="Contoh: sakit demam, izin acara keluarga." />
           <p className="help">Laporan untuk tanggal mendatang ditolak, dan satu anak hanya dapat memiliki satu laporan aktif per tanggal.</p>
           <div className="button-row">
-            <button className="button" type="submit" disabled={saving || (!pendingRequest && !reason.trim())}>
+            <button className="button" type="submit" disabled={!students.length || saving || (!pendingRequest && !reason.trim())}>
               {saving ? 'Mengirim…' : pendingRequest ? 'Kirim ulang laporan' : 'Kirim laporan'}
             </button>
           </div>
           {formError && <p className="error" role="alert">{formError}</p>}
           {success && <p className="status" role="status">{success}</p>}
-        </form>}
+        </form>
     </>}
     {!parentView && <>
       {success && <p className="status" role="status">{success}</p>}

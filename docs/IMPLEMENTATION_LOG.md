@@ -719,3 +719,9 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Token warna/typografi, lima ruang peran, dashboard dan halaman fitur diselaraskan; animasi ringan menghormati `prefers-reduced-motion`. Audit kontras menggelapkan angka penanda bagian dan kartu.
 - Bukti akhir Node 24.22.3: `npm run check` EXIT 0 (39 migration, lint, typecheck, 149/149 tes, build 1.792 modul, 30 bundle JS tanpa akun demo). Suite Playwright penuh 420/420 lulus pada desktop dan mobile di port 5191. Beranda/login ditinjau pada 1280×900 dan 390×844 tanpa overflow horizontal; seluruh API browser ditiru, bukan UAT.
 - Fokus keyboard dan reduced motion tercakup dalam suite. Belum ada UAT akun sekolah nyata atau pemeriksaan hosted sebagai bagian dari restyling ini.
+
+## Pencocokan migrasi Supabase hosted - 22 November 2026
+
+- Metadata read-only dari proyek yang cocok dengan `supabase/config.toml`: riwayat 23/39 migrasi. Inventaris objek untuk 16 migrasi tertinggal mencakup tabel, kolom, constraint, policy, fungsi, index, trigger, dan bucket Storage.
+- Ditemukan tabel fitur yang belum ada (kebiasaan, komunikasi, laporan wali, notifikasi, dokumen, absensi guru) serta tabel konfigurasi/deletion requests yang sudah ada dengan constraint, policy, kategori retensi, dan perilaku berbeda dari migration lokal. Ini memerlukan migrasi rekonsiliasi forward-only setelah pilihan kanonis ditetapkan.
+- `npm run check:supabase` lulus pada Auth dan tabel lama sampai gagal `habit_records` HTTP 404. Security Advisor masih WARN; backup/restore dan Supabase lokal belum diverifikasi. Tidak ada DDL atau status migration hosted yang ditulis. Laporan: `docs/HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md`.

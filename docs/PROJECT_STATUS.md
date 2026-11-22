@@ -1,5 +1,11 @@
 # Status SI STIR HEBAT
 
+## Infrastruktur dan kapasitas - 22 November 2026
+
+Frontend Vite statis memakai CDN global Vercel; cache satu tahun untuk asset build ber-hash dikonfigurasi di `vercel.json`. Cache publik tidak diterapkan pada data Data API/RPC yang bergantung pada pengguna atau RLS. Supabase terhubung berada di paket Free, region Seoul, PostgreSQL 17.11.0.018. Snapshot statistik menunjukkan tabel operasional hampir kosong dan log 24 jam bervolume kecil, sehingga belum ada bukti untuk menaikkan compute atau membuat read replica.
+
+Performance Advisor melaporkan 15 foreign key tanpa indeks penutup dan 63 indeks belum terpakai. Tidak ada indeks database yang diubah: riwayat hosted 23 migration sampai `20261113074045` tidak cocok dengan 39 migration lokal, dan metadata hosted untuk konfigurasi sekolah berbeda dari migration lokal. Rekonsiliasi skema dan verifikasi backup/restore wajib sebelum DDL hosted. Read replica/load balancer Supabase memerlukan paket berbayar dan compute Small; belum dibuat. Rincian: [INFRA_SCALING_CACHE_DB.md](INFRA_SCALING_CACHE_DB.md).
+
 - **Restyling UI 22 November 2026:** token warna/typografi disatukan, lima variasi ruang peran tersedia, dan komponen dashboard/formulir/status mendapat interaksi ringan dengan dukungan `prefers-reduced-motion`. Catatan pola referensi ada di `docs/UI_REFERENSI_NOTES.md`. Pemeriksaan lint dan TypeScript lulus pada Node 24.22.3. `npm run check` belum lulus: runner tes Node berakhir dengan fatal out-of-memory `Zone` pada tes database; tes konfigurasi sekolah serial lulus 9/9. Suite browser belum dijalankan karena gate check belum bersih. Pekerjaan restyling halaman lain dan audit visual 390×844/1280×900 belum selesai.
 
 - **Login sesuai ruang peran:** halaman masuk kini menyediakan pilihan Murid, Orang tua, Guru, Kepala Sekolah, dan Administrator. Pilihan mengganti sapaan, ikon, dan aksen panel; akun Supabase serta profil tetap menentukan sesi dan hak akses. Ruang Murid memakai ikon dan ornamen ceria responsif. Belum diuji secara visual/browser pada perubahan ini.

@@ -708,3 +708,14 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Vercel sudah memberi CDN global untuk SPA statis. Supabase terhubung ada di paket Free, region Seoul, PostgreSQL 17.11; statistik 22 November menunjukkan tabel operasional hampir kosong, serta 7 log PostgREST, 34 PostgreSQL, dan 81 PgBouncer dalam 24 jam. Tidak ada peningkatan compute atau replica yang dilakukan.
 - Performance Advisor menandai 15 FK tanpa indeks penutup dan 63 indeks belum terpakai. DDL ditahan karena riwayat hosted 23 migration berbeda dari 39 migration lokal dan definisi konfigurasi sekolah hosted tidak sesuai berkas lokal. Tidak ada migration atau perubahan Supabase hosted yang dijalankan.
 - Validasi: JSON cache config, lint, `npx tsc --noEmit`, `npm run build:isolated` (1.792 modul; 30 berkas JS tanpa akun demo) dan `git diff --check` lulus. Peringatan ukuran chunk PDF 790,69 kB tetap ada. Deployment Vercel belum dilakukan.
+## Restyling dan audit UI - 22 November 2026
+
+- Token warna/typografi, lima ruang peran, dashboard dan halaman fitur diselaraskan; animasi ringan menghormati `prefers-reduced-motion`. Audit kontras menggelapkan angka penanda bagian dan kartu.
+- Bukti akhir Node 24.22.3: `npm run check` EXIT 0 (39 migration, lint, typecheck, 149/149 tes, build 1.792 modul, 30 bundle JS tanpa akun demo). Suite Playwright penuh 420/420 lulus pada desktop dan mobile di port 5191. Beranda/login ditinjau pada 1280×900 dan 390×844 tanpa overflow horizontal; seluruh API browser ditiru, bukan UAT.
+- Fokus keyboard dan reduced motion tercakup dalam suite. Belum ada UAT akun sekolah nyata atau pemeriksaan hosted sebagai bagian dari restyling ini.
+
+## Restyling dan audit UI - 22 November 2026
+
+- Token warna/typografi, lima ruang peran, dashboard dan halaman fitur diselaraskan; animasi ringan menghormati `prefers-reduced-motion`. Audit kontras menggelapkan angka penanda bagian dan kartu.
+- Bukti akhir Node 24.22.3: `npm run check` EXIT 0 (39 migration, lint, typecheck, 149/149 tes, build 1.792 modul, 30 bundle JS tanpa akun demo). Suite Playwright penuh 420/420 lulus pada desktop dan mobile di port 5191. Beranda/login ditinjau pada 1280×900 dan 390×844 tanpa overflow horizontal; seluruh API browser ditiru, bukan UAT.
+- Fokus keyboard dan reduced motion tercakup dalam suite. Belum ada UAT akun sekolah nyata atau pemeriksaan hosted sebagai bagian dari restyling ini.

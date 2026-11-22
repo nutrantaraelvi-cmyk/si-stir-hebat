@@ -28,13 +28,13 @@ const SchoolDocuments = lazy(() => import('../features/school-documents/SchoolDo
 const TeacherAttendance = lazy(() => import('../features/attendance/TeacherAttendance').then(module => ({ default: module.TeacherAttendance })))
 const roles = [
   { id: 'student', icon: GraduationCap, title: 'Murid', detail: 'Materi, tugas, jadwal, dan perkembangan belajar' },
-  { id: 'parent', icon: Users, title: 'Orang Tua', detail: 'Kehadiran anak dan komunikasi dengan guru' },
+  { id: 'parent', icon: Users, title: 'Orang Tua', detail: 'Kehadiran anak dan informasi sekolah' },
   { id: 'teacher', icon: BookOpen, title: 'Guru', detail: 'Materi, absensi, asesmen, dan jurnal' },
   { id: 'principal', icon: ClipboardCheck, title: 'Kepala Sekolah', detail: 'Supervisi akademik dan dokumen sekolah' },
   { id: 'administrator', icon: ShieldCheck, title: 'Administrator', detail: 'Data sekolah, akun, dan pengaturan akses' },
 ]
 const homeServices = [
-  { icon: BookOpen, tag: 'BELAJAR', title: 'Pembelajaran terarah', detail: 'Materi, tugas, asesmen, dan jadwal mengikuti ruang belajar masing-masing.' },
+  { icon: BookOpen, tag: 'BELAJAR', title: 'Pembelajaran terarah', detail: 'Materi, tugas, dan asesmen' },
   { icon: HeartHandshake, tag: 'MENDAMPINGI', title: 'Tumbuh bersama', detail: 'Guru dan keluarga terhubung untuk mendampingi keseharian murid.' },
   { icon: ClipboardCheck, tag: 'MENGELOLA', title: 'Layanan sekolah', detail: 'Kehadiran, jurnal, supervisi, dan dokumen tertata sesuai kewenangan.' },
 ]

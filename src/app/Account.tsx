@@ -64,7 +64,7 @@ export function Login() {
       <p className="login-role-note">Pilihan ini mengubah tampilan saja. Layanan dan hak akses mengikuti peran pada akun sekolah Anda.</p>
     </div>
     <div className="login-panel">
-    <h2>Masuk ke akun sekolah</h2><p>Gunakan email dan kata sandi yang diberikan administrator.</p>
+    <h2>Masuk SI STIR HEBAT</h2><p>Gunakan email dan kata sandi yang diberikan administrator.</p>
     <form onSubmit={submit}>
       <label htmlFor="email">Email</label><input id="email" type="email" autoComplete="username" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />
       <label htmlFor="password">Kata sandi</label><input id="password" type="password" autoComplete="current-password" required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} />

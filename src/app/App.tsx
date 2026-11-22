@@ -29,7 +29,7 @@ const TeacherAttendance = lazy(() => import('../features/attendance/TeacherAtten
 const roles = [
   { id: 'student', icon: GraduationCap, title: 'Murid', detail: 'Materi, tugas, jadwal, dan perkembangan belajar' },
   { id: 'parent', icon: Users, title: 'Orang Tua', detail: 'Kehadiran anak dan informasi sekolah' },
-  { id: 'teacher', icon: BookOpen, title: 'Guru', detail: 'Materi, absensi, asesmen, dan jurnal' },
+  { id: 'teacher', icon: BookOpen, title: 'Guru', detail: 'Materi, absensi, penilaian, dan jurnal' },
   { id: 'principal', icon: ClipboardCheck, title: 'Kepala Sekolah', detail: 'Supervisi akademik dan dokumen sekolah' },
   { id: 'administrator', icon: ShieldCheck, title: 'Administrator', detail: 'Data sekolah, akun, dan pengaturan akses' },
 ]

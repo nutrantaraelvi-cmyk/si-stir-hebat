@@ -37,4 +37,16 @@ Playwright memakai Edge sebagai default di Windows jika `PLAYWRIGHT_CHANNEL` kos
 3. Setelah rilis disetujui, build revisi yang sama di Vercel dengan Node 24, `npm run build` dan dua variabel publishable milik target. `prebuild` membaca environment proses. Build menghasilkan `dist/` yang diaudit lagi. Gunakan environment Preview milik proyek uji untuk UAT sebelum promosi.
 4. Catat ID deployment, status smoke, hasil UAT, dan versi skema. Bila smoke atau alur sekolah gagal, hentikan promosi. Untuk deployment yang sudah aktif, pilih deployment sehat terakhir yang kompatibel dengan skema. Perbaikan database memakai migrasi maju atau prosedur pemulihan yang telah diuji. [Runbook operasional](RUNBOOK_OPERASIONAL.md)
 
+## CD Preview otomatis
+
+Job `deploy-preview` di `.github/workflows/verify.yml` berjalan pada push ke `main` setelah job `verify` lulus, lalu men-deploy ke **Preview** Vercel (bukan produksi) dengan `vercel@65.14.0` (`pull` → `build` → `deploy --prebuilt`). URL Preview tampil di ringkasan run dan environment `preview` GitHub. Tanpa secret, job dilewati dengan pemberitahuan sehingga CI tetap hijau.
+
+Penyiapan satu kali oleh pemilik:
+
+1. Vercel → Account Settings → Tokens: buat token khusus CI.
+2. GitHub repo → Settings → Secrets and variables → Actions: tambahkan `VERCEL_TOKEN`, `VERCEL_ORG_ID`, dan `VERCEL_PROJECT_ID`. Dua ID terakhir ada di `.vercel/project.json` setelah `vercel link`, atau di Project Settings Vercel.
+3. Vercel → Project → Settings → Environment Variables: isi `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` untuk environment **Preview**. Tanpa keduanya build ditolak oleh `prebuild`.
+
+Produksi sengaja tidak otomatis: kode `main` membutuhkan migration yang belum diterapkan ke Supabase hosted. Promosikan Preview ke produksi secara manual setelah gerbang migration, smoke, dan UAT di atas terpenuhi.
+
 Konfigurasi CI memakai fixture dan tidak menerbitkan `dist-check/` ke layanan hosted. Bukti produksi berasal dari deployment, smoke serta UAT peran dan email pada target yang disetujui. [Aktivasi operator](AKTIVASI_DAN_RILIS.md)

@@ -96,7 +96,7 @@
 .assessment-detail [aria-label="Riwayat perubahan nilai"] { margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
 .assessment-detail [aria-label="Riwayat perubahan nilai"] article { padding-block: 10px; border-bottom: 1px solid var(--line); }
 .schedule-page > fieldset { grid-template-columns: max-content minmax(0, 1fr); align-items: center; }
-.schedule-page > fieldset > p, .schedule-page > fieldset > .reference-notice { grid-column: 1 / -1; }
+.schedule-page > fieldset > p { grid-column: 1 / -1; }
 .schedule-page > fieldset > button { grid-column: 2; justify-self: start; }
 .schedule-page > form { margin-block: 20px; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid var(--brand-soft); border-radius: var(--radius-md); background: var(--lilac); }
 .schedule-page > form > h2 { margin-top: 0; color: var(--brand); }
@@ -139,5 +139,14 @@
   .journals-page .journal-fields { grid-template-columns: minmax(0, 1fr); }
   .journals-page .journal-fields legend, .journals-page .journal-fields > p, .journals-page .journal-fields textarea, .journals-page .journal-fields .actions { grid-column: 1; }
   .schedule-page > fieldset { grid-template-columns: minmax(0, 1fr); }
-  .schedule-page > fieldset > p, .schedule-page > fieldset > .reference-notice, .schedule-page > fieldset > button { grid-column: 1; }
+  .schedule-page > fieldset > p, .schedule-page > fieldset > button { grid-column: 1; }
 }
+
+/* Peringatan sesi tidak aktif (PRD 6.3) */
+.idle-warning{position:fixed;inset:auto 16px 16px auto;z-index:60;max-width:360px;background:var(--paper);border:2px solid var(--ink);border-radius:var(--radius-md);box-shadow:4px 4px 0 var(--ink);padding:var(--space-4) var(--space-6)}
+.idle-warning p{margin:0 0 var(--space-2);line-height:1.6;color:var(--ink)}
+.idle-warning .button{margin-top:var(--space-2);min-height:var(--touch)}
+@media(max-width:600px){.idle-warning{inset:auto 12px 84px 12px;max-width:none}}
+.account-sign-out-all{display:block;margin-top:var(--space-3);min-height:var(--touch)}
+.audit-page .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);margin:var(--space-6) 0}
+.audit-page .toolbar select{font:inherit;min-height:var(--touch);padding:8px 12px;border:1px solid var(--muted);border-radius:10px;background:var(--paper);color:var(--ink)}

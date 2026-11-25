@@ -198,9 +198,8 @@ body { background: var(--bg); color: var(--ink); }
 .role-space a { position: relative; display: inline-flex; min-height: var(--touch); align-items: center; padding: .55rem .9rem; border-radius: 999px; background: var(--brand); color: var(--paper); font-weight: 700; text-decoration: none; text-underline-offset: .2em; transition: background-color var(--motion-fast) ease, transform var(--motion-fast) ease; }
 .role-space a:hover { background: var(--brand-accent); transform: translateY(-1px); }
 .role-space a:focus-visible { outline: 3px solid var(--brand-accent); outline-offset: 3px; }
-.hero, .login, .board, .dashboard { min-width: 0; }
-.hero h1 { letter-spacing: -.035em; }
-.hero-context, .role-number { color: var(--brand-accent); }
+.login, .board, .dashboard { min-width: 0; }
+.role-number { color: var(--brand-accent); }
 .role-ledger { border-color: var(--line); }
 .role-ledger li { border-color: var(--line); }
 .login { border-color: var(--line); }
@@ -208,8 +207,6 @@ body { background: var(--bg); color: var(--ink); }
 .login-intro { padding: clamp(1.25rem, 3vw, 2rem); border-radius: 1rem; background: #f2ecfa; }
 .login-kicker { margin: 0 0 .75rem; color: #5b3a86; font-size: .8rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .login-page .login-intro h1 { color: var(--ink); font-size: clamp(1.8rem, 3vw, 2.6rem); line-height: 1.15; }
-.login-roles { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.5rem 0; }
-.login-roles span { padding: .4rem .7rem; border: 1px solid #d4c5e8; border-radius: 999px; background: var(--paper); color: var(--brand); font-size: .8rem; font-weight: 700; }
 .login-role-note { color: #50445e; font-size: .875rem; }
 .login-panel { align-self: center; min-width: 0; }
 .login-panel h2 { margin: 0; color: var(--ink); font-size: 1.35rem; }
@@ -236,7 +233,7 @@ body { background: var(--bg); color: var(--ink); }
   .quick-access-grid { grid-template-columns: 1fr; gap: .75rem; }
   .quick-access-grid a { padding: 1rem; }
   .bottom-nav { background: var(--paper); border-top: 1px solid var(--line); }
-  .hero, .login { min-width: 0; }
+  .login { min-width: 0; }
   .table-scroll { max-width: 100%; overscroll-behavior-inline: contain; }
   .nav-drawer-panel { max-height: min(85dvh, 42rem); overflow-y: auto; }
   .admin-service-grid { grid-template-columns: 1fr; }

@@ -1,3 +1,9 @@
+## Tema ceria dan perbaikan tes - 25 November 2026
+
+- Menambahkan `src/styles/theme-playful.css` (dimuat terakhir) dengan bingkai tebal, bayangan keras, tombol/tab pil, latar bertitik, header kapsul untuk halaman publik, pita miring beranda, chip label, lencana nomor, dan footer ungu. Font judul Poppins, navigasi/tombol Montserrat, isi tetap Inter. Rincian referensi di `docs/UI_REFERENSI_NOTES.md`.
+- Memperbaiki sidebar desktop yang membungkus menu ke kolom kedua yang terpotong (`flex-wrap: nowrap`), label peran dashboard yang kontrasnya rendah, ilustrasi hero ponsel yang menimpa teks, dan ruang kosong di bawah footer bagi tamu.
+- Sebelumnya hari ini: efek hover tombol dibatasi ke `@media (hover: hover)`, drawer navigasi memfokuskan tombol Tutup, dan 17 tes browser yang tertinggal diselaraskan.
+
 ## Pemeriksaan workspace - 22 November 2026
 
 - Tidak ada konflik Git aktif atau penanda konflik sumber. Tes kebiasaan diperbaiki untuk menguji perubahan status terlarang dan hasil nol baris RLS; `npm run check` lulus 149 tes, lint, typecheck dan build terisolasi. Audit menyeluruh dan UAT hosted belum selesai.

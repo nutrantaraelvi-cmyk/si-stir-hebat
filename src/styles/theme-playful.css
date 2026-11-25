@@ -1,0 +1,228 @@
+/*
+ * Tema ceria SI STIR HEBAT.
+ * Pola visual diadaptasi dari situs acara kampus yang ramah pelajar: bingkai tebal,
+ * bayangan keras, tombol pil, latar bertitik, pita teks miring, dan judul tebal.
+ * Palet tetap mengikuti keputusan D8 (ungu tua, lilac, biru muda, pink).
+ * Berkas ini dimuat terakhir dan hanya mengubah tampilan, bukan logika halaman.
+ */
+
+:root {
+  --font-heading: 'Poppins', 'Plus Jakarta Sans', Arial, sans-serif;
+  --font-ui: 'Montserrat', 'Inter', Arial, sans-serif;
+  --outline: #23124a;
+  --night: #2e0f6b;
+  --dot: rgb(124 58 237 / 11%);
+  --pop-1: 0 3px 0 var(--outline);
+  --pop-2: 0 5px 0 var(--outline);
+  --pop-3: 7px 7px 0 var(--outline);
+  --radius-pop: 22px;
+}
+
+/* Latar bertitik halus; konten tetap berada di atas kartu putih. */
+body {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) 1.4px, transparent 1.6px);
+  background-size: 22px 22px;
+}
+
+h1, h2, h3 { font-family: var(--font-heading); }
+.board h1, .dashboard h1, .page-header h1, .board-heading h1, .workspace > h1 { font-weight: 800; letter-spacing: -.025em; }
+
+.main-nav a, .guest-nav a, .bottom-nav a, .bottom-nav button, .nav-drawer-panel a,
+.button, .refresh-button, .master-tabs a, .admin-service-filters button { font-family: var(--font-ui); }
+/* Pilihan peran di login tetap memakai Inter: kolomnya sempit dan "Administrator" harus muat. */
+.login-role-option span { min-width: 0; }
+.login-role-option { border-radius: 16px !important; padding-inline: .5rem; }
+.login-role-options { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); }
+
+/* ---------- Header dan navigasi ---------- */
+.header { background: var(--paper); }
+.brand { font-family: var(--font-heading); }
+.brand .logo, .logo { border: 2.5px solid var(--outline); border-radius: 14px; box-shadow: var(--pop-1); font-family: var(--font-heading); font-weight: 800; }
+
+.main-nav a, .guest-nav a { border-radius: 999px; font-weight: 700; }
+.main-nav a:hover, .guest-nav a:hover { background: var(--lilac); color: var(--brand); }
+.main-nav a.active, .main-nav a[aria-current=page], .guest-nav a.active, .guest-nav a[aria-current=page] {
+  background: var(--info-bg); color: var(--brand); box-shadow: inset 0 0 0 2px var(--outline);
+}
+
+@media (max-width: 999px) {
+  /* Header ponsel mengambang seperti kapsul. */
+  .header { margin: 12px 12px 0; padding: 10px 14px; border: 2.5px solid var(--outline); border-radius: var(--radius-pop); box-shadow: var(--pop-2); }
+  .bottom-nav {
+    left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+    padding: 6px; border: 2.5px solid var(--outline); border-radius: var(--radius-pop); box-shadow: var(--pop-2);
+  }
+  .bottom-nav a, .bottom-nav button { border-radius: 16px; font-weight: 700; }
+  .bottom-nav a[aria-current=page], .bottom-nav a.active, .bottom-nav button[aria-expanded=true] {
+    background: var(--info-bg); color: var(--brand); box-shadow: inset 0 0 0 2px var(--outline);
+  }
+  body { padding-bottom: 96px; }
+  /* Tamu tidak punya bottom-nav, jadi tidak perlu ruang cadangan di bawah footer. */
+  body:not(:has(.bottom-nav)) { padding-bottom: 0; }
+}
+
+@media (min-width: 1000px) {
+  /* Sidebar: jangan membungkus menu ke kolom kedua yang terpotong; cukup gulir. */
+  .header { flex-wrap: nowrap; border-right: 3px solid var(--outline); }
+  .header .main-nav { flex: 0 0 auto; }
+
+  /* Halaman publik (belum ada menu sesi): header kapsul di atas, tanpa sidebar. */
+  body:not(:has(.main-nav)) { padding-left: 0; }
+  .header:not(:has(.main-nav)) {
+    position: static; width: min(1180px, calc(100% - 32px)); height: auto; margin: 16px auto 0;
+    flex-direction: row; align-items: center; justify-content: space-between;
+    padding: 10px 12px 10px 18px; border: 3px solid var(--outline); border-radius: 999px; box-shadow: var(--pop-2); overflow: visible;
+  }
+  .header:not(:has(.main-nav)) .guest-nav { display: flex; gap: 6px; }
+}
+
+.nav-drawer-panel { border-left: 3px solid var(--outline); }
+.nav-drawer-panel a { border-radius: 999px; font-weight: 700; }
+.nav-drawer-panel a[aria-current=page], .nav-drawer-panel a.active { background: var(--info-bg); color: var(--brand); box-shadow: inset 0 0 0 2px var(--outline); }
+
+/* ---------- Tombol pil dengan bayangan keras ---------- */
+.button, .board .button, .workspace .button, .login-panel .button,
+.student-primary-action, .teacher-primary-action, .portal-primary-action {
+  border: 2.5px solid var(--outline); border-radius: 999px; box-shadow: var(--pop-1);
+  font-family: var(--font-ui); font-weight: 700;
+}
+.button.secondary, .board .button.secondary, .workspace .button.secondary,
+.student-secondary-action, .teacher-secondary-action, .portal-secondary-action, .refresh-button {
+  border: 2.5px solid var(--outline); border-radius: 999px; background: var(--paper); color: var(--brand); box-shadow: var(--pop-1); font-weight: 700;
+}
+.button:active:not(:disabled), .refresh-button:active,
+.student-primary-action:active, .teacher-primary-action:active, .portal-primary-action:active {
+  transform: translateY(2px); box-shadow: 0 1px 0 var(--outline);
+}
+@media (hover: hover) {
+  .button:hover:not(:disabled), .board .button:hover:not(:disabled), .workspace .button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 0 var(--outline); }
+}
+.button:disabled { box-shadow: none; }
+
+/* ---------- Kartu berbingkai tebal ---------- */
+.home-role-card, .home-service-card, .home-closing,
+.admin-service-card, .student-service-card, .teacher-service-card, .portal-service-card,
+.student-welcome, .teacher-welcome, .portal-welcome, .student-habit-checklist,
+.dashboard-stats article, .principal-overview, .principal-metric, .account-card,
+.login-panel, .announcement-editor, .attendance-import, .confirm-dialog {
+  border: 2.5px solid var(--outline); border-radius: var(--radius-pop); box-shadow: var(--pop-2);
+}
+.login-panel { padding: clamp(1.1rem, 3vw, 1.75rem); background: var(--paper); }
+.role-space { border: 2.5px solid var(--outline); border-left-width: 2.5px; border-radius: var(--radius-pop); box-shadow: var(--pop-2); }
+
+@media (hover: hover) {
+  .home-role-card:hover, .admin-service-card:hover, .student-service-card:hover, .teacher-service-card:hover, .portal-service-card:hover {
+    transform: translateY(-2px); border-color: var(--outline); box-shadow: 0 7px 0 var(--outline);
+  }
+}
+
+/* Daftar akses cepat pada dashboard peran pending. */
+.quick-access-grid a { border: 2.5px solid var(--outline); border-radius: 18px; background: var(--paper); box-shadow: var(--pop-1); padding: 14px; }
+
+/* Label peran: kontras jelas, bukan teks gelap di atas ungu. */
+.role-strip {
+  display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px; width: fit-content; max-width: 100%;
+  padding: 6px 14px; border: 2.5px solid var(--outline); border-radius: 999px; background: var(--info-bg); box-shadow: var(--pop-1);
+  font-family: var(--font-ui);
+}
+.role-strip span { color: var(--ink-soft); }
+.role-strip strong { color: var(--brand); font-weight: 800; }
+
+/* Lencana nomor bulat. */
+.student-group-number, .teacher-group-number, .portal-group-number, .home-role-index {
+  display: inline-grid; place-items: center; min-width: 2.1rem; height: 2.1rem; padding: 0 .35rem;
+  border: 2px solid var(--outline); border-radius: 999px; background: var(--brand); color: var(--paper);
+  box-shadow: 0 2px 0 var(--outline); font-family: var(--font-ui); font-weight: 800;
+}
+
+/* Label kecil di atas judul menjadi chip. */
+.home-section-tag, .board-heading .eyebrow, .page-header .eyebrow {
+  display: inline-flex; width: fit-content; align-items: center; padding: .3rem .75rem;
+  border: 2px solid var(--outline); border-radius: 999px; background: var(--pink-soft); color: #9d174d;
+  font-family: var(--font-ui); font-weight: 800; letter-spacing: .06em;
+}
+
+/* ---------- Tabel, formulir, tab ---------- */
+.table-scroll, .board .table-scroll, .workspace .table-scroll, .data-table {
+  border: 2.5px solid var(--outline); border-radius: 18px; box-shadow: var(--pop-1);
+}
+.table-scroll th, .data-table th { background: var(--lilac); color: var(--outline); font-family: var(--font-ui); font-weight: 700; }
+
+.board input:not([type=checkbox]):not([type=radio]):not([type=file]), .board select, .board textarea,
+.workspace input:not([type=checkbox]):not([type=radio]):not([type=file]), .workspace select, .workspace textarea,
+.login input {
+  border: 2px solid var(--muted); border-radius: 14px;
+}
+.board input:focus-visible, .board select:focus-visible, .board textarea:focus-visible,
+.workspace input:focus-visible, .workspace select:focus-visible, .workspace textarea:focus-visible, .login input:focus-visible {
+  border-color: var(--brand); outline: 3px solid var(--brand-soft); outline-offset: 1px;
+}
+
+.master-tabs a, .master-data .master-tabs a, .admin-service-filters button, .login-role-option {
+  border: 2px solid var(--outline); border-radius: 999px; font-weight: 700;
+}
+.master-tabs a.active, .master-data .master-tabs a.active, .master-data .master-tabs a[aria-current=page],
+.admin-service-filters button[aria-pressed="true"], .login-role-option[aria-pressed="true"] {
+  border-color: var(--outline); background: var(--brand); color: var(--paper); box-shadow: var(--pop-1);
+}
+
+/* ---------- Beranda ---------- */
+/* Pita miring boleh melebar penuh; sisi yang keluar layar dipotong tanpa scroll horizontal. */
+#main-content { overflow-x: clip; }
+.home-hero {
+  border: 3px solid var(--outline); border-radius: 28px; box-shadow: var(--pop-3); color: var(--paper);
+  background-color: var(--night);
+  background-image: radial-gradient(rgb(255 255 255 / 14%) 1.6px, transparent 1.8px), linear-gradient(135deg, #3b1487 0%, var(--night) 70%);
+  background-size: 24px 24px, auto;
+}
+.home-hero h1 { color: var(--paper); font-weight: 800; letter-spacing: -.035em; }
+.home-hero h1 span { color: var(--pink); }
+.home-hero-lede { color: var(--lilac); }
+.home-hero-note { color: #d8cff0; }
+.home-eyebrow { border: 2px solid var(--outline); background: var(--paper); color: var(--brand); box-shadow: var(--pop-1); }
+.home-hero .button, .home-closing .button {
+  border: 2.5px solid var(--outline); background: var(--sky); color: var(--outline); box-shadow: var(--pop-1);
+}
+@media (hover: hover) {
+  .home-hero .button:hover, .home-closing .button:hover { background: #bfdbfe; box-shadow: 0 5px 0 var(--outline); }
+}
+.home-closing .button.secondary { background: var(--paper); color: var(--brand); }
+.home-text-link { color: var(--paper); text-decoration: underline; }
+.home-hero a:focus-visible { outline-color: var(--sky); }
+
+/* Pita teks miring di antara bagian. */
+.home-service-ribbon {
+  margin-block: 2.6rem 3.8rem; margin-inline: calc(50% - 50vw - 24px);
+  border-block: 3px solid var(--outline); background: var(--pink); transform: rotate(-1.6deg);
+}
+@media (max-width: 560px) {
+  /* Judul Poppins lebih tinggi; beri jarak agar ilustrasi tidak menimpa catatan hero. */
+  .home-hero-art { margin-top: 1.75rem; }
+}
+.home-ribbon-group span { color: var(--outline); font-family: var(--font-ui); font-size: .85rem; font-weight: 800; }
+.home-ribbon-group svg { color: var(--brand); }
+
+.home-section-heading h2, .home-closing h2 { font-weight: 800; letter-spacing: -.035em; }
+.home-section-mark {
+  display: inline-grid; place-items: center; min-width: 3rem; height: 3rem; border: 2.5px solid var(--outline); border-radius: 999px;
+  background: var(--sky); color: var(--outline); box-shadow: var(--pop-1); font-family: var(--font-ui);
+}
+.home-role-card { background: var(--paper); }
+.home-role-card > strong { font-family: var(--font-heading); font-weight: 700; }
+.home-role-enter { font-family: var(--font-ui); }
+.home-service-card { background: var(--paper); }
+.home-closing { background: linear-gradient(120deg, var(--lilac), var(--sky-soft) 60%, var(--pink-soft)); }
+
+/* ---------- Footer ---------- */
+footer {
+  margin-top: 56px; padding: 32px 20px 40px; border-top: 3px solid var(--outline);
+  background-color: var(--brand); background-image: radial-gradient(rgb(255 255 255 / 12%) 1.4px, transparent 1.6px); background-size: 22px 22px;
+  color: var(--paper); font-family: var(--font-ui); font-weight: 600; text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button:active, .refresh-button:active, .student-primary-action:active, .teacher-primary-action:active, .portal-primary-action:active,
+  .home-role-card:hover, .admin-service-card:hover, .student-service-card:hover, .teacher-service-card:hover, .portal-service-card:hover,
+  .button:hover, .board .button:hover, .workspace .button:hover { transform: none; }
+}

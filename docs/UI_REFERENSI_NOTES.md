@@ -19,3 +19,16 @@ Halaman dapat dibuka. Hero memakai komposisi ilustrasi besar dan ajakan bertinda
 - Pertahankan hierarki informasi portal sekolah dan Bahasa Indonesia yang jelas.
 - Gunakan warna ungu, lilac, biru muda, dan pink proyek sendiri; jangan gunakan identitas institusi referensi.
 - Terapkan gerak hanya pada dekorasi dan interaksi ringan, tanpa menunda konten atau mengubah teks maupun label aksesibilitas.
+
+## Tema ceria — 25 November 2026
+
+Diperiksa ulang dengan screenshot desktop 1280×900 dan ponsel 390×844. Pola yang diadopsi ke `src/styles/theme-playful.css` (dimuat terakhir, tanpa mengubah logika halaman):
+
+- Bingkai gelap tebal (`--outline`) dan bayangan keras tanpa blur (`--pop-1/2/3`) pada kartu, panel, tabel, dan tombol.
+- Tombol, tab, dan menu aktif berbentuk pil; menu aktif biru muda dengan garis dalam.
+- Latar bertitik halus; hero beranda dan footer berwarna ungu tua bertitik.
+- Header publik berbentuk kapsul mengambang; sidebar tetap dipakai setelah login.
+- Pita teks miring sebagai pemisah bagian beranda; chip label di atas judul; lencana nomor bulat.
+- Judul memakai Poppins 800, navigasi dan tombol memakai Montserrat 700, isi tetap Inter.
+
+Yang tidak diambil: logo, nama acara, ilustrasi, foto, dan warna kuning khas referensi. Aksen tetap ungu tua, lilac, biru muda, dan pink sesuai D8. Seluruh pasangan warna baru lulus WCAG AA (terendah 5,36:1 untuk bingkai input, 6,64:1 untuk teks). Efek hover hanya untuk perangkat ber-pointer dan semua pergeseran dimatikan pada `prefers-reduced-motion`.

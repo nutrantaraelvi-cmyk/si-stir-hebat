@@ -6,4 +6,5 @@ import './styles/global.css'
 import './styles/school-theme.css'
 import './styles/features.css'
 import './styles/tailwind-components.css'
+import './styles/theme-playful.css'
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>)

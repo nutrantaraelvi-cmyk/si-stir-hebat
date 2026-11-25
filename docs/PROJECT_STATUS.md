@@ -1,5 +1,13 @@
 # Status SI STIR HEBAT
 
+## Pemeriksaan workspace - 25 November 2026
+
+- Pekerjaan yang belum di-commit (ruang peran dashboard, editor kebiasaan harian, migration lokal `20261123092240_habit_edit_validation.sql`, dokumen arsitektur) di-commit pada `d20faff`. Migration tersebut tetap belum hosted.
+- `npm run check` EXIT 0 pada Node v26.13.0 (Node 24 sesuai `engines` tidak terpasang di mesin ini): 42 migration, lint, typecheck, 152/152 tes unit/database, build terisolasi, 31 bundel JavaScript tanpa akun demo.
+- Suite browser penuh pertama 411/428 lulus. Ke-17 kegagalan berasal dari tes yang tertinggal: mock `content-range` tanpa `access-control-expose-headers`, tombol jurnal yang kini aktif tanpa penugasan, teks beranda baru, race helper `clickNavLink` di ponsel, dan asersi drawer modal yang tidak dapat lulus di Playwright.
+- Dua bug UI diperbaiki: efek hover menggeser tombol sehingga bergetar di bawah pointer dan tertinggal setelah tap di layar sentuh (kini hanya pada `@media (hover: hover)`), serta drawer navigasi panjang yang memberi fokus ke panel bergulir alih-alih tombol Tutup.
+- Rerun terfokus seluruh tes yang gagal lulus di desktop dan ponsel. Tes browser memakai API tiruan, bukan UAT akun sekolah.
+
 ## Pemeriksaan workspace - 24 November 2026
 
 - Baseline lokal memiliki 42 migration berurutan. Lint, typecheck, seluruh 152 unit/database/smoke test, dan build terisolasi lulus dengan Node 24.22.3. Smoke test menggunakan server preview loopback dan verifikasi penolakan REST anonim.

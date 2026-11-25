@@ -17,11 +17,11 @@ test.beforeEach(async ({ page }) => {
 })
 
 async function clickNavLink(page: Page, name: string) {
-  const link = page.getByRole('link', { name, exact: true })
-  if (!(await link.isVisible().catch(() => false))) {
-    const toggle = page.getByRole('button', { name: 'Lainnya', exact: true })
-    if (await toggle.count()) await toggle.click()
-  }
+  // The menu grows once the profile role loads; wait for either the link or the overflow toggle.
+  const link = page.getByRole('link', { name, exact: true }).filter({ visible: true })
+  const toggle = page.getByRole('button', { name: 'Lainnya', exact: true })
+  await expect(link.or(toggle).first()).toBeVisible()
+  if (!(await link.count())) await toggle.click()
   await link.click()
 }
 
@@ -766,7 +766,7 @@ test('administrator assigns a teacher to class and subject', async ({ page }) =>
 test('master data announces a truncated reference list instead of hiding it', async ({ page }) => {
   await mockSchool(page, { relationsReady: true })
   const students = Array.from({ length: 1000 }, (_, index) => ({ id: `student-${index}`, code: `SISWA_${index}`, name: `Data Contoh Siswa ${index}`, is_active: true }))
-  await page.route('**/rest/v1/students?**', route => route.fulfill({ json: students, headers: { 'content-range': '0-999/1001' } }))
+  await page.route('**/rest/v1/students?**', route => route.fulfill({ json: students, headers: { 'content-range': '0-999/1001', 'access-control-expose-headers': 'content-range' } }))
   await page.goto('/sekolah/class_enrollments')
   await expect(page.getByRole('status').filter({ hasText: 'Sebagian daftar referensi dipotong' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Tambah keanggotaan kelas' })).toBeEnabled()
@@ -979,13 +979,15 @@ for(const role of ['student','parent','pending']) test(`${role} cannot request o
   expect(mock.requests).toHaveLength(0)
 })
 
-test('journals show a preparation state when backend is unavailable and disable creation without assignment',async({page})=>{
+test('journals show a preparation state when backend is unavailable and explain a missing assignment',async({page})=>{
   await mockJournals(page,'teacher',{unavailable:true})
   await page.goto('/jurnal')
   await expect(page.getByRole('alert').filter({ hasText: 'Layanan jurnal sedang disiapkan' })).toBeVisible()
   await mockJournals(page,'teacher',{noAssignment:true})
   await page.getByRole('button',{name:'Coba lagi'}).click()
-  await expect(page.getByRole('button',{name:'Catat jurnal hari ini'})).toBeDisabled()
+  // Since 22 November the form opens without an assignment; saving still needs one.
+  await expect(page.getByRole('button',{name:'Catat jurnal hari ini'})).toBeEnabled()
+  await expect(page.getByText(/Belum ada penugasan aktif\. Minta administrator/)).toBeVisible()
 })
 
 test('journal pagination and CSV export stay within the displayed page',async({page})=>{
@@ -1166,7 +1168,8 @@ for (const { role, attendance, journals, learning } of [
       const drawer = page.getByRole('dialog', { name: 'Menu lainnya' })
       await expect(drawer).toBeVisible()
       await expect(drawer.getByRole('link', { name: 'Pengumuman', exact: true })).toBeVisible()
-      await expect(quick).toHaveCount(0)
+      // showModal() makes the quick bar inert; Playwright still counts inert nodes, so assert modality.
+      await expect(page.locator('dialog:modal')).toHaveCount(1)
       await expect(drawer.getByRole('button', { name: 'Tutup' })).toBeFocused()
       await expect(drawer.getByRole('link', { name: 'Absensi', exact: true })).toHaveCount(Number(attendance) - hasQuickAttendance)
       await expect(page.getByRole('link', { name: 'Jurnal', exact: true })).toHaveCount(Number(journals))
@@ -1195,7 +1198,7 @@ async function mockAssessments(page: Page, { role = 'teacher', empty = false, co
   const result = { id: 'result-example', student_name: 'Data Contoh Siswa', student_code: 'CONTOH01', score: role === 'teacher' ? null as number | null : 10, feedback: '', revision: 0 }
   const history: Record<string, unknown>[] = []
   let created = !empty
-  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ headers: { 'content-range': overflow ? '0-999/1001' : '0-0/1' }, json: overflow
+  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ headers: { 'content-range': overflow ? '0-999/1001' : '0-0/1', 'access-control-expose-headers': 'content-range' }, json: overflow
     ? Array.from({ length: 1000 }, (_, index) => ({ id: `assignment-${index}`, school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } }))
     : [{ id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } }] }))
   await page.route('**/rest/v1/assessments?*', route => {
@@ -1839,7 +1842,7 @@ for (const role of ['administrator', 'principal'] as const) {
 test('home page drops promises for modules that are not built', async ({ page }) => {
   await mockSchool(page)
   await page.goto('/')
-  await expect(page.getByText('Materi, tugas, dan asesmen', { exact: true })).toBeVisible()
+  await expect(page.getByText('Materi, tugas, jadwal, dan perkembangan belajar', { exact: true })).toBeVisible()
   await expect(page.getByText('Kehadiran anak dan informasi sekolah', { exact: true })).toBeVisible()
   await expect(page.locator('main').getByText(/komunikasi/i)).toHaveCount(0)
   if ((page.viewportSize()?.width ?? 1280) < 1000) await page.getByRole('button', { name: 'Lainnya', exact: true }).click()

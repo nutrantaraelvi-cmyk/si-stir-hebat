@@ -1888,3 +1888,68 @@ test('assessment result shows the KKM label next to the score', async ({ page })
   await page.getByRole('button', { name: 'Buka asesmen' }).click()
   await expect(page.getByText('CONTOH01 · Nilai 10 / 20 · Belum tuntas')).toBeVisible()
 })
+
+for (const [role, defaults] of [
+  ['teacher', ['Absensi kelas', 'Jurnal mengajar', 'Materi kelas', 'Tugas kelas']],
+  ['principal', ['Supervisi akademik', 'Peninjauan modul ajar', 'Kehadiran guru', 'Dokumen sekolah']],
+  ['parent', ['Kehadiran anak', 'Laporan ketidakhadiran', 'Tugas kelas', 'Komunikasi dengan guru']],
+  ['administrator', ['Akun sekolah', 'Tautan akun', 'Data sekolah', 'Pengumuman']],
+] as const) {
+  test(`${role} can personalize workspace shortcuts`, async ({ page }) => {
+    await mockSchool(page, { role })
+    await page.goto('/dashboard')
+    const panel = page.getByRole('region', { name: 'Pintasan saya' })
+    await expect(panel).toBeVisible()
+    await expect(panel.getByText(/^Selamat (pagi|siang|sore|malam)/)).toBeVisible()
+    const pinned = panel.getByRole('list', { name: 'Layanan yang disematkan' })
+    await expect(pinned.getByRole('link')).toHaveText(defaults.map(title => new RegExp(title)))
+
+    await panel.getByRole('button', { name: 'Atur pintasan' }).click()
+    await panel.getByRole('checkbox', { name: defaults[0], exact: true }).uncheck()
+    await panel.getByRole('button', { name: `Majukan ${defaults[2]}` }).click()
+    await expect(pinned.getByRole('link')).toHaveText([defaults[2], defaults[1], defaults[3]].map(title => new RegExp(title)))
+    await panel.getByRole('button', { name: 'Selesai mengatur' }).click()
+
+    await page.reload()
+    await expect(page.getByRole('list', { name: 'Layanan yang disematkan' }).getByRole('link')).toHaveText([defaults[2], defaults[1], defaults[3]].map(title => new RegExp(title)))
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  })
+}
+
+test('workspace remembers recently opened services and ignores tampered shortcuts', async ({ page }) => {
+  await mockSchool(page, { role: 'teacher' })
+  await page.goto('/dashboard')
+  await page.locator('.teacher-service-card[href="/jadwal"]').click()
+  await expect(page).toHaveURL(/\/jadwal$/)
+  await page.goto('/dashboard')
+  const panel = page.getByRole('region', { name: 'Pintasan saya' })
+  await expect(panel.getByText('Terakhir dibuka')).toBeVisible()
+  await expect(panel.getByRole('link', { name: 'Jadwal mengajar' })).toBeVisible()
+
+  await page.evaluate(() => {
+    const key = Object.keys(localStorage).find(item => item.startsWith('si-stir:ruang:teacher:'))
+    if (key) localStorage.setItem(key, JSON.stringify({ pinned: ['/sekolah', 'https://contoh.invalid', '/jurnal'], recent: [], custom: true }))
+  })
+  await page.reload()
+  const pinned = page.getByRole('list', { name: 'Layanan yang disematkan' })
+  await expect(pinned.getByRole('link')).toHaveText([/Jurnal mengajar/])
+  await expect(page.locator('.ws-shortcuts a[href="/sekolah"]')).toHaveCount(0)
+})
+
+test('student can personalize shortcuts in friendly language', async ({ page }) => {
+  await mockSchool(page, { role: 'student' })
+  await page.goto('/dashboard')
+  const panel = page.getByRole('region', { name: 'Pintasanku' })
+  await expect(panel).toBeVisible()
+  await expect(panel.getByText('Pilih kegiatan favoritmu')).toBeVisible()
+  const pinned = panel.getByRole('list', { name: 'Layanan yang disematkan' })
+  await expect(pinned.getByRole('link')).toHaveText([/Materi kelas/, /Tugas kelas/, /Jadwal pelajaran/, /Asesmen dan hasil/])
+  await panel.getByRole('button', { name: 'Atur pintasanku' }).click()
+  await panel.getByRole('checkbox', { name: 'Kehadiranku', exact: true }).check()
+  await panel.getByRole('checkbox', { name: 'Jadwal pelajaran', exact: true }).uncheck()
+  await page.reload()
+  await expect(page.getByRole('region', { name: 'Pintasanku' }).getByRole('list', { name: 'Layanan yang disematkan' }).getByRole('link'))
+    .toHaveText([/Materi kelas/, /Tugas kelas/, /Asesmen dan hasil/, /Kehadiranku/])
+  await expect(page.locator('.ws-shortcuts a[href="/sekolah"], .ws-shortcuts a[href="/absensi-guru"]')).toHaveCount(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, type LucideIcon } from 'lucide-react'
+import { useTrackVisit } from './workspace-context'
 
 export type ServiceLink = { to: string; icon: LucideIcon; title: string; detail: string }
 export type PortalServiceGroup = { id: string; number: string; title: string; detail: string; services: ServiceLink[] }
@@ -8,7 +9,8 @@ export type PortalServiceGroup = { id: string; number: string; title: string; de
 // (student-, teacher-, portal-) sehingga gaya yang sudah ada tetap berlaku.
 export function ServiceCard({ service, prefix, modifier }: { service: ServiceLink; prefix: 'student' | 'teacher' | 'portal'; modifier?: string }) {
   const { to, icon: Icon, title, detail } = service
-  return <Link className={`${prefix}-service-card${modifier ? ` ${prefix}-service-card--${modifier}` : ''}`} to={to} data-reveal>
+  const track = useTrackVisit()
+  return <Link className={`${prefix}-service-card${modifier ? ` ${prefix}-service-card--${modifier}` : ''}`} to={to} onClick={() => track(to)} data-reveal>
     <span className={`${prefix}-service-icon`}><Icon size={20} aria-hidden="true"/></span>
     <span className={`${prefix}-service-copy`}><strong>{title}</strong><small>{detail}</small></span>
     <ArrowUpRight size={17} aria-hidden="true"/>

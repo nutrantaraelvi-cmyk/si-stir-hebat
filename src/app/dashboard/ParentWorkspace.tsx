@@ -4,6 +4,7 @@ import { ArrowUpRight, Bell, BookOpen, CalendarDays, ClipboardCheck, ClipboardLi
 import { canReadAnnouncements } from '../../lib/announcements'
 import { canAccessCommunication, canReadAbsenceReports, canReadGuardianPortal, canReadHabits, canReadLearning, canReadNotifications, canReadSchedules } from '../../utils/permissions'
 import { type ServiceLink, PortalServiceGroups, type PortalServiceGroup } from './services'
+import { PersonalizedShortcuts } from './PersonalizedShortcuts'
 
 export function ParentWorkspace() {
   const child: ServiceLink[] = [
@@ -42,6 +43,7 @@ export function ParentWorkspace() {
         <SchoolWhatsAppLink className="portal-secondary-action"/>
       </div></div><div className="portal-welcome-art" aria-hidden="true"><span className="portal-art-orbit"/><span className="portal-art-icon"><HeartHandshakeIcon size={38}/></span><span className="portal-art-spark">✿</span><span className="portal-art-note">Dekat dan peduli</span></div>
     </section>
+    <PersonalizedShortcuts services={groups.flatMap(group => group.services)} defaults={['/ruang-orang-tua', '/laporan-ketidakhadiran', '/tugas', '/komunikasi']}/>
     <PortalServiceGroups groups={groups} audience="parent"/>
   </div>
 }

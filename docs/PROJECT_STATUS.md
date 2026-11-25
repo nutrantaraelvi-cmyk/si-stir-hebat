@@ -8,8 +8,9 @@ Diperbarui: 25 November 2026 (Asia/Jakarta). Branch `ai/claude-roadmap-2-7` (bel
 
 | Pemeriksaan | Hasil |
 | --- | --- |
-| `npm run check` | EXIT 0: 46 migration, CI check, lint, typecheck, **170/170** tes unit/database, build terisolasi 1.814 modul, 34 bundel JavaScript tanpa akun demo |
+| `npm run check` | EXIT 0: 46 migration, CI check, lint, typecheck, **178/178** tes unit/database, build terisolasi 1.814 modul, 34 bundel JavaScript tanpa akun demo |
 | Suite browser penuh (desktop + ponsel, API tiruan) | **444/444 lulus** (8,5 menit), termasuk 16 tes baru untuk audit log, sesi, dan absensi offline |
+| Tes browser dashboard + personalisasi (setelah fitur Pintasan saya) | **34/34 lulus**. Suite penuh belum dijalankan ulang |
 | CSP di Chromium terhadap `vite preview` build sintetis | Tidak ada pelanggaran di beranda/login. Service worker terdaftar. Halaman login tetap terbuka saat dimuat ulang offline. |
 
 Mesin ini memakai Node 26. `engines` dan CI memakai Node 24 (`.nvmrc`). Tes browser memakai API tiruan dan **bukan UAT akun sekolah**.
@@ -45,7 +46,7 @@ Tidak ada keputusan produk yang tertunda saat ini. Gate operasional di atas teta
 
 ## Fitur PRD: status ringkas
 
-Sudah ada (lokal, tes API tiruan): autentikasi/profil, dashboard per peran, pengumuman, data master, absensi murid (manual, impor Excel, **antrean offline**), absensi guru dan koreksi, jurnal, tautan akun, portal dan laporan ketidakhadiran wali, modul ajar, supervisi empat tahap, materi/tugas/umpan balik, asesmen dan rekap (CSV/Excel/PDF), komunikasi guru–wali, notifikasi, 7 Kebiasaan, dokumen sekolah, **audit log**, **logout otomatis 30 menit**, **keluar dari semua perangkat**, **pencabutan sesi oleh admin**, dan **tombol WhatsApp sekolah**.
+Sudah ada (lokal, tes API tiruan): autentikasi/profil, dashboard per peran, pengumuman, data master, absensi murid (manual, impor Excel, **antrean offline**), absensi guru dan koreksi, jurnal, tautan akun, portal dan laporan ketidakhadiran wali, modul ajar, supervisi empat tahap, materi/tugas/umpan balik, asesmen dan rekap (CSV/Excel/PDF), komunikasi guru–wali, notifikasi, 7 Kebiasaan, dokumen sekolah, **audit log**, **logout otomatis 30 menit**, **keluar dari semua perangkat**, **pencabutan sesi oleh admin**, dan **tombol WhatsApp sekolah**, dan **Pintasan saya** (personalisasi ruang guru/kepsek/orang tua/admin/murid, tersimpan per perangkat).
 
 Belum ada: jumlah notifikasi belum dibaca di navigasi, notifikasi otomatis dari semua modul, lampiran materi dan laporan wali, integrasi Google Drive/Sheets, dan WhatsApp Business API (fase lanjutan).
 

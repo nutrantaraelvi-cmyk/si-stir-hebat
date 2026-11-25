@@ -459,3 +459,47 @@ body { background: var(--bg); color: var(--ink); }
   .dashboard [data-reveal] { opacity: 1; transform: none; }
 }
 
+
+/* Pintasan saya: personalisasi ruang guru, kepala sekolah, orang tua, dan admin. */
+.ws-shortcuts { --ws-accent: var(--brand); display: grid; gap: .9rem; min-width: 0; padding: clamp(1rem, 3vw, 1.4rem); border: 1px solid #e3dfeb; border-radius: 1.2rem; background: linear-gradient(135deg, var(--paper), #faf7ff); box-shadow: 0 4px 16px rgb(48 29 76 / 5%); }
+.dashboard--teacher .ws-shortcuts { --ws-accent: var(--teacher-purple, var(--brand)); }
+.dashboard--principal .ws-shortcuts, .dashboard--parent .ws-shortcuts { --ws-accent: var(--portal-primary); }
+.dashboard--parent .ws-shortcuts { background: linear-gradient(135deg, var(--paper), #f2f8ff); }
+.admin-service-center > .ws-shortcuts { margin-bottom: 1.25rem; }
+.ws-shortcuts-heading { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+.ws-shortcuts-heading > div { min-width: 0; flex: 1 1 16rem; }
+.ws-shortcuts-greeting { margin: 0 0 .3rem; color: var(--ws-accent); font-size: .78rem; font-weight: 800; }
+.ws-shortcuts h3 { display: flex; align-items: center; gap: .45rem; margin: 0; color: var(--ink); font-family: var(--font-heading); font-size: 1.12rem; }
+.ws-shortcuts h3 svg { color: var(--ws-accent); }
+.ws-shortcuts-heading p:not(.ws-shortcuts-greeting) { margin: .2rem 0 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
+.ws-shortcuts-toggle { display: inline-flex; min-height: 44px; align-items: center; gap: .4rem; padding: .5rem .85rem; border: 1px solid color-mix(in srgb, var(--ws-accent) 30%, white); border-radius: 999px; background: var(--paper); color: var(--ws-accent); font: inherit; font-size: .85rem; font-weight: 750; cursor: pointer; }
+.ws-shortcuts-toggle[aria-expanded="true"] { background: var(--ws-accent); color: var(--paper); }
+.ws-shortcuts-toggle:focus-visible, .ws-shortcut:focus-visible, .ws-shortcut-order button:focus-visible, .ws-recent a:focus-visible { outline: 3px solid var(--brand-accent); outline-offset: 2px; }
+.ws-shortcut-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 11.5rem), 1fr)); gap: .6rem; margin: 0; padding: 0; list-style: none; }
+.ws-shortcut-grid li { display: grid; gap: .35rem; min-width: 0; }
+.ws-shortcut { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .6rem; min-height: 56px; padding: .6rem .7rem; border: 1px solid #e3dfeb; border-radius: .9rem; background: var(--paper); color: var(--ink); text-decoration: none; transition: transform var(--motion-base) var(--ease-standard), border-color var(--motion-base) ease; }
+.ws-shortcut:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--ws-accent) 40%, white); }
+.ws-shortcut strong { overflow-wrap: anywhere; font-size: .85rem; }
+.ws-shortcut > svg:last-child { color: var(--ws-accent); }
+.ws-shortcut-icon { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: .75rem; background: var(--lilac); color: var(--ws-accent); }
+.ws-shortcut-grid li:nth-child(3n+2) .ws-shortcut-icon { background: var(--sky-soft); }
+.ws-shortcut-grid li:nth-child(3n) .ws-shortcut-icon { background: var(--pink-soft); }
+.ws-shortcut-order { display: flex; gap: .35rem; }
+.ws-shortcut-order button { display: grid; min-width: 44px; min-height: 36px; flex: 1; place-items: center; border: 1px solid var(--line); border-radius: .6rem; background: var(--paper); color: var(--ws-accent); cursor: pointer; }
+.ws-shortcut-order button:disabled { opacity: .4; cursor: not-allowed; }
+.ws-shortcuts-empty { margin: 0; padding: .8rem; border: 1px dashed #d7d0eb; border-radius: .9rem; color: var(--ink-soft); font-size: .85rem; }
+.ws-shortcut-editor { min-width: 0; margin: 0; padding: .85rem; border: 1px solid #e3dfeb; border-radius: .9rem; background: var(--paper); }
+.ws-shortcut-editor legend { padding: 0 .35rem; color: var(--ink); font-size: .85rem; font-weight: 750; }
+.ws-shortcut-options { display: flex; flex-wrap: wrap; gap: .45rem; }
+.ws-shortcut-options label { display: inline-flex; min-height: 44px; align-items: center; gap: .45rem; padding: .4rem .75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); font-size: .82rem; cursor: pointer; }
+.ws-shortcut-options label.is-checked { border-color: var(--ws-accent); background: color-mix(in srgb, var(--ws-accent) 9%, white); color: var(--ink); font-weight: 700; }
+.ws-shortcut-options label:has(input:disabled) { opacity: .55; cursor: not-allowed; }
+.ws-shortcut-options input { accent-color: var(--ws-accent); }
+.ws-shortcut-limit { margin: .6rem 0 0; color: #9d174d; font-size: .8rem; }
+.ws-recent { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .7rem; }
+.ws-recent p { display: inline-flex; align-items: center; gap: .35rem; margin: 0; color: var(--muted); font-size: .78rem; font-weight: 700; }
+.ws-recent ul { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0; padding: 0; list-style: none; }
+.ws-recent a { display: inline-flex; min-height: 36px; align-items: center; padding: .3rem .7rem; border-radius: 999px; background: var(--sky-soft); color: var(--ink); font-size: .8rem; font-weight: 650; text-decoration: none; }
+@media (prefers-reduced-motion: reduce) { .ws-shortcut { transition: none; } .ws-shortcut:hover { transform: none; } }
+.dashboard--student .ws-shortcuts { --ws-accent: var(--student-purple); background: linear-gradient(135deg, var(--paper), #fdf2f8 70%, #f0f7ff); font-family: var(--font-student, inherit); }
+.dashboard--student .ws-shortcut-grid li:nth-child(odd) .ws-shortcut-icon { background: var(--pink-soft); color: var(--student-pink); }

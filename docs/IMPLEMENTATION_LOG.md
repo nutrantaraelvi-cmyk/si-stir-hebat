@@ -1,3 +1,16 @@
+## Personalisasi ruang guru, kepala sekolah, orang tua, admin, dan murid (Claude) - 25 November 2026
+
+Branch `ai/claude-roadmap-2-7`, belum di-commit. Tanpa migration, tanpa perubahan hosted.
+
+- Panel **Pintasan saya** di ruang guru, kepala sekolah, orang tua, dan admin (`src/app/dashboard/PersonalizedShortcuts.tsx`). Isinya:
+  - sapaan sesuai jam WIB dan tanggal hari ini;
+  - hingga 6 layanan yang disematkan dan bisa diurutkan ulang;
+  - pintasan awal per peran (guru: absensi/jurnal/materi/tugas; kepsek: supervisi/modul ajar/absensi guru/dokumen; orang tua: kehadiran anak/laporan izin/tugas/komunikasi; admin: akun sekolah/tautan akun/data sekolah/pengumuman);
+  - daftar 3 layanan terakhir dibuka.
+- Ruang murid memakai panel yang sama dengan bahasa "kamu" (judul **Pintasanku**, `tone="student"`), pintasan awal materi/tugas/jadwal/asesmen, dan aksen ungu-pink ruang murid.
+- Preferensi disimpan di `localStorage` per akun dan per peran (`si-stir:ruang:<peran>:<userId>`, `personalization.ts`). Ini hanya preferensi tampilan. Isinya selalu disaring ulang terhadap layanan yang diizinkan peran, jadi jalur luar atau hasil rekayasa tidak pernah ditampilkan. Otorisasi tetap di RLS.
+- Tes baru: `tests/dashboard-personalization.test.mjs` (8 tes) dan 6 tes browser × 2 viewport (atur, urutkan, simpan setelah muat ulang, riwayat, tolak isi rekayasa). `npm run check` EXIT 0 dengan 178/178 tes; tes browser terkait dashboard 34/34 lulus. Suite browser penuh belum dijalankan ulang.
+
 ## Migration ke produksi baru (pemilik) - 25 November 2026
 
 - Pemilik menjalankan `npx supabase db push` ke project `rsvoodhdxyrrprqogwop`. Ke-46 migration (`20261110075255` sampai `20261125090200`) diterapkan ke database kosong tanpa error.

@@ -5,6 +5,7 @@ import { canReadAnnouncements } from '../../lib/announcements'
 import { canReadAssessments, canReadAttendance, canReadHabits, canReadLearning, canReadNotifications, canReadSchedules } from '../../utils/permissions'
 import { habitLabels } from '../../features/student-habits/api'
 import { ServiceCard, type ServiceLink } from './services'
+import { PersonalizedShortcuts } from './PersonalizedShortcuts'
 
 export function StudentWorkspace() {
   const [checkedHabits, setCheckedHabits] = useState<number[]>([])
@@ -36,6 +37,7 @@ export function StudentWorkspace() {
       </div></div>
       <div className="student-welcome-art" aria-hidden="true"><span className="student-art-spark student-art-spark-a">✦</span><span className="student-art-spark student-art-spark-b">✿</span><span className="student-art-book"><BookOpen size={42}/></span><span className="student-art-note">Ayo belajar!</span></div>
     </section>
+    <PersonalizedShortcuts tone="student" services={[...learning, ...daily, ...updates, ...account]} defaults={['/materi', '/tugas', '/jadwal', '/asesmen']}/>
     <section className="student-habit-checklist" aria-labelledby="student-habits-title">
       <div className="student-habits-heading"><div><p className="student-kicker"><Sparkles size={16} aria-hidden="true"/> LANGKAH BAIK HARI INI</p><h3 id="student-habits-title">7 Kebiasaan Anak Indonesia Hebat</h3><p>Ketuk kebiasaan yang sudah kamu lakukan hari ini.</p></div><span className="student-habits-count" aria-live="polite">{checkedHabits.length} / 7</span></div>
       <div className="student-habits-progress" aria-hidden="true"><span style={{ width: `${checkedHabits.length / 7 * 100}%` }}/></div>

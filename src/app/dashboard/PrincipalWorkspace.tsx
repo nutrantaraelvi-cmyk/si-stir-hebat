@@ -3,6 +3,7 @@ import { ArrowUpRight, Bell, CalendarDays, ClipboardCheck, ClipboardList, Eye, F
 import { canReadAnnouncements } from '../../lib/announcements'
 import { canReadAbsenceReports, canReadAttendance, canReadNotifications, canReadSchedules, canReadSchoolDocuments, canReadSupervision, canReadTeacherAttendance, canReadTeachingModules } from '../../utils/permissions'
 import { type ServiceLink, PortalServiceGroups, type PortalServiceGroup } from './services'
+import { PersonalizedShortcuts } from './PersonalizedShortcuts'
 
 export function PrincipalWorkspace() {
   const oversight: ServiceLink[] = [
@@ -37,6 +38,7 @@ export function PrincipalWorkspace() {
         {canReadTeachingModules('principal') && <Link className="portal-secondary-action" to="/modul-ajar">Tinjau modul ajar <ArrowUpRight size={16} aria-hidden="true"/></Link>}
       </div></div><div className="portal-welcome-art" aria-hidden="true"><span className="portal-art-orbit"/><span className="portal-art-icon"><ShieldCheck size={38}/></span><span className="portal-art-spark">✦</span><span className="portal-art-note">Arahkan dengan bijak</span></div>
     </section>
+    <PersonalizedShortcuts services={groups.flatMap(group => group.services)} defaults={['/supervisi', '/modul-ajar', '/absensi-guru', '/dokumen']}/>
     <PortalServiceGroups groups={groups} audience="principal"/>
   </div>
 }

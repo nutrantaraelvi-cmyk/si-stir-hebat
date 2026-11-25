@@ -3,6 +3,7 @@ import { ArrowUpRight, Bell, BookOpen, CalendarDays, ClipboardCheck, ClipboardLi
 import { canReadAnnouncements } from '../../lib/announcements'
 import { canAccessCommunication, canReadAbsenceReports, canReadAttendance, canReadHabits, canReadJournals, canReadLearning, canReadNotifications, canReadSchedules, canReadSchoolDocuments, canReadSupervision, canReadTeacherAttendance, canReadTeachingModules } from '../../utils/permissions'
 import { ServiceCard, type ServiceLink } from './services'
+import { PersonalizedShortcuts } from './PersonalizedShortcuts'
 
 export function TeacherWorkspace() {
   const planning: ServiceLink[] = [
@@ -47,6 +48,7 @@ export function TeacherWorkspace() {
       </div></div>
       <div className="teacher-welcome-art" aria-hidden="true"><span className="teacher-art-orbit"/><span className="teacher-art-icon"><BookOpen size={38}/></span><span className="teacher-art-spark">✦</span><span className="teacher-art-note">Ruang untuk berkarya</span></div>
     </section>
+    <PersonalizedShortcuts services={groups.flatMap(group => group.services)} defaults={['/absensi', '/jurnal', '/materi', '/tugas']}/>
     {groups.map(group => group.services.length > 0 && <section className="teacher-service-group" key={group.id} aria-labelledby={group.id}><header><span className="teacher-group-number">{group.number}</span><div><h3 id={group.id}>{group.title}</h3><p>{group.detail}</p></div></header><div className="teacher-service-grid">{group.services.map(service => <ServiceCard key={service.to} service={service} prefix="teacher"/>)}</div></section>)}
   </div>
 }

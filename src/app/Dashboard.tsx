@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { KeyRound, UserRound, type LucideIcon } from 'lucide-react'
 import { useAuth } from '../components/auth/auth-context'
@@ -12,6 +12,7 @@ import { StudentWorkspace } from './dashboard/StudentWorkspace'
 import { TeacherWorkspace } from './dashboard/TeacherWorkspace'
 import { PrincipalWorkspace } from './dashboard/PrincipalWorkspace'
 import { ParentWorkspace } from './dashboard/ParentWorkspace'
+import { WorkspaceContext } from './dashboard/workspace-context'
 
 type SchoolProfile = { full_name: string; role: string }
 const roleSpaces: Record<string, { title: string; description: string }> = {
@@ -34,16 +35,17 @@ const workspaces = [
   { role: 'parent', variant: 'parent', title: 'Ruang keluarga', view: ParentWorkspace },
 ]
 
-function DashboardServices({ role }: { role?: string }) {
+function DashboardServices({ role, userId }: { role?: string; userId: string }) {
   const workspace = workspaces.find(item => item.role === role)
   const Workspace = workspace?.view
-  return <section className={workspace ? `quick-access quick-access--${workspace.variant}` : 'quick-access'} aria-labelledby="quick-access">
+  const identity = useMemo(() => role ? { userId, role } : null, [role, userId])
+  return <WorkspaceContext.Provider value={identity}><section className={workspace ? `quick-access quick-access--${workspace.variant}` : 'quick-access'} aria-labelledby="quick-access">
     <h2 id="quick-access">{workspace?.title ?? 'Akses cepat'}</h2>
     {Workspace ? <Workspace/> : <div className="quick-access-grid">
       <QuickLink to="/akun" icon={UserRound} title="Profil saya" detail="Lengkapi nama dan periksa peran akun."/>
       <QuickLink to="/kata-sandi" icon={KeyRound} title="Keamanan akun" detail="Perbarui kata sandi akun sekolah."/>
     </div>}
-  </section>
+  </section></WorkspaceContext.Provider>
 }
 
 export function Dashboard() {
@@ -190,6 +192,6 @@ function SchoolDashboard({ userId }: { userId: string }) {
         </section>
       </>}
     </>}
-    <DashboardServices role={profile?.role}/>
+    <DashboardServices role={profile?.role} userId={userId}/>
   </section>
 }

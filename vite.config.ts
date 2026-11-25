@@ -7,6 +7,19 @@ import { getPublicSupabaseConfig } from './src/lib/config'
 
 const require = createRequire(import.meta.url)
 
+// Header keamanan produksi berasal dari vercel.json. `vite preview` memakai header
+// yang sama agar pelanggaran CSP terlihat secara lokal. HSTS dan
+// upgrade-insecure-requests dilepas karena preview berjalan di http://127.0.0.1.
+function productionSecurityHeaders(): Record<string, string> {
+  const config = JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')) as {
+    headers: { source: string; headers: { key: string; value: string }[] }[]
+  }
+  const entries = config.headers.find(rule => rule.source === '/(.*)')?.headers ?? []
+  return Object.fromEntries(entries
+    .filter(header => header.key !== 'Strict-Transport-Security')
+    .map(header => [header.key, header.value.replace(/;\s*upgrade-insecure-requests/, '')]))
+}
+
 // The academic report uses only normal and bold Roboto. Keep its lazy font
 // chunk limited to those variants while retaining the original TTF glyphs.
 function academicPdfFonts() {
@@ -39,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
     // need HMR, so Playwright disables the watcher for a stable web server.
     watch: process.env.VITE_TEST_NO_WATCH === '1' ? null : undefined,
   },
-  preview: { host: '127.0.0.1', port: 4173, strictPort: true },
+  preview: { host: '127.0.0.1', port: 4173, strictPort: true, headers: productionSecurityHeaders() },
   build: {
     rollupOptions: {
       output: {

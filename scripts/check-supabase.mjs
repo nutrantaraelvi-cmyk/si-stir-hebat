@@ -27,8 +27,11 @@ async function check() {
     'habit_records', 'habit_events', 'habit_catalog', 'guardian_absence_reports', 'notifications', 'school_documents',
     'document_categories', 'document_versions', 'document_reviews', 'school_document_events',
     'teacher_attendance', 'teacher_attendance_corrections', 'teacher_attendance_events',
+    'communication_messages', 'profile_role_changes',
+    'grading_settings', 'retention_policies', 'teacher_attendance_status_types', 'teacher_document_types',
+    'school_calendar_events', 'deletion_requests',
   ]) {
-    const column = table === 'parent_student_relationships' ? 'student_id' : 'id'
+    const column = ({ parent_student_relationships: 'student_id', retention_policies: 'category', teacher_attendance_status_types: 'code' })[table] ?? 'id'
     const result = await fetch(new URL(`/rest/v1/${table}?select=${column}&limit=0`, url), {
       headers: { apikey: key }, signal: AbortSignal.timeout(15000), redirect: 'error',
     })

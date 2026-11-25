@@ -1,3 +1,9 @@
+## Migration ke produksi baru (pemilik) - 25 November 2026
+
+- Pemilik menjalankan `npx supabase db push` ke project `rsvoodhdxyrrprqogwop`. Ke-46 migration (`20261110075255` sampai `20261125090200`) diterapkan ke database kosong tanpa error.
+- Claude menjalankan `npx supabase migration list` (read-only) dan hasilnya Local = Remote untuk ke-46 migration. Keputusan dicatat sebagai D13. PROJECT_STATUS, AI_COORDINATION, dan AGENTS.md sudah diperbarui.
+- Belum dijalankan: Security/Performance Advisor, leaked password protection, administrator pertama, redirect URL Auth, UAT, dan env Vercel untuk project baru.
+
 ## Roadmap perbaikan 2–7 (Claude) - 25 November 2026
 
 Branch `ai/claude-roadmap-2-7`, belum di-commit. Tidak ada perubahan hosted, deploy, atau push.

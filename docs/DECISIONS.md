@@ -9,6 +9,7 @@
   - Retensi mengikuti definisi lokal D5 dengan masa **1 tahun ajaran** untuk komunikasi dan bukti supervisi (`retention_policies` lokal). Baris retensi hosted dengan kategori lama (`assessment`, `learning`, `habits`, `teacher_documents`, aksi `anonymize`) tidak dipindahkan.
   - Permintaan penghapusan dari `drift_archive.deletion_requests` dipindahkan dengan `subject_type` `guardian` diganti menjadi **`parent`**.
   - Prosedur operator ada di [RUNBOOK_STAGING_DAN_MIGRASI.md](RUNBOOK_STAGING_DAN_MIGRASI.md).
+- **D13 — Produksi baru `rsvoodhdxyrrprqogwop`** (menggantikan `ysworvoaqqwppwcrnmqk` sebagai target): pemilik menerapkan ke-46 migration dari database kosong pada 25 November 2026. Gate backup, uji restore, dan staging dilewati karena database-nya masih kosong. Advisor, UAT, dan deploy Vercel dengan kredensial project baru tetap wajib. Belum diputuskan apa yang terjadi pada data dan project lama. D12 hanya berlaku kalau data lama dipindahkan.
 
 ## Keputusan pemilik terbaru — 20 November 2026 (menggantikan keputusan yang bertentangan)
 

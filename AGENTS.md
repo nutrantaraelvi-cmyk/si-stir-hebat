@@ -38,7 +38,7 @@ React 19 + Vite + TypeScript + React Router; Supabase Auth/PostgreSQL/Storage/RL
 
 ## Current handoff baseline
 - Do not copy test counts or migration counts into this file. The single source of current numbers, gates, and open owner decisions is `docs/PROJECT_STATUS.md`; the document index is `docs/README.md`.
-- Hosted Supabase still records 23 migrations through `20261113074045`; every later local migration is unapplied. Follow `docs/RUNBOOK_STAGING_DAN_MIGRASI.md` (staging first, tested restore, owner approval) before any hosted change.
+- Since 25 November 2026 the production Supabase project is `rsvoodhdxyrrprqogwop` (owner decision; all migrations through `20261125090200` applied). `ysworvoaqqwppwcrnmqk` is the old project and must not be targeted. Applied migrations are immutable: add new ones instead of editing. See `docs/PROJECT_STATUS.md` for current state, and get owner approval before any hosted change.
 - Browser tests use mocked APIs and do not establish real-account UAT.
 
 ## Start work

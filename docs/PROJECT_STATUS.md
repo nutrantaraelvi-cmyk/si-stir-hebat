@@ -17,9 +17,10 @@ Mesin ini memakai Node 26. `engines` dan CI memakai Node 24 (`.nvmrc`). Tes brow
 ## Database
 
 - Lokal: 46 migration (`node scripts/check-migrations.mjs`).
-- Hosted (`ysworvoaqqwppwcrnmqk`): 23 migration tercatat, sampai `20261113074045` (pemeriksaan read-only terakhir 22 November). **23 migration lokal belum hosted.**
-- Drift enam tabel konfigurasi ditangani `20261121085900_quarantine_hosted_config_drift` (karantina ke `drift_archive`, tanpa menghapus data). Pemindahan data mengikuti D12 ([runbook](RUNBOOK_STAGING_DAN_MIGRASI.md) bagian 5).
-- Security Advisor hosted: WARN `auth_leaked_password_protection` (harus diaktifkan pemilik di dashboard Auth).
+- **Produksi baru (`rsvoodhdxyrrprqogwop`), keputusan pemilik 25 November:** pemilik menjalankan `supabase db push` dari database kosong. Ke-46 migration diterapkan tanpa error. `supabase migration list` (25 November) menunjukkan Local = Remote untuk ke-46 migration. Belum ada data dan belum ada administrator.
+- Produksi lama (`ysworvoaqqwppwcrnmqk`): 23 migration sampai `20261113074045` (pemeriksaan read-only terakhir 22 November). Sudah tidak menjadi target. Belum diputuskan apakah datanya akan dipindahkan atau project-nya diarsipkan.
+- Drift enam tabel konfigurasi ditangani `20261121085900_quarantine_hosted_config_drift`. Di project baru migration ini tidak berpengaruh karena tabel drift-nya tidak ada. Langkah D12 ([runbook](RUNBOOK_STAGING_DAN_MIGRASI.md) bagian 5) hanya relevan kalau data project lama dipindahkan.
+- Security Advisor di project baru **belum dijalankan**. Di project lama ada WARN `auth_leaked_password_protection`. Pengaturan ini per project, jadi perlu diaktifkan lagi di project baru.
 
 ## Gate sebelum produksi (urut)
 
@@ -29,7 +30,7 @@ Mesin ini memakai Node 26. `engines` dan CI memakai Node 24 (`.nvmrc`). Tes brow
 4. UAT lima peran di staging ([PANDUAN_UAT.md](PANDUAN_UAT.md)), termasuk administrator pertama dan redirect URL Auth.
 5. Persetujuan tertulis pemilik, lalu langkah yang sama di produksi dan deploy Vercel.
 
-Belum ada satu pun gate di atas yang dijalankan. Agen AI tidak memegang kredensial database.
+Status 25 November: atas keputusan pemilik, migration langsung diterapkan ke produksi baru `rsvoodhdxyrrprqogwop`. Gate 2–3 (backup, uji restore, staging) dilewati karena database-nya masih kosong. Gate 1, 4, dan 5 (Advisor, UAT lima peran, dan deploy Vercel yang memakai URL/anon key project baru) masih terbuka. Sebaiknya UAT dijalankan sebelum data sekolah asli dimasukkan. Agen AI tidak memegang kredensial database.
 
 ## Keputusan pemilik terbaru (25 November 2026)
 

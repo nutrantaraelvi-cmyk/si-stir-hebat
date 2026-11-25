@@ -65,7 +65,7 @@ a{text-underline-offset:3px}
 .role-ledger strong{display:block;font-size:14px}
 .role-ledger li div span{display:block;margin-top:2px;font-size:12px;line-height:1.55;color:var(--muted)}
 .button{min-height:44px;border-radius:12px;background:var(--accent);color:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transition:transform .15s ease,box-shadow .15s ease}
-.button:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
+@media(hover:hover){.button:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}}
 .board{max-width:1000px;margin:24px auto 48px;padding:0 24px}
 .board-heading{align-items:flex-start;gap:16px}
 .board h1{margin:0 0 8px;letter-spacing:-1px}

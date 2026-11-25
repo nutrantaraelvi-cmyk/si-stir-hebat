@@ -72,9 +72,12 @@ function NavLinks({ items }: { items: NavItem[] }) {
 
 function NavigationDrawer({ items, onDismiss }: { items: NavItem[]; onDismiss: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
   useLayoutEffect(() => {
     const dialog = dialogRef.current
     dialog?.showModal()
+    // A long menu makes the panel a focusable scroller; start on the close button instead.
+    closeRef.current?.focus()
     return () => dialog?.close()
   }, [])
 
@@ -92,7 +95,7 @@ function NavigationDrawer({ items, onDismiss }: { items: NavItem[]; onDismiss: (
     <div className="nav-drawer-panel">
       <div className="nav-drawer-head">
         <h2 id="drawer-title">Menu lainnya</h2>
-        <button type="button" onClick={onDismiss}>Tutup</button>
+        <button ref={closeRef} type="button" onClick={onDismiss}>Tutup</button>
       </div>
       <nav aria-label="Menu tambahan"><NavLinks items={items} /></nav>
     </div>

@@ -323,7 +323,7 @@ body { background: var(--bg); color: var(--ink); }
 .home-hero-lede { max-width: 42ch; margin: 1.2rem 0 0; color: #51475e; font-size: clamp(1rem, 1.7vw, 1.12rem); line-height: 1.75; }
 .home-hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.35rem; margin-top: 1.5rem; }
 .home-hero .button, .home-closing .button { display: inline-flex; min-height: 50px; align-items: center; gap: .65rem; margin: 0; border: 0; border-radius: 999px; background: #492778; box-shadow: 0 5px 0 #321b53; transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
-.home-hero .button:hover, .home-closing .button:hover { transform: translateY(-2px); background: #5b358c; box-shadow: 0 7px 0 #321b53; }
+@media (hover: hover) { .home-hero .button:hover, .home-closing .button:hover { transform: translateY(-2px); background: #5b358c; box-shadow: 0 7px 0 #321b53; } }
 .home-text-link { display: inline-flex; min-height: 44px; align-items: center; gap: .4rem; color: #4e2c79; font-size: .88rem; font-weight: 800; text-underline-offset: .25em; }
 .home-text-link svg, .home-role-enter svg { transition: transform .18s ease; }
 .home-text-link:hover svg, .home-role-card:hover .home-role-enter svg { transform: translateX(4px); }
@@ -426,7 +426,8 @@ body { background: var(--bg); color: var(--ink); }
 .board button:not(.button):not(.text-button):not(.refresh-button):hover:not(:disabled),
 .workspace button:not(.button):not(.text-button):not(.refresh-button):hover:not(:disabled) { border-color: var(--brand); background: var(--brand); color: var(--paper); }
 .board .button, .workspace .button { min-height: var(--touch); border-color: var(--brand); border-radius: 12px; background: var(--brand); color: var(--paper); box-shadow: 0 3px 0 #321461; transition: transform var(--motion-fast) ease, background-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease; }
-.board .button:hover:not(:disabled), .workspace .button:hover:not(:disabled) { transform: translateY(-1px); background: var(--brand-accent); box-shadow: 0 4px 0 #321461; }
+/* Touch screens keep :hover after a tap; moving the button there makes it jitter under the pointer. */
+@media (hover: hover) { .board .button:hover:not(:disabled), .workspace .button:hover:not(:disabled) { transform: translateY(-1px); background: var(--brand-accent); box-shadow: 0 4px 0 #321461; } }
 .board .button.secondary, .workspace .button.secondary { border-color: var(--line); background: var(--paper); color: var(--ink); box-shadow: none; }
 .board .button.secondary:hover:not(:disabled), .workspace .button.secondary:hover:not(:disabled) { border-color: var(--brand-soft); background: var(--lilac); color: var(--brand); }
 .board .button.danger, .workspace .button.danger { border-color: var(--danger); background: var(--danger); color: var(--paper); box-shadow: none; }

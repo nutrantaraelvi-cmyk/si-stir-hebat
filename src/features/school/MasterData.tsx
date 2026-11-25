@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, NavLink, useParams } from 'react-router-dom'
 import { useAuth } from '../../components/auth/auth-context'
@@ -67,16 +68,15 @@ function MasterManager({ userId, kind }: { userId: string; kind: MasterKind }) {
         const yearRows = (results[1]?.data ?? []) as unknown as MasterRow[]
         const yearsTruncated = yearRows.length > 200
         setYears(yearRows.slice(0, 200))
-        setHasNext(data.length > pageSize)
         const tables = definition.fields.flatMap(field => field.reference ? [field.reference] : [])
         if (tables.length) {
           let truncated = yearsTruncated
           const choices = await Promise.all(tables.map(async table => {
             const columns = table === 'school_classes' ? 'id,name,is_active,academic_year_id' : 'id,name,is_active,code'
-            const { data, error } = await supabase!.from(table).select(columns).order('name').limit(1001)
-            if (error) throw error
-            if (data.length > 1000) truncated = true
-            return [table, data as unknown as MasterRow[]] as const
+            const result = await supabase!.from(table).select(columns, { count: 'exact' }).order('name').limit(referenceLimit)
+            if (result.error) throw result.error
+            if (hasMoreReferences(result)) truncated = true
+            return [table, result.data.slice(0, referenceLimit) as unknown as MasterRow[]] as const
           }))
           if (active) {
             setReferences(Object.fromEntries(choices))

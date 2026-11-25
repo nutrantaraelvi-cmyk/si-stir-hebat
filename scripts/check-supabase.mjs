@@ -1,5 +1,6 @@
 // Run with Node.js 22.18+: node --env-file=.env.local scripts/check-supabase.mjs
 import { getPublicSupabaseConfig } from '../src/lib/config.ts'
+import { isDatabasePermissionDenied } from './database-denial.mjs'
 const config = getPublicSupabaseConfig(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_PUBLISHABLE_KEY)
 
 async function check() {
@@ -32,8 +33,7 @@ async function check() {
       headers: { apikey: key }, signal: AbortSignal.timeout(15000), redirect: 'error',
     })
     if (![401, 403].includes(result.status)) throw new Error(`Tabel ${table}: harapkan penolakan akses anonim, mendapat HTTP ${result.status}. Periksa migration dan izin tabel.`)
-    const failure = await result.json()
-    if (failure.code !== '42501') throw new Error(`Tabel ${table}: penolakan belum dapat dikonfirmasi sebagai izin database.`)
+    if (!await isDatabasePermissionDenied(result)) throw new Error(`Tabel ${table}: penolakan belum dapat dikonfirmasi sebagai izin database.`)
     console.log(`Tabel ${table}: Data API menolak akses anonim sesuai rancangan.`)
   }
   const dashboardRpc = await fetch(new URL('/rest/v1/rpc/dashboard_overview', url), {
@@ -41,8 +41,7 @@ async function check() {
     signal: AbortSignal.timeout(15000), redirect: 'error',
   })
   if (![401, 403].includes(dashboardRpc.status)) throw new Error(`RPC dashboard_overview: harapkan penolakan akses anonim, mendapat HTTP ${dashboardRpc.status}. Periksa grant dan migration.`)
-  const dashboardFailure = await dashboardRpc.json()
-  if (dashboardFailure.code !== '42501') throw new Error('RPC dashboard_overview: penolakan belum dapat dikonfirmasi sebagai izin database.')
+  if (!await isDatabasePermissionDenied(dashboardRpc)) throw new Error('RPC dashboard_overview: penolakan belum dapat dikonfirmasi sebagai izin database.')
   console.log('RPC dashboard_overview: Data API menolak akses anonim sesuai rancangan.')
   console.log('Pemeriksaan ini tidak membaca baris data. Alur email dan sesi pengguna tetap perlu pengujian dengan akun sekolah.')
 }

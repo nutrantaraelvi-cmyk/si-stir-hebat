@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useAuth } from '../../components/auth/auth-context'
 import { supabase } from '../../lib/supabase'
@@ -47,15 +48,15 @@ function AssessmentWorkspace({ userId }: { userId: string }) {
         const [list, options] = await Promise.all([
           client.from('assessments').select(assessmentFields).order('held_on', { ascending: false }).order('id')
             .range(page * 20, page * 20 + 20).abortSignal(controller.signal),
-          isTeacher(nextRole) ? client.from('teacher_assignments').select('id,school_classes!inner(name),subjects!inner(name)')
+          isTeacher(nextRole) ? client.from('teacher_assignments').select('id,school_classes!inner(name),subjects!inner(name)', { count: 'exact' })
             .eq('is_active', true).eq('school_classes.is_active', true).eq('subjects.is_active', true)
-            .limit(1001).abortSignal(controller.signal).overrideTypes<Assignment[], { merge: false }>() : null,
+            .limit(referenceLimit).abortSignal(controller.signal).overrideTypes<Assignment[], { merge: false }>() : null,
         ])
         if (list.error || options?.error) throw new Error('Assessment unavailable')
         if (!controller.signal.aborted) {
           setRows(list.data as Assessment[])
-          setAssignments(options?.data?.slice(0, 1000) ?? [])
-          setOptionsTruncated((options?.data?.length ?? 0) > 1000)
+          setAssignments(options?.data?.slice(0, referenceLimit) ?? [])
+          setOptionsTruncated(hasMoreReferences(options))
         }
       } catch {
         if (!controller.signal.aborted) setLoadError(true)

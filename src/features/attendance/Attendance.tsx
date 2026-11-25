@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../components/auth/auth-context'
@@ -70,13 +71,13 @@ function AttendanceWorkspace({ userId }: { userId: string }) {
         if (!canReadAttendance(nextRole)) return
         const [sessionResult, classResult, yearResult] = await Promise.all([
           client.from('attendance_sessions').select('id,class_id,held_on').order('held_on', { ascending: false }).order('created_at', { ascending: false }).order('id').range(page * pageSize, page * pageSize + pageSize),
-          client.from('school_classes').select('id,name,academic_year_id,is_active').order('name').limit(1001),
+          client.from('school_classes').select('id,name,academic_year_id,is_active', { count: 'exact' }).order('name').limit(referenceLimit),
           client.from('academic_years').select('id,name').limit(201),
         ])
         for (const result of [sessionResult,classResult,yearResult]) if (result.error) throw result.error
         if (!active) return
         setClasses(classResult.data ?? [])
-        setReferencesTruncated((classResult.data?.length ?? 0) > 1000 || (yearResult.data?.length ?? 0) > 200)
+        setReferencesTruncated(hasMoreReferences(classResult) || (yearResult.data?.length ?? 0) > 200)
         setYears(Object.fromEntries((yearResult.data ?? []).map(year => [year.id,year.name])))
         const sessionRows = (sessionResult.data ?? []).slice(0,pageSize)
         setSessions(sessionRows)
@@ -85,12 +86,12 @@ function AttendanceWorkspace({ userId }: { userId: string }) {
         if (isTeacher(nextRole)) {
           const [teacher,assignments,subjects] = await Promise.all([
             client.from('teachers').select('id').eq('profile_id',userId).eq('is_active',true).maybeSingle(),
-            client.from('teacher_assignments').select('teacher_id,class_id,subject_id').eq('is_active',true).limit(1001),
-            client.from('subjects').select('id').eq('is_active',true).limit(1001),
+            client.from('teacher_assignments').select('teacher_id,class_id,subject_id', { count: 'exact' }).eq('is_active',true).limit(referenceLimit),
+            client.from('subjects').select('id', { count: 'exact' }).eq('is_active',true).limit(referenceLimit),
           ])
           for (const result of [teacher,assignments,subjects]) if (result.error) throw result.error
           if (active) {
-            if ((assignments.data?.length ?? 0) > 1000 || (subjects.data?.length ?? 0) > 1000) setReferencesTruncated(true)
+            if (hasMoreReferences(assignments) || hasMoreReferences(subjects)) setReferencesTruncated(true)
             setAllowedClasses([...new Set((assignments.data ?? []).filter(item => item.teacher_id === teacher.data?.id && subjects.data?.some(subject => subject.id === item.subject_id)).map(item => item.class_id))])
           }
         }

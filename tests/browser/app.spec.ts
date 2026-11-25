@@ -447,7 +447,7 @@ test('protected routes require login and unknown pages show recovery navigation'
   await mockSchool(page, { signedIn: false })
   await page.goto('/dashboard')
   await expect(page).toHaveURL(/\/login$/)
-  await expect(page.getByRole('heading', { name: 'Masuk SI STIR HEBAT' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Masuk sebagai Murid' })).toBeVisible()
   await page.goto('/jurnal')
   await expect(page).toHaveURL(/\/login$/)
   await page.goto('/halaman-tidak-ada')
@@ -527,7 +527,7 @@ test('dashboard overview stays closed for teachers', async ({ page }) => {
     await route.fulfill({ status: 403, json: { code: '42501' } })
   })
   await page.goto('/dashboard')
-  await expect(page.getByRole('heading', { name: 'Akses cepat' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ruang kerja guru' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Ringkasan kepala sekolah' })).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Ringkasan data sekolah' })).toHaveCount(0)
   expect(requested).toBe(false)
@@ -765,8 +765,8 @@ test('administrator assigns a teacher to class and subject', async ({ page }) =>
 
 test('master data announces a truncated reference list instead of hiding it', async ({ page }) => {
   await mockSchool(page, { relationsReady: true })
-  const students = Array.from({ length: 1001 }, (_, index) => ({ id: `student-${index}`, code: `SISWA_${index}`, name: `Data Contoh Siswa ${index}`, is_active: true }))
-  await page.route('**/rest/v1/students?**', route => route.fulfill({ json: students }))
+  const students = Array.from({ length: 1000 }, (_, index) => ({ id: `student-${index}`, code: `SISWA_${index}`, name: `Data Contoh Siswa ${index}`, is_active: true }))
+  await page.route('**/rest/v1/students?**', route => route.fulfill({ json: students, headers: { 'content-range': '0-999/1001' } }))
   await page.goto('/sekolah/class_enrollments')
   await expect(page.getByRole('status').filter({ hasText: 'Sebagian daftar referensi dipotong' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Tambah keanggotaan kelas' })).toBeEnabled()
@@ -1134,6 +1134,16 @@ test('xlsx retry reuses the same request after an uncertain response',async({pag
   await expect(page.getByText('retry.xlsx',{exact:true})).toHaveCount(1)
 })
 
+test('pending profile has no empty additional menu and can reach its account', async ({ page }) => {
+  await mockSchool(page, { role: 'pending' })
+  await page.goto('/dashboard')
+  await expect(page.getByText('Menunggu penetapan peran', { exact: true })).toBeVisible()
+  const navigation = page.getByRole('navigation', { name: (page.viewportSize()?.width ?? 1280) < 1000 ? 'Navigasi cepat' : 'Navigasi utama' })
+  await expect(navigation.getByRole('button', { name: 'Lainnya' })).toHaveCount(0)
+  await navigation.getByRole('link', { name: 'Akun', exact: true }).click()
+  await expect(page).toHaveURL(/\/akun$/)
+})
+
 for (const { role, attendance, journals, learning } of [
   { role: 'teacher', attendance: true, journals: true, learning: true },
   { role: 'student', attendance: true, journals: false, learning: true },
@@ -1150,12 +1160,15 @@ for (const { role, attendance, journals, learning } of [
       const quick = page.getByRole('navigation', { name: 'Navigasi cepat' })
       await expect(quick.getByRole('link', { name: 'Beranda', exact: true })).toHaveAttribute('aria-current', 'page')
       await expect(quick.getByRole('link')).toHaveCount(4)
+      const hasQuickAttendance = await quick.getByRole('link', { name: 'Absensi', exact: true }).count()
       await expect(quick.getByRole('button', { name: 'Lainnya', exact: true })).toHaveCount(1)
       await page.getByRole('button', { name: 'Lainnya', exact: true }).click()
       const drawer = page.getByRole('dialog', { name: 'Menu lainnya' })
       await expect(drawer).toBeVisible()
       await expect(drawer.getByRole('link', { name: 'Pengumuman', exact: true })).toBeVisible()
-      await expect(page.getByRole('link', { name: 'Absensi', exact: true })).toHaveCount(Number(attendance))
+      await expect(quick).toHaveCount(0)
+      await expect(drawer.getByRole('button', { name: 'Tutup' })).toBeFocused()
+      await expect(drawer.getByRole('link', { name: 'Absensi', exact: true })).toHaveCount(Number(attendance) - hasQuickAttendance)
       await expect(page.getByRole('link', { name: 'Jurnal', exact: true })).toHaveCount(Number(journals))
       for (const label of learningLinks) await expect(page.getByRole('link', { name: label, exact: true })).toHaveCount(Number(learning))
       await page.keyboard.press('Escape')
@@ -1182,8 +1195,8 @@ async function mockAssessments(page: Page, { role = 'teacher', empty = false, co
   const result = { id: 'result-example', student_name: 'Data Contoh Siswa', student_code: 'CONTOH01', score: role === 'teacher' ? null as number | null : 10, feedback: '', revision: 0 }
   const history: Record<string, unknown>[] = []
   let created = !empty
-  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ json: overflow
-    ? Array.from({ length: 1001 }, (_, index) => ({ id: `assignment-${index}`, school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } }))
+  await page.route('**/rest/v1/teacher_assignments?*', route => route.fulfill({ headers: { 'content-range': overflow ? '0-999/1001' : '0-0/1' }, json: overflow
+    ? Array.from({ length: 1000 }, (_, index) => ({ id: `assignment-${index}`, school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } }))
     : [{ id: 'assignment-example', school_classes: { name: 'Kelas 1A' }, subjects: { name: 'Matematika' } }] }))
   await page.route('**/rest/v1/assessments?*', route => {
     const request = route.request()
@@ -1634,22 +1647,29 @@ test('schedule class filter queries server across pages and distinguishes school
   await expect(page.getByRole('button', { name: /Lihat riwayat/ })).toHaveCount(0)
 })
 
+const workspaceTitles: Record<string, string> = {
+  administrator: 'Pusat kendali administrator', principal: 'Ruang kepemimpinan sekolah', teacher: 'Ruang kerja guru',
+  student: 'Ruang belajarku', parent: 'Ruang keluarga', pending: 'Akses cepat',
+}
+
 for (const role of ['administrator', 'principal', 'teacher', 'student', 'parent', 'pending']) {
   test(`release dashboard services follow ${role} access`, async ({ page }, testInfo) => {
     await mockSchool(page, { role })
     await page.goto('/dashboard')
-    const services = page.getByRole('region', { name: 'Akses cepat' })
+    const services = page.getByRole('region', { name: workspaceTitles[role], exact: true })
+    await expect(services).toBeVisible()
     const staff = ['administrator', 'principal', 'teacher'].includes(role)
     const learns = ['teacher', 'student', 'parent'].includes(role)
-    if (role === 'pending') await expect(services.getByRole('link', { name: /Jadwal pelajaran/ })).toHaveCount(0)
-    else await expect(services.getByRole('link', { name: /Jadwal pelajaran/ })).toBeVisible()
-    await expect(services.getByRole('link', { name: /Siapkan data sekolah/ })).toHaveCount(role === 'administrator' ? 1 : 0)
-    await expect(services.getByRole('link', { name: /Kehadiran anak/ })).toHaveCount(role === 'parent' ? 1 : 0)
-    for (const name of [/Materi kelas/, /Tugas kelas/, /Asesmen dan nilai/]) {
-      await expect(services.getByRole('link', { name })).toHaveCount(learns ? 1 : 0)
-    }
-    for (const name of [/Dokumen sekolah/, /Absensi guru/]) {
-      await expect(services.getByRole('link', { name })).toHaveCount(staff ? 1 : 0)
+    const expectedLinks: [string, boolean][] = [
+      ['/jadwal', role !== 'pending'], ['/sekolah', role === 'administrator'],
+      ['/akun-sekolah', role === 'administrator'], ['/ruang-orang-tua', role === 'parent'],
+      ['/materi', learns], ['/tugas', learns], ['/asesmen', learns],
+      ['/dokumen', staff], ['/absensi-guru', staff], ['/akun', true], ['/kata-sandi', true],
+    ]
+    for (const [path, allowed] of expectedLinks) {
+      const links = services.locator(`a[href="${path}"]`)
+      if (allowed) await expect(links.first()).toBeVisible()
+      else await expect(links).toHaveCount(0)
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     if (role === 'administrator') await page.screenshot({ path: testInfo.outputPath('dashboard-release.png'), fullPage: true })
@@ -1675,7 +1695,7 @@ for (const role of ['teacher','student','parent','pending']) test(`school overvi
   let requested = false
   await page.route('**/rpc/dashboard_overview', async route => { requested = true; await route.fulfill({ status: 403, json: { code: '42501' } }) })
   await page.goto('/dashboard')
-  await expect(page.getByRole('heading', { name: 'Akses cepat' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: workspaceTitles[role], exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Ringkasan data sekolah' })).toHaveCount(0)
   expect(requested).toBe(false)
 })

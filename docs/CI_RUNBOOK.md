@@ -1,80 +1,40 @@
-# Runbook CI/CD
+# CI/CD dan keputusan rilis SI STIR HEBAT
 
-Status: 15 November 2026 (Kilo/QA)
-Cakupan: L08 (CI/CD & VC) pada master prompt multi-AI.
+Diperbarui 24 November 2026. Workflow GitHub Actions memverifikasi setiap push dan pull request dari root aplikasi. Promosi frontend ke Vercel dan penerapan migrasi Supabase merupakan tindakan operator dengan persetujuan pemilik. Konfigurasi repositori dapat diperiksa di [workflow](../.github/workflows/verify.yml), [package.json](../package.json), dan [vercel.json](../vercel.json).
 
-## 1. Apa yang dijalankan GitHub Actions
+## Alur CI
 
-`.github/workflows/verify.yml` (sama pada repo aplikasi dan repo rilis mandiri):
+| Tahap | Input dan perintah | Keluaran yang diperiksa |
+| --- | --- | --- |
+| Persiapan | Checkout revisi, Ubuntu, Node 24, cache npm, `npm ci` | Dependensi mengikuti `package-lock.json`. Job memakai `permissions.contents: read`. |
+| Konfigurasi | `node scripts/guard-env.mjs` | GitHub Actions menjalankan `CI_FIXTURE=1` dengan pasangan URL dan kunci publishable sintetis yang ditetapkan. |
+| Kontrak repositori | `npm run check` mulai dengan `check-migrations.mjs` dan `check-ci.mjs` | Penamaan, urutan dan duplikasi migrasi diperiksa. Pemeriksaan statis memeriksa langkah workflow dan nama skrip. |
+| Kode dan database | Lint, TypeScript, kemudian `npm test` | Tes unit, smoke dengan server sintetis, dan pengujian database. PGlite memutar ulang migrasi dengan kontrak Auth/Storage untuk tes. |
+| Build verifikasi | `npm run build:isolated` melalui `npm run check` | Vite menulis ke `dist-check/`. Audit menelusuri hasil build untuk penanda akun demo. |
+| Antarmuka | Instal Chromium dengan dependensi OS, lalu `npm run test:browser` | Playwright membuka Vite dev server di loopback. Proyek desktop dan ponsel memakai API tiruan. |
 
-| Langkah | Alasan |
-| --- | --- |
-| `actions/checkout@v4` | mengambil kode |
-| `actions/setup-node@v4` dengan `node-version: '24'` | sesuai `engines` |
-| `npm ci` | instalasi deterministik dari lockfile |
-| `npm run check` | gerbang utama (lihat bagian 2) |
-| `npx playwright install --with-deps chromium` | browser untuk CI Linux |
-| `npm run test:browser` | suite desktop + ponsel dengan API tiruan |
+Job `verify` gagal bila salah satu langkah keluar dengan status gagal. Selidiki dari langkah gagal pertama. Setelah perbaikan, jalankan kembali pemeriksaan pada revisi yang akan dirilis. Status GitHub Actions dan branch protection perlu dilihat pada repositori tujuan. Bila pemilik menerapkan perlindungan branch, pilih status `verify` dari workflow ini.
 
-Env `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` disetel sebagai nilai contoh. Ini wajib: sejak `vite.config.ts` menolak build tanpa konfigurasi Supabase, tanpa env ini langkah `npm run check` gagal.
+## Menyamakan pemeriksaan lokal
 
-## 2. Gerbang yang dijalankan `npm run check`
-
-1. `node scripts/check-migrations.mjs` — nama berkas `<14 digit>_<nama>.sql`, timestamp unik dan naik, serta aturan `student_habits` sebelum `komunikasi`.
-2. `node scripts/check-ci.mjs` — workflow memakai Node 24, `npm ci`, `npm run check`, pemasangan Playwright, `test:browser`, env Supabase, dan `permissions: contents: read`; setiap `npm run <skrip>` di workflow benar-benar ada di `package.json`.
-3. `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
-
-## 3. Menjalankan langkah CI di lokal
+Jalankan dari direktori yang berisi `package.json` dengan Node 24. Siapkan konfigurasi publishable melalui `.env.local` untuk Vite sesuai `.env.example`, atau lewat environment proses. Pastikan proses tes diizinkan memakai loopback.
 
 ```powershell
-# Node 24, dari SI_STIR_HEBAT_Starter/si-stir-hebat
 npm ci
 npm run check
-
-# Suite browser pada port sendiri agar tidak bentrok dengan agen lain
+npx playwright install chromium
+$env:PLAYWRIGHT_CHANNEL = 'chromium'
 $env:PLAYWRIGHT_PORT = '5191'
 npm run test:browser
 ```
 
-Catatan: jangan menjalankan `test:browser` bersamaan dengan `vite build` atau run browser agen lain. Pada RAM 7,6 GB, dua run paralel membuat peluncuran Edge melewati batas 180 detik.
+Playwright memakai Edge sebagai default di Windows jika `PLAYWRIGHT_CHANNEL` kosong. Pada Linux CI, workflow memasang Chromium dengan `--with-deps`. Port harus bebas karena server tes meminta `strictPort`. Bukti eksekusi terbaru dicatat di [status proyek](PROJECT_STATUS.md).
 
-## 4. Bukti pemeriksaan (15 November 2026)
+## Pengiriman dan pemulihan
 
-```
-$ node scripts/check-migrations.mjs
-Migration OK: 25 berkas, timestamp unik dan naik.
+1. Catat revisi kandidat, hasil CI dan versi migrasi yang dibutuhkan. Untuk distribusi sumber, jalankan `node scripts/prepare-release.mjs` dan gunakan direktori baru yang dicetak saat sukses. Skrip menyalin sumber, tes, workflow, dan skrip build dari daftar yang dipilih.
+2. Cocokkan kontrak backend dengan target. Untuk perubahan skema, rekonsiliasi versi serta definisi objek, uji Supabase lokal, periksa Security Advisor, bukti backup/restore, dan pemeriksaan anonim. Tinjau hasil menurut syarat pemilik sebelum menerapkan migrasi. [Rekonsiliasi hosted](HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md)
+3. Setelah rilis disetujui, build revisi yang sama di Vercel dengan Node 24, `npm run build` dan dua variabel publishable milik target. `prebuild` membaca environment proses. Build menghasilkan `dist/` yang diaudit lagi. Gunakan environment Preview milik proyek uji untuk UAT sebelum promosi.
+4. Catat ID deployment, status smoke, hasil UAT, dan versi skema. Bila smoke atau alur sekolah gagal, hentikan promosi. Untuk deployment yang sudah aktif, pilih deployment sehat terakhir yang kompatibel dengan skema. Perbaikan database memakai migrasi maju atau prosedur pemulihan yang telah diuji. [Runbook operasional](RUNBOOK_OPERASIONAL.md)
 
-$ node scripts/check-ci.mjs
-Workflow CI OK: 1 berkas valid dan memakai skrip yang tersedia.
-```
-
-Uji negatif (bukti bahwa gerbang benar-benar menolak):
-
-| Kasus | Hasil |
-| --- | --- |
-| Dua berkas dengan timestamp sama + nama berkas salah | keluar dengan 3 pesan galat, exit 1 |
-| `komunikasi` lebih dulu daripada `student_habits` | keluar dengan pesan urutan, exit 1 |
-
-`npm run check` penuh **belum** dapat dinyatakan lulus pada 15 November 2026: `src/app/Password.tsx` sedang disunting agen lain dan gagal typecheck (`TS6133`, `TS2304`). Gerbang baru (migration + workflow) sendiri lulus.
-
-## 5. Belum terverifikasi
-
-- **Run GitHub Actions**: repo privat dan `gh` tidak tersedia pada mesin ini, jadi status run tidak dapat dibaca. Tidak ada push dilakukan.
-- **Branch protection**: setelan repositori tidak dapat diubah dari mesin ini.
-- **Secret/Environment Vercel**: hanya dapat diperiksa pemilik.
-
-## 6. Rekomendasi branch protection (dipasang pemilik)
-
-Pada `main` (dan bila ada, `release`):
-
-1. Wajibkan pull request sebelum merge; minimal 1 approval.
-2. Wajibkan status `verify` (job pada workflow `Verify application`) lulus sebelum merge.
-3. Wajibkan branch mutakhir sebelum merge.
-4. Larang force push dan penghapusan branch.
-5. Tandai `verify` sebagai status yang diperlukan, bukan pemeriksaan opsional.
-
-## 7. Yang dibutuhkan pemilik
-
-- Memasang branch protection sesuai bagian 6.
-- Mengonfirmasi run `Verify application` pertama hijau, lalu menautkan lognya di `docs/AI_COORDINATION.md`.
-- Menambahkan `mariomagfii-sys/si-stir-hebat` sebagai remote branch terlindungi bila repo rilis mandiri dipisah.
+Konfigurasi CI memakai fixture dan tidak menerbitkan `dist-check/` ke layanan hosted. Bukti produksi berasal dari deployment, smoke serta UAT peran dan email pada target yang disetujui. [Aktivasi operator](AKTIVASI_DAN_RILIS.md)

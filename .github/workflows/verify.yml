@@ -16,6 +16,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: node scripts/guard-env.mjs
       - run: npm run check
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser

@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '../../components/auth/auth-context'
 import { EmptyState, ErrorNotice, LoadingState } from '../../components/ui/Feedback'
@@ -83,14 +84,14 @@ function SupervisionWorkspace({ userId }: { userId: string }) {
         const [sessions, options] = await Promise.all([
           client.from('academic_supervisions').select(columns).order('updated_at', { ascending: false }).order('id')
             .range(page * 20, page * 20 + 20).abortSignal(controller.signal).overrideTypes<Session[], { merge: false }>(),
-          isPrincipal(nextRole) ? client.from('teachers').select('id,name').eq('is_active', true)
-            .order('name').order('id').limit(1001).abortSignal(controller.signal) : null,
+          isPrincipal(nextRole) ? client.from('teachers').select('id,name', { count: 'exact' }).eq('is_active', true)
+            .order('name').order('id').limit(referenceLimit).abortSignal(controller.signal) : null,
         ])
         if (sessions.error || options?.error) throw new Error('Unable to load supervision')
         if (!controller.signal.aborted) {
           setRows(sessions.data ?? [])
-          setTeachers(options?.data?.slice(0, 1000) ?? [])
-          setTeachersTruncated((options?.data?.length ?? 0) > 1000)
+          setTeachers(options?.data?.slice(0, referenceLimit) ?? [])
+          setTeachersTruncated(hasMoreReferences(options))
         }
       } catch {
         if (!controller.signal.aborted) setLoadError(true)

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -40,5 +40,5 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { session, loading, error } = useAuth()
   if (loading) return <section className="login" role="status">Memuat sesi…</section>
   if (error) return <section className="login" role="alert">{error}</section>
-  return session ? children : <Navigate to="/login" replace />
+  return session ? <Fragment key={session.user.id}>{children}</Fragment> : <Navigate to="/login" replace />
 }

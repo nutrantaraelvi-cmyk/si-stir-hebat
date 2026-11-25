@@ -179,13 +179,17 @@ type HabitWeeklySummary = {
 function daftarKebiasaan(client: SupabaseClient, studentId?: string, page?: number): Promise<Page<HabitRecord>>
 function validateHabitDraft(draft: Pick<HabitDraft, 'record_date' | 'habits' | 'notes'>,
   today: string): string
-function simpanKebiasaan(client: SupabaseClient, draft: HabitDraft, today: string): Promise<HabitRecord>
+function ambilKebiasaanHarian(client: SupabaseClient, studentId: string, date: string): Promise<HabitRecord | null>
+function simpanKebiasaan(client: SupabaseClient, draft: HabitDraft, today: string,
+  expectedRevision?: number | null): Promise<HabitRecord>
 function validasiKebiasaan(client: SupabaseClient, id: string, revision: number, note: string): Promise<HabitRecord>
 function ringkasanKebiasaanMingguan(client: SupabaseClient, weekStart: string,
   studentId?: string, page?: number): Promise<Page<HabitWeeklySummary>>
 ```
 
 Wali mencatat untuk anak yang tertaut. Guru hanya memantau rekap kelas yang ditugaskan; siswa membaca catatan diri sesuai kebijakan publikasi; kepala sekolah/admin mengikuti cakupan kebijakan. Katalog tetap tujuh item. Tidak ada peringkat. Catatan yang tidak ada/sel kosong berarti **belum diisi**, bukan nilai `false`/"tidak dilakukan"; `days_missing` adalah hitungan hari tanpa catatan.
+
+Editor membaca satu pasangan siswa/tanggal saat memuat formulir. Revisi kosong membuat entri baru. Untuk koreksi, kirim revisi yang ditampilkan saat formulir dibuka. Data API menerapkan pembaruan pada siswa, tanggal dan revisi yang cocok. Konflik insert atau perubahan revisi memerlukan muat ulang. Perubahan isi oleh wali membatalkan validasi lama, sehingga guru dapat meninjau catatan terkini.
 
 ## Ringkasan dashboard
 

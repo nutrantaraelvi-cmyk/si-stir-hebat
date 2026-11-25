@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { canReadMasterData } from '../features/school/master'
 import { canReadAnnouncements } from '../lib/announcements'
@@ -70,30 +70,44 @@ function NavLinks({ items }: { items: NavItem[] }) {
   return <>{items.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'}>{item.label}</NavLink>)}</>
 }
 
+function NavigationDrawer({ items, onDismiss }: { items: NavItem[]; onDismiss: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current
+    dialog?.showModal()
+    return () => dialog?.close()
+  }, [])
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1000px)')
+    const onResize = () => { if (desktop.matches) onDismiss() }
+    onResize()
+    desktop.addEventListener('change', onResize)
+    return () => desktop.removeEventListener('change', onResize)
+  }, [onDismiss])
+
+  return <dialog ref={dialogRef} className="nav-drawer" id="nav-drawer" aria-labelledby="drawer-title"
+    onCancel={event => { event.preventDefault(); onDismiss() }}
+    onClick={event => { if (event.target === event.currentTarget) onDismiss() }}>
+    <div className="nav-drawer-panel">
+      <div className="nav-drawer-head">
+        <h2 id="drawer-title">Menu lainnya</h2>
+        <button type="button" onClick={onDismiss}>Tutup</button>
+      </div>
+      <nav aria-label="Menu tambahan"><NavLinks items={items} /></nav>
+    </div>
+  </dialog>
+}
+
 function SessionNavigation({ userId }: { userId: string }) {
   const role = useRole(userId)
-  const { pathname } = useLocation()
+  const location = useLocation()
   const [open, setOpen] = useState(false)
-  const toggleRef = useRef<HTMLButtonElement>(null)
-  const closeRef = useRef<HTMLButtonElement>(null)
   const items = navItems(role)
   const primary = items.slice(0, 4)
   const overflow = items.slice(4)
 
-  useEffect(() => { setOpen(false) }, [pathname])
-
-  useEffect(() => {
-    if (!open) return
-    closeRef.current?.focus()
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false)
-        toggleRef.current?.focus()
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [open])
+  useEffect(() => { setOpen(false) }, [location.key])
 
   return <>
     <nav className="main-nav" aria-label="Navigasi utama">
@@ -101,21 +115,11 @@ function SessionNavigation({ userId }: { userId: string }) {
     </nav>
     <nav className="bottom-nav" aria-label="Navigasi cepat">
       {primary.map(item => <NavLink key={item.to} to={item.to} end={item.to === '/'}>{item.label}</NavLink>)}
-      <button ref={toggleRef} type="button" aria-expanded={open} aria-controls="nav-drawer" onClick={() => setOpen(value => !value)}>
+      {overflow.length > 0 && <button type="button" aria-haspopup="dialog" aria-expanded={open} aria-controls={open ? 'nav-drawer' : undefined} onClick={() => setOpen(true)}>
         Lainnya
-      </button>
+      </button>}
     </nav>
-    {open && <div className="nav-drawer" id="nav-drawer" role="dialog" aria-label="Menu lainnya" onClick={() => { setOpen(false); toggleRef.current?.focus() }}>
-      <div className="nav-drawer-panel" onClick={event => event.stopPropagation()}>
-        <div className="nav-drawer-head">
-          <h2>Menu lainnya</h2>
-          <button ref={closeRef} type="button" onClick={() => { setOpen(false); toggleRef.current?.focus() }}>Tutup</button>
-        </div>
-        <nav aria-label="Menu tambahan">
-          <NavLinks items={overflow} />
-        </nav>
-      </div>
-    </div>}
+    {open && overflow.length > 0 && <NavigationDrawer items={overflow} onDismiss={() => setOpen(false)} />}
   </>
 }
 

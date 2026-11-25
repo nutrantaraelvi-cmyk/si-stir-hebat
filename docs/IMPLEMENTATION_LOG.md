@@ -809,3 +809,9 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Menambahkan halaman `/akun-sekolah` untuk administrator melihat akun pending terverifikasi dan menetapkan guru, kepala sekolah, murid, atau wali dengan konfirmasi.
 - RPC database memeriksa role administrator saat dipanggil, memvalidasi email terverifikasi dan status pending, menolak role administrator dari UI, serta menyimpan audit perubahan. Akun administrator pertama masih memerlukan bootstrap operator.
 - Migration lokal belum hosted; gate hosted proyek tetap berlaku. Lint dan typecheck lulus; tes otomatis/browser dan build belum dijalankan.
+## Audit arsitektur dan verifikasi - 24 November 2026
+
+- Menambahkan PRD operasional yang memetakan lima peran, alur, kriteria penerimaan, pilot, metrik, dan keputusan produk terbuka.
+- Menambahkan peta arsitektur aplikasi, boundary server Supabase, pola UI/UX, dependensi modul, serta gerbang CI/CD.
+- Menyatukan layanan dashboard dengan helper izin domain. Login Supabase mengarahkan sesi berhasil ke dashboard. Regresi browser memeriksa layanan dashboard untuk enam status peran pada desktop dan ponsel.
+- Menambahkan validasi unduhan dokumen aktif dan historis pada harness browser. Verifikasi lokal lulus 152/152 unit/database/smoke test, lint, typecheck, build terisolasi, dan tes browser fokus 14/14.

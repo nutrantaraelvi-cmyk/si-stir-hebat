@@ -51,13 +51,26 @@ export async function daftarKebiasaan(client: SupabaseClient, studentId?: string
   return { items: rows.slice(0, 25), hasMore: rows.length > 25 }
 }
 
-export async function simpanKebiasaan(client: SupabaseClient, draft: HabitDraft, today: string): Promise<HabitRecord> {
+export async function ambilKebiasaanHarian(client: SupabaseClient, studentId: string, date: string): Promise<HabitRecord | null> {
+  const { data, error } = await client.from('habit_records').select(columns)
+    .eq('student_id', studentId).eq('record_date', date).maybeSingle()
+  if (error) throw error
+  return data as HabitRecord | null
+}
+
+export async function simpanKebiasaan(client: SupabaseClient, draft: HabitDraft, today: string, expectedRevision: number | null = null): Promise<HabitRecord> {
   const notes = draft.notes.trim()
   const invalid = validateHabitDraft({ ...draft, notes }, today)
   if (invalid) throw new Error(invalid)
-  const { data, error } = await client.from('habit_records')
-    .upsert({ student_id: draft.student_id, record_date: draft.record_date, habits: draft.habits, notes }, { onConflict: 'student_id,record_date' })
-    .select(columns).single()
+  if (expectedRevision !== null && (!Number.isSafeInteger(expectedRevision) || expectedRevision < 0)) {
+    throw new Error('Revisi catatan kebiasaan tidak valid.')
+  }
+  const records = client.from('habit_records')
+  const change = expectedRevision === null
+    ? records.insert({ student_id: draft.student_id, record_date: draft.record_date, habits: draft.habits, notes })
+    : records.update({ habits: draft.habits, notes, revision: expectedRevision + 1 })
+      .eq('student_id', draft.student_id).eq('record_date', draft.record_date).eq('revision', expectedRevision)
+  const { data, error } = await change.select(columns).single()
   if (error) throw error
   return data as HabitRecord
 }

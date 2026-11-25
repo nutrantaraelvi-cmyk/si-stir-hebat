@@ -1,5 +1,7 @@
 # Draf Matriks RBAC Resmi
 
+> Arsip usulan 20 November. Untuk izin efektif lokal, gunakan [Matriks RBAC operasional](RBAC_MATRIX.md), termasuk koreksi atas pembacaan bukti supervisi, registri siswa dan kebiasaan.
+
 Status: **DRAF untuk disahkan pemilik** — bukan kebijakan resmi
 Tanggal: 15 November 2026; diperbarui 20 November 2026 (modul kebiasaan validasi, laporan ketidakhadiran wali, notifikasi, dokumen sekolah)
 Penulis: Qoder

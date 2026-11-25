@@ -1,5 +1,12 @@
 # Status SI STIR HEBAT
 
+## Pemeriksaan workspace - 24 November 2026
+
+- Baseline lokal memiliki 42 migration berurutan. Lint, typecheck, seluruh 152 unit/database/smoke test, dan build terisolasi lulus dengan Node 24.22.3. Smoke test menggunakan server preview loopback dan verifikasi penolakan REST anonim.
+- Tes browser terfokus untuk dashboard/RBAC lulus 12/12 pada desktop dan ponsel. Tes unduhan berkas aktif dan versi historis lulus 2/2. Suite browser penuh tetap memakai mock API dan belum menjadi UAT akun sekolah.
+- Dokumen arsitektur aktif: [arsitektur database](ARSITEKTUR_DATABASE.md), [arsitektur aplikasi/server/UI/UX](ARSITEKTUR_APLIKASI.md), [matriks RBAC](RBAC_MATRIX.md), [PRD operasional](PRD_OPERASIONAL.md), [runbook CI/CD](CI_RUNBOOK.md), dan [runbook operasional](RUNBOOK_OPERASIONAL.md).
+- Hosted belum berubah. Rekonsiliasi 23 migration hosted dengan migration lokal, Security Advisor, backup/restore, bootstrap administrator, konfigurasi redirect Auth, dan UAT sekolah tetap merupakan gate sebelum deployment atau penerapan migration.
+
 ## Pemeriksaan workspace - 22 November 2026
 
 - Tidak ada konflik Git aktif atau penanda konflik pada berkas sumber. Ekspektasi tes validasi kebiasaan disesuaikan untuk memeriksa perubahan status terlarang dan pembaruan yang ditolak RLS. `npm run check` lulus: 149 tes, lint, typecheck, dan build terisolasi. Ini bukan audit menyeluruh seluruh kode atau UAT hosted.

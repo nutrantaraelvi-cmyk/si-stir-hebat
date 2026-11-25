@@ -12,7 +12,7 @@ Folder ini adalah root utama SI STIR HEBAT. Aplikasi utamanya tetap React/Vite; 
 
 Laporan rinci: [Status proyek](docs/PROJECT_STATUS.md), [Log implementasi](docs/IMPLEMENTATION_LOG.md), [Keputusan sementara](docs/DECISIONS.md), [Telaah keamanan migration](docs/SECURITY_REVIEW.md), dan [Panduan UAT](docs/PANDUAN_UAT.md). Tujuh dokumen acuan tersedia sebagai Markdown di [`docs/references/`](docs/references/README.md), lengkap dengan hash dan hierarki otoritas; salinan tersebut belum disahkan sebagai acuan resmi. Skema nilai maksimum per asesmen dan publikasi manual guru merupakan keputusan sementara; skema resmi akan diberikan pengguna. Tidak ada perhitungan rapor otomatis.
 
-Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Dua puluh tiga migration terkonfirmasi diterapkan hingga 13 November 2026; repository kini memuat **38 berkas migration lokal** menurut `node scripts/check-migrations.mjs` (laporan Codex menyebut 39; selisih belum dijelaskan), sehingga 15 berkas belum hosted. Jangan menganggap berkas lokal sudah diterapkan:
+Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Read-only terakhir mengonfirmasi 23 migration hosted hingga 13 November 2026; repository kini memuat **42 berkas migration lokal** menurut `node scripts/check-migrations.mjs`, sehingga 19 berkas belum hosted. Jangan menganggap berkas lokal sudah diterapkan:
 
 | Versi | Migration |
 | --- | --- |
@@ -42,7 +42,7 @@ Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Dua pu
 
 RLS, izin dan trigger modul diverifikasi melalui metadata remote sebagaimana dicatat pada status proyek. Data API anonim diuji sesuai daftar tabel pada `scripts/check-supabase.mjs`, tanpa membaca baris data. Nama berkas migration yang tercatat mengikuti versi aktual remote. Jangan menerapkan ulang migration ini pada proyek tersebut. Tes lokal terbaru memakai Node 24; pengujian browser memakai API tiruan dan tidak menggantikan UAT akun sekolah.
 
-Ada 25 berkas migration di repo lokal. Dua berkas belum diterapkan ke hosted: `20261114000139_student_habits.sql` (ke-24; tabelnya tidak ditemukan lewat Data API pada 14 November 2026) dan `20261114083827_komunikasi.sql` (ke-25). Setelah persetujuan pemilik, terapkan berurutan dan jangan melompati `student_habits`. Telaah keamanan migration dan temuan yang masih terbuka ada di [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md).
+Migration lokal setelah baseline hosted meliputi kebiasaan, komunikasi, laporan wali, notifikasi, dokumen, konfigurasi sekolah, penetapan peran, dan validasi koreksi kebiasaan. Semuanya harus direkonsiliasi, diuji pada Supabase lokal, dan mendapat persetujuan sebelum penerapan berurutan ke hosted. Telaah keamanan dan drift ada di [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md), [docs/HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md](docs/HOSTED_MIGRATION_RECONCILIATION_2026-11-22.md), dan [docs/ARSITEKTUR_DATABASE.md](docs/ARSITEKTUR_DATABASE.md).
 
 Akun administrator belum diaktifkan. Aplikasi sudah tersedia di https://si-stir-hebat-blue.vercel.app; Site URL/redirect Supabase Auth, login dengan akun sekolah, email pemulihan, dan UAT masih perlu diverifikasi oleh pemilik akun. Deployment ini tidak berarti aplikasi sudah siap operasional.
 

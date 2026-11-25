@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { canReadJournals, isTeacher } from '../../utils/permissions'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -62,13 +63,13 @@ function JournalWorkspace({userId}:{userId:string}) {
         if(isTeacher(nextRole)) {
           const [teacher,assignments,classes,subjects,years]=await Promise.all([
             client.from('teachers').select('id').eq('profile_id',userId).eq('is_active',true).maybeSingle(),
-            client.from('teacher_assignments').select('id,teacher_id,class_id,subject_id').eq('is_active',true).limit(1001),
-            client.from('school_classes').select('id,name,academic_year_id').eq('is_active',true).limit(1001),
-            client.from('subjects').select('id,name').eq('is_active',true).limit(1001),
+            client.from('teacher_assignments').select('id,teacher_id,class_id,subject_id', { count: 'exact' }).eq('is_active',true).limit(referenceLimit),
+            client.from('school_classes').select('id,name,academic_year_id', { count: 'exact' }).eq('is_active',true).limit(referenceLimit),
+            client.from('subjects').select('id,name', { count: 'exact' }).eq('is_active',true).limit(referenceLimit),
             client.from('academic_years').select('id,name').limit(201),
           ])
           for(const result of [teacher,assignments,classes,subjects,years]) if(result.error) throw result.error
-          if(active) setChoicesTruncated([assignments,classes,subjects].some(result=>(result.data?.length??0)>1000) || (years.data?.length??0)>200)
+          if(active) setChoicesTruncated([assignments,classes,subjects].some(result=>hasMoreReferences(result)) || (years.data?.length??0)>200)
           const options=(assignments.data??[]).filter(item=>item.teacher_id===teacher.data?.id).flatMap(item=>{
             const classroom=classes.data?.find(row=>row.id===item.class_id)
             const subject=subjects.data?.find(row=>row.id===item.subject_id)

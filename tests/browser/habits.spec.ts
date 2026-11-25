@@ -318,6 +318,8 @@ async function setupParentWithTwoChildren(page: Page) {
       }
       const filter = url.searchParams.get('student_id') ?? ''
       const rows = filter.startsWith('eq.') ? records.filter(row => row.student_id === filter.slice(3)) : records
+      const date = url.searchParams.get('record_date')
+      if (date) return json(rows.filter(row => `eq.${row.record_date}` === date))
       const start = Number(url.searchParams.get('offset') ?? 0)
       const limit = Number(url.searchParams.get('limit') ?? 26)
       return json(rows.slice(start, start + limit))
@@ -359,4 +361,47 @@ test('parent with two linked children picks one child and saves for that child o
   await expect(page.getByText('Catatan harian: sudah diisi', { exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Data Contoh Anak A' })).toHaveCount(0)
   await expectNoHorizontalOverflow(page)
+})
+
+test('guardian checks a historical day and reloads the record on a revision conflict', async ({ page }) => {
+  await setupParentWithTwoChildren(page)
+  const row = makeHabitRow({ record_date: '2026-07-06', revision: 4, notes: 'Data Contoh catatan liburan' })
+  await page.route('**/rest/v1/habit_records?**', async route => {
+    const params = new URL(route.request().url()).searchParams
+    if (params.get('record_date') !== 'eq.2026-07-06') return route.fallback()
+    expect(params.get('student_id')).toBe('eq.student-one')
+    if (route.request().method() === 'PATCH') {
+      expect(params.get('revision')).toBe('eq.4')
+      row.revision = 5
+      row.notes = 'Data Contoh perubahan dari perangkat lain'
+      return route.fulfill({ status: 406, json: { code: 'PGRST116', message: 'No matching row' } })
+    }
+    return route.fulfill({ json: [row] })
+  })
+  await page.goto('/kebiasaan')
+  await page.getByLabel('Tanggal', { exact: true }).fill(row.record_date)
+  await expect(page.getByLabel('Catatan tambahan')).toHaveValue(row.notes)
+  await page.getByLabel('Catatan tambahan').fill('Catatan yang perlu diperbarui')
+  await page.getByRole('button', { name: 'Perbarui catatan' }).click()
+  const conflict = page.getByRole('alert').filter({ hasText: 'Catatan sudah berubah' })
+  await expect(conflict).toBeVisible()
+  await conflict.getByRole('button', { name: 'Coba lagi' }).click()
+  await expect(page.getByLabel('Catatan tambahan')).toHaveValue('Data Contoh perubahan dari perangkat lain')
+})
+
+test('switching children clears unsaved habits and requires an explicit empty-day confirmation', async ({ page }) => {
+  const { saved } = await setupParentWithTwoChildren(page)
+  await page.goto('/kebiasaan')
+  await page.getByRole('button', { name: /Beribadah/ }).click()
+  await page.getByLabel('Catatan tambahan').fill('Data Contoh draf anak pertama')
+  await page.getByLabel('Pilih murid').selectOption('student-two')
+  await expect(page.getByLabel('Catatan tambahan')).toHaveValue('')
+  await expect(page.getByRole('button', { name: /Beribadah/ })).toHaveAttribute('aria-pressed', 'false')
+  await page.getByRole('button', { name: 'Simpan catatan' }).click()
+  await expect(page.getByRole('alert').filter({ hasText: 'konfirmasi' })).toBeVisible()
+  expect(saved).toHaveLength(0)
+  await page.getByLabel('Belum ada kebiasaan yang dilakukan pada tanggal ini').check()
+  await page.getByRole('button', { name: 'Simpan catatan' }).click()
+  await expect(page.getByText(/tersimpan dan menunggu validasi guru/)).toBeVisible()
+  expect(saved).toMatchObject([{ student_id: 'student-two', habits: Array(7).fill(false), notes: '' }])
 })

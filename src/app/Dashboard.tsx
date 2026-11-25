@@ -5,7 +5,7 @@ import { useAuth } from '../components/auth/auth-context'
 import { supabase } from '../lib/supabase'
 import { canManageAnnouncements, canReadAnnouncements, type Announcement } from '../lib/announcements'
 import { schoolRoleLabels } from '../lib/school'
-import { canAccessCommunication, canReadAbsenceReports, canReadAssessments, canReadAttendance, canReadDashboardOverview, canReadGuardianPortal, canReadHabits, canReadJournals, canReadLearning, canReadNotifications, canReadSchedules, canReadSchoolDocuments, canReadSupervision, canReadTeacherAttendance, canReadTeachingModules, isAdministrator, isParent, isPrincipal, isStudent, isTeacher } from '../utils/permissions'
+import { canAccessCommunication, canReadAbsenceReports, canReadAssessments, canReadAttendance, canReadDashboardOverview, canReadGuardianPortal, canReadHabits, canReadJournals, canReadLearning, canReadNotifications, canReadSchedules, canReadSchoolDocuments, canReadSupervision, canReadTeacherAttendance, canReadTeachingModules, isParent, isPrincipal, isStudent, isTeacher } from '../utils/permissions'
 import { getDashboardOverview, type DashboardOverview } from '../lib/dashboard-overview'
 import { canReadMasterData } from '../features/school/master'
 import { habitLabels } from '../features/student-habits/api'
@@ -263,6 +263,26 @@ function ParentWorkspace() {
   </div>
 }
 
+const workspaces = [
+  { role: 'administrator', variant: 'admin', title: 'Pusat kendali administrator', view: AdminServiceCenter },
+  { role: 'student', variant: 'student', title: 'Ruang belajarku', view: StudentWorkspace },
+  { role: 'teacher', variant: 'teacher', title: 'Ruang kerja guru', view: TeacherWorkspace },
+  { role: 'principal', variant: 'principal', title: 'Ruang kepemimpinan sekolah', view: PrincipalWorkspace },
+  { role: 'parent', variant: 'parent', title: 'Ruang keluarga', view: ParentWorkspace },
+]
+
+function DashboardServices({ role }: { role?: string }) {
+  const workspace = workspaces.find(item => item.role === role)
+  const Workspace = workspace?.view
+  return <section className={workspace ? `quick-access quick-access--${workspace.variant}` : 'quick-access'} aria-labelledby="quick-access">
+    <h2 id="quick-access">{workspace?.title ?? 'Akses cepat'}</h2>
+    {Workspace ? <Workspace/> : <div className="quick-access-grid">
+      <QuickLink to="/akun" icon={UserRound} title="Profil saya" detail="Lengkapi nama dan periksa peran akun."/>
+      <QuickLink to="/kata-sandi" icon={KeyRound} title="Keamanan akun" detail="Perbarui kata sandi akun sekolah."/>
+    </div>}
+  </section>
+}
+
 export function Dashboard() {
   const { session } = useAuth()
   return session ? <SchoolDashboard key={session.user.id} userId={session.user.id}/> : null
@@ -407,31 +427,6 @@ function SchoolDashboard({ userId }: { userId: string }) {
         </section>
       </>}
     </>}
-    <section className={`quick-access${isAdministrator(profile?.role) ? ' quick-access--admin' : ''}${isStudent(profile?.role) ? ' quick-access--student' : ''}${isTeacher(profile?.role) ? ' quick-access--teacher' : ''}${isPrincipal(profile?.role) ? ' quick-access--principal' : ''}${isParent(profile?.role) ? ' quick-access--parent' : ''}`} aria-labelledby="quick-access"><h2 id="quick-access">{isAdministrator(profile?.role) ? 'Pusat kendali administrator' : isStudent(profile?.role) ? 'Ruang belajarku' : isTeacher(profile?.role) ? 'Ruang kerja guru' : isPrincipal(profile?.role) ? 'Ruang kepemimpinan sekolah' : isParent(profile?.role) ? 'Ruang keluarga' : 'Akses cepat'}</h2>{isAdministrator(profile?.role) ? <AdminServiceCenter/> : isStudent(profile?.role) ? <StudentWorkspace/> : isTeacher(profile?.role) ? <TeacherWorkspace/> : isPrincipal(profile?.role) ? <PrincipalWorkspace/> : isParent(profile?.role) ? <ParentWorkspace/> : <div className="quick-access-grid">
-      {!loading && canRead && <>
-        {canReadSchedules(profile?.role ?? null) && <QuickLink to="/jadwal" icon={CalendarDays} title="Jadwal pelajaran" detail="Lihat jadwal sesuai kelas dan tanggal."/>}
-        {canReadLearning(profile?.role ?? null) && <QuickLink to="/materi" icon={BookOpen} title="Materi kelas" detail="Buka bahan pembelajaran yang tersedia."/>}
-        {canReadLearning(profile?.role ?? null) && <QuickLink to="/tugas" icon={ClipboardList} title="Tugas kelas" detail="Kelola tugas, pengumpulan, dan umpan balik."/>}
-        {canReadAssessments(profile?.role ?? null) && <QuickLink to="/asesmen" icon={ClipboardCheck} title="Asesmen dan nilai" detail="Lihat hasil terbit atau kelola asesmen sesuai peran."/>}
-        {canReadAttendance(profile?.role ?? null) && <QuickLink to="/absensi" icon={UserCheck} title="Absensi kelas" detail="Catatan kehadiran dan rekap yang dapat Anda akses."/>}
-        {canReadTeacherAttendance(profile?.role ?? null) && <QuickLink to="/absensi-guru" icon={ClipboardCheck} title="Absensi guru" detail="Catat jam masuk/keluar dan ajukan koreksi."/>}
-        {canReadGuardianPortal(profile?.role ?? null) && <QuickLink to="/ruang-orang-tua" icon={UserRound} title="Kehadiran anak" detail="Pantau anak yang telah ditautkan oleh sekolah."/>}
-        {canAccessCommunication(profile?.role ?? null) && <QuickLink to="/komunikasi" icon={MessageSquare} title="Komunikasi" detail="Pesan wali kelas dan keluarga sesuai tautan akun."/>}
-        {canReadAbsenceReports(profile?.role) && <QuickLink to="/laporan-ketidakhadiran" icon={ClipboardList} title="Laporan ketidakhadiran" detail="Kirim atau tinjau laporan sesuai peran Anda."/>}
-        {canReadHabits(profile?.role) && <QuickLink to="/kebiasaan" icon={ClipboardCheck} title="7 Kebiasaan" detail="Buka catatan kebiasaan yang dapat Anda akses."/>}
-        {canReadNotifications(profile?.role) && <QuickLink to="/notifikasi" icon={Bell} title="Notifikasi" detail="Periksa pembaruan untuk akun Anda."/>}
-        {canReadTeachingModules(profile?.role ?? null) && <QuickLink to="/modul-ajar" icon={FileText} title="Modul ajar" detail="Dokumen perencanaan dan proses peninjauan."/>}
-        {canReadSchoolDocuments(profile?.role ?? null) && <QuickLink to="/dokumen" icon={FileText} title="Dokumen sekolah" detail="Unggah, periksa, dan arsipkan dokumen administrasi."/>}
-        {canReadSupervision(profile?.role ?? null) && <QuickLink to="/supervisi" icon={Eye} title="Supervisi akademik" detail="Jadwal, observasi, tindak lanjut, dan laporan."/>}
-        {canReadJournals(profile?.role ?? null) && <QuickLink to="/jurnal" icon={PenLine} title="Jurnal mengajar" detail="Catatan kegiatan pembelajaran sesuai penugasan."/>}
-        {isAdministrator(profile?.role) && <>
-          <QuickLink to="/sekolah" icon={ShieldCheck} title="Siapkan data sekolah" detail="Tahun ajaran, kelas, guru, siswa, dan penugasan."/>
-          <QuickLink to="/tautan-akun" icon={Link2} title="Tautan akun" detail="Verifikasi hubungan akun guru, siswa, dan wali."/>
-        </>}
-        <QuickLink to="/pengumuman" icon={Bell} title={canManage ? 'Kelola pengumuman' : 'Pengumuman sekolah'} detail={canManage ? 'Tulis kabar baru, terbitkan, atau arsipkan.' : 'Baca informasi dan kegiatan sekolah.'}/>
-      </>}
-      <QuickLink to="/akun" icon={UserRound} title="Profil saya" detail="Lengkapi nama dan periksa peran akun."/>
-      <QuickLink to="/kata-sandi" icon={KeyRound} title="Keamanan akun" detail="Perbarui kata sandi akun sekolah."/>
-    </div>}</section>
+    <DashboardServices role={profile?.role}/>
   </section>
 }

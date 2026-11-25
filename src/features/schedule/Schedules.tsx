@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useAuth } from '../../components/auth/auth-context'
 import { supabase } from '../../lib/supabase'
@@ -57,18 +58,18 @@ function Workspace({ userId }: { userId: string }) {
         }
         const [list, options, classOptions] = await Promise.all([
           query.range(page * 25, page * 25 + 25).abortSignal(controller.signal),
-          isAdministrator(nextRole) ? client.from('teacher_assignments').select('id,teachers!inner(name),school_classes!inner(name),subjects!inner(name)')
+          isAdministrator(nextRole) ? client.from('teacher_assignments').select('id,teachers!inner(name),school_classes!inner(name),subjects!inner(name)', { count: 'exact' })
             .eq('is_active', true).eq('teachers.is_active', true).eq('school_classes.is_active', true).eq('subjects.is_active', true)
-            .limit(1001).abortSignal(controller.signal).overrideTypes<Assignment[], { merge: false }>() : null,
-          client.from('school_classes').select('id,name,academic_years!inner(name)').order('name').order('id')
-            .limit(1001).abortSignal(controller.signal).overrideTypes<ClassOption[], { merge: false }>(),
+            .limit(referenceLimit).abortSignal(controller.signal).overrideTypes<Assignment[], { merge: false }>() : null,
+          client.from('school_classes').select('id,name,academic_years!inner(name)', { count: 'exact' }).order('name').order('id')
+            .limit(referenceLimit).abortSignal(controller.signal).overrideTypes<ClassOption[], { merge: false }>(),
         ])
         if (list.error || options?.error || classOptions.error) throw new Error('Unavailable')
         if (!controller.signal.aborted) {
           setRows(list.data as Schedule[])
-          setAssignments(options?.data?.slice(0, 1000) ?? [])
-          setClasses(classOptions.data.slice(0, 1000))
-          setReferencesTruncated((options?.data?.length ?? 0) > 1000 || classOptions.data.length > 1000)
+          setAssignments(options?.data?.slice(0, referenceLimit) ?? [])
+          setClasses(classOptions.data.slice(0, referenceLimit))
+          setReferencesTruncated(hasMoreReferences(options) || hasMoreReferences(classOptions))
         }
       } catch { if (!controller.signal.aborted) setFailed(true) }
       finally { if (!controller.signal.aborted) setLoading(false) }

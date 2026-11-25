@@ -1,3 +1,4 @@
+import { hasMoreReferences, referenceLimit } from '../../utils/references'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useAuth } from '../../components/auth/auth-context'
 import { EmptyState, ErrorNotice, LoadingState } from '../../components/ui/Feedback'
@@ -58,15 +59,15 @@ function ModuleWorkspace({ userId }: { userId: string }) {
         const [records, options] = await Promise.all([
           client.from('teaching_modules').select(moduleColumns).order('updated_at', { ascending: false }).order('id')
             .range(page * pageSize, page * pageSize + pageSize).abortSignal(controller.signal).overrideTypes<Module[], { merge: false }>(),
-          isTeacher(nextRole) ? client.from('teacher_assignments').select('id,school_classes!inner(name),subjects!inner(name)')
+          isTeacher(nextRole) ? client.from('teacher_assignments').select('id,school_classes!inner(name),subjects!inner(name)', { count: 'exact' })
             .eq('is_active', true).eq('school_classes.is_active', true).eq('subjects.is_active', true)
-            .limit(1001).abortSignal(controller.signal).overrideTypes<Assignment[], { merge: false }>() : null,
+            .limit(referenceLimit).abortSignal(controller.signal).overrideTypes<Assignment[], { merge: false }>() : null,
         ])
         if (records.error || options?.error) throw new Error('Module list unavailable')
         if (!controller.signal.aborted) {
           setModules(records.data ?? [])
-          setAssignments(options?.data?.slice(0, 1000) ?? [])
-          setOptionsTruncated((options?.data?.length ?? 0) > 1000)
+          setAssignments(options?.data?.slice(0, referenceLimit) ?? [])
+          setOptionsTruncated(hasMoreReferences(options))
         }
       } catch {
         if (!controller.signal.aborted) setLoadError(true)

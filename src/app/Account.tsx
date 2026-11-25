@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Bell, BookHeart, ClipboardCheck, KeyRound, LogOut, ShieldCheck, Sparkles, UserRound, UsersRound, type LucideIcon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../components/auth/auth-context'
@@ -52,6 +52,7 @@ function registrationErrorMessage(message: string) {
 }
 
 export function Login() {
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { session, loading, error: sessionError } = useAuth()
   const [email, setEmail] = useState('')
@@ -75,6 +76,7 @@ export function Login() {
     try {
       const { error: failure } = await client.auth.signInWithPassword({ email: email.trim(), password })
       if (failure) setError('Tidak dapat masuk. Periksa email dan kata sandi, lalu coba lagi.')
+      else navigate('/dashboard', { replace: true })
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }
     finally { setBusy(false) }
   }

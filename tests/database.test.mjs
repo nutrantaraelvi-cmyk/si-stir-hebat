@@ -102,6 +102,37 @@ test('migrations and database permissions', async t => {
     await db.exec(role === 'anon' ? 'set role anon' : 'set role authenticated')
   }
   const permissionDenied = { code: '42501' }
+  await t.test('public domain tables enforce RLS after replaying all migrations', async () => {
+    const { rows } = await db.query(
+      "select tablename from pg_tables where schemaname='public' and not rowsecurity order by tablename",
+    )
+    assert.deepEqual(rows, [])
+  })
+  await t.test('an administrator activates a confirmed pending account once and records the actor', async () => {
+    const target = '10000000-0000-4000-8000-eeee00000001'
+    await db.query('insert into auth.users (id) values ($1)', [target])
+    const activate = () => db.query('select public.assign_school_role($1,$2)', [target, 'teacher'])
+    await as('administrator')
+    await assert.rejects(activate(), { code: 'P0002' })
+    await db.exec('reset role')
+    await db.query('update auth.users set email_confirmed_at=now() where id=$1', [target])
+    await as('principal')
+    await assert.rejects(activate(), permissionDenied)
+    await as('administrator')
+    const queue = () => db.query('select profile_id from public.list_pending_school_accounts()')
+    assert.ok((await queue()).rows.some(row => row.profile_id === target))
+    await activate()
+    assert.ok(!(await queue()).rows.some(row => row.profile_id === target))
+    await assert.rejects(activate(), { code: 'P0002' })
+    assert.deepEqual(
+      (await db.query('select old_role,new_role,changed_by from public.profile_role_changes where profile_id=$1', [target])).rows,
+      [{ old_role: 'pending', new_role: 'teacher', changed_by: ids.administrator }],
+    )
+    await as('teacher')
+    assert.equal((await db.query('select id from public.profile_role_changes')).rows.length, 0)
+    await db.exec('reset role')
+    await db.query('delete from auth.users where id=$1', [target])
+  })
   await t.test('dashboard overview aggregates only for administrator and principal', async () => {
     const { rows: indexes } = await db.query("select indexname from pg_indexes where schemaname='public' and tablename='teaching_modules'")
     assert.ok(indexes.some(row => row.indexname === 'teaching_modules_submitted_dashboard_idx'))
@@ -1247,6 +1278,8 @@ test('migrations and database permissions', async t => {
     assert.equal((await db.query("update public.habit_records set validation_status='validated',revision=revision+1 returning id")).rows.length, 0)
     await as('teacher')
     assert.equal((await db.query('select * from public.habit_records')).rows.length, 1)
+    await assert.rejects(db.query("update public.habit_records set notes='Data Contoh sunting', revision=revision+1"), permissionDenied)
+    await assert.rejects(db.query("update public.habit_records set validation_status='validated', revision=revision+1"), { code: '23514' })
     assert.equal((await db.query("select student_id from public.habit_weekly_summary(date_trunc('week',$1::date)::date,0,null)", [pendingDay])).rows.some(row => row.student_id === studentOne), true)
     const validated = (await db.query("update public.habit_records set validation_status='validated',validation_note='Data Contoh konfirmasi',revision=revision+1 where record_date=$1 returning validation_status,validated_by,validated_at", [pendingDay])).rows[0]
     assert.equal(validated.validation_status, 'validated')
@@ -1255,7 +1288,17 @@ test('migrations and database permissions', async t => {
     await as('parent')
     assert.equal((await db.query("select validation_status from public.habit_records where record_date=$1", [pendingDay])).rows[0].validation_status, 'validated')
     await assert.rejects(db.query("update public.habit_records set validation_status='pending',revision=revision+1"), permissionDenied)
+    const unchanged = await db.query('update public.habit_records set notes=notes, revision=revision+1 returning validated_by, validated_at')
+    assert.deepEqual(unchanged.rows, [{ validated_by: ids.teacher, validated_at: validated.validated_at }])
+    const corrected = await db.query(
+      "update public.habit_records set notes='Data Contoh koreksi', revision=revision+1 where id=$1 and revision=2 returning validation_status,validated_by,validated_at,validation_note",
+      [parentRow.id],
+    )
+    assert.deepEqual(corrected.rows, [{ validation_status: 'pending', validated_by: null, validated_at: null, validation_note: '' }])
+    const stale = await db.query('update public.habit_records set notes=$1, revision=revision+1 where id=$2 and revision=2 returning id', ['Data Contoh lama', parentRow.id])
+    assert.equal(stale.rows.length, 0)
     await as('teacher')
+    await db.query("update public.habit_records set validation_status='validated',validation_note='Data Contoh validasi ulang',revision=revision+1 where id=$1", [parentRow.id])
     await db.query("update public.habit_records set validation_status='pending',revision=revision+1 where record_date=$1", [pendingDay])
     await as('parent')
     const pendingAgain = (await db.query("select validation_status,validated_by,validated_at,validation_note from public.habit_records where record_date=$1", [pendingDay])).rows[0]

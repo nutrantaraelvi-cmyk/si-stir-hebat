@@ -8,13 +8,13 @@ Tandai setiap butir setelah diverifikasi langsung pada proyek yang benar. Jangan
 
 - [ ] Pemilik sekolah membuat akun administrator pertama pada proyek Supabase yang benar, menyelesaikan verifikasi email, dan menyimpan kredensial hanya di pengelola kata sandi sekolah.
 - [ ] Operator mencocokkan UID akun dengan tepat satu profil `pending`, menetapkan peran administrator memakai prosedur SQL terbatas di bawah, lalu memastikan aplikasi menampilkan dashboard Administrator.
-- [ ] Setelah akun pertama aktif, nonaktifkan pendaftaran publik pada Authentication → Settings → User Signups. Akun berikutnya dibuat operator dan diberi peran setelah identitasnya diverifikasi.
+- [ ] Cocokkan pengaturan User Signups dengan cara penerimaan akun yang disetujui sekolah. Alur mandiri di `/daftar` memerlukan signup aktif dan verifikasi email. Profil baru berstatus `pending`; administrator mencocokkan identitas dan menetapkan peran melalui Akun sekolah setelah migrasi terkait tersedia di target.
 - [ ] Pastikan tidak ada akun atau data sekolah nyata yang dimasukkan sebelum UAT dan pemeriksaan akses peran disetujui.
 
 ### Supabase Auth, URL, dan email pemulihan
 
 - [ ] Site URL menunjuk ke domain produksi HTTPS yang benar.
-- [ ] Redirect URL mencantumkan tepat `https://DOMAIN/kata-sandi`; tambahkan URL lokal hanya bila diperlukan. Jangan memakai wildcard yang lebih luas dari kebutuhan.
+- [ ] Daftarkan `https://DOMAIN/login` untuk konfirmasi pendaftaran dan `https://DOMAIN/kata-sandi` untuk pemulihan. Tambahkan URL preview atau lokal sesuai origin yang dipakai.
 - [ ] Pengiriman email pemulihan siap untuk penggunaan sekolah. Minta email pemulihan, ikuti tautan, tetapkan kata sandi baru, lalu pastikan pengguna kembali ke aplikasi.
 - [ ] Uji login, logout, refresh halaman terlindungi saat logout, dan pemulihan kata sandi dengan akun uji yang berwenang.
 
@@ -68,11 +68,11 @@ returning id, role;
 - Isi `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` pada Environment Variables Vercel untuk Production. Ambil dari proyek Supabase yang benar, setelah riwayat migration hosted dicocokkan. Jangan memakai nilai tiruan CI.
 - Jangan memasukkan service-role key, secret key, password database atau token admin ke variabel `VITE_*`.
 - `vercel.json` menyediakan fallback SPA agar `/dashboard`, `/jadwal` dan route lain dapat dibuka langsung.
-- Snapshot repository ini berisi 22 berkas migration; catatan operasional menyatakan proyek hosted sudah mencatat 23 migration. Kedua riwayat belum direkonsiliasi. Jangan menerapkan migration dari snapshot ini ke hosted atau mereset database. Perubahan database memerlukan migration baru, pengujian lokal, pencocokan riwayat hosted, dan persetujuan pemilik sebelum penerapan.
+- Cocokkan berkas di `supabase/migrations/` dengan riwayat dan struktur proyek tujuan. Rekonsiliasi 22 November 2026 mencatat 23 versi hosted dan beberapa objek yang berbeda dari definisi lokal. Sebelum perubahan hosted, periksa ulang versi, kebijakan akses, pengujian lokal, Security Advisor, serta bukti backup/restore sesuai keputusan pemilik.
 
 ## Setelah mendapatkan alamat deployment
 
-1. Di Supabase Authentication → URL Configuration, set Site URL ke domain produksi HTTPS. Tambahkan URL redirect tepat `https://DOMAIN/kata-sandi`. Tambahkan alamat lokal hanya bila dibutuhkan pengembang. Konfigurasi lokal tidak otomatis memperbarui pengaturan hosted.
+1. Di Supabase Authentication → URL Configuration, isi Site URL domain produksi HTTPS dan kedua redirect `https://DOMAIN/login` serta `https://DOMAIN/kata-sandi`. Konfigurasi CLI lokal berlaku pada stack lokal.
 2. Periksa pengiriman email pemulihan melalui akun milik sekolah. Pastikan layanan email/SMTP proyek siap untuk penggunaan sekolah dan alur pemulihan benar-benar selesai.
 3. Uji login, refresh route langsung, logout, penolakan akses saat sudah keluar, dan pemulihan kata sandi.
 4. Uji satu peran guru, siswa dan wali dengan data uji yang diberi label Data Contoh; jangan mengimpor seluruh data sekolah sebelum pemeriksaan peran selesai.
@@ -84,7 +84,7 @@ Vercel meng-host frontend; Supabase melayani Auth, database dan berkas privat. P
 
 Workflow `.github/workflows/verify.yml` berada di root repository mandiri ini. Workflow memakai Node 24, menjalankan `npm ci`, `npm run check`, memasang Chromium, lalu menjalankan `npm run test:browser` dengan endpoint dan kunci publishable tiruan khusus tes. Hasil CI tidak membuktikan login/email produksi berhasil. Status siap pakai penuh membutuhkan deployment terverifikasi dan UAT operator sekolah.
 
-## Deployment aktif — 14 November 2026
+## Riwayat verifikasi deployment pada 14 November 2026
 
 Alamat produksi: https://si-stir-hebat-blue.vercel.app
 
@@ -92,7 +92,7 @@ Deployment Vercel berstatus READY. HTTP halaman utama, /login, /jadwal dan /kata
 
 Langkah pemilik sekolah yang masih diperlukan:
 
-1. Supabase Authentication → URL Configuration: Site URL `https://si-stir-hebat-blue.vercel.app`; tambahkan redirect `https://si-stir-hebat-blue.vercel.app/kata-sandi`.
+1. Periksa Site URL domain sekolah dan redirect konfirmasi serta pemulihan sesuai checklist di atas.
 2. Aktifkan administrator pertama mengikuti panduan di atas, lalu uji login dan pemulihan email.
 3. Vercel Account Settings → Login Connections: hubungkan GitHub. Integrasi repo otomatis belum berhasil karena koneksi login ini belum ada. Deployment saat ini dilakukan melalui CLI; push GitHub belum otomatis berarti produksi berubah.
 4. Jalankan UAT peran sekolah sebelum memasukkan data operasional.

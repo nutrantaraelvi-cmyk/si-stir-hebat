@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../components/auth/auth-context'
 import { EmptyState, ErrorNotice, LoadingState } from '../../components/ui/Feedback'
+import { HabitDayEditor } from './HabitDayEditor'
 import { schoolToday } from '../../utils/date'
 import { supabase } from '../../lib/supabase'
-import { daftarKebiasaan, habitLabels, ringkasanKebiasaanMingguan, simpanKebiasaan, validasiKebiasaan, type HabitRecord, type HabitWeeklySummary } from './api'
-import { canReadHabits, canSubmitHabits, canValidateHabits, isParent, isStudent, isTeacher } from '../../utils/permissions'
+import { daftarKebiasaan, habitLabels, ringkasanKebiasaanMingguan, validasiKebiasaan, type HabitRecord, type HabitWeeklySummary } from './api'
+import { canReadHabits, canSubmitHabits, canValidateHabits, isStudent, isTeacher } from '../../utils/permissions'
 
 type RosterStudent = { id: string; name: string }
 
@@ -27,36 +28,16 @@ function errorMessage(thrown: unknown, fallback: string) {
 
 export function StudentHabits() {
   const { session } = useAuth()
-  return session ? <HabitsWorkspace userId={session.user.id} /> : null
+  return session ? <HabitsWorkspace key={session.user.id} userId={session.user.id} /> : null
 }
 
 function HabitsWorkspace({ userId }: { userId: string }) {
   const [role, setRole] = useState<string | null>(null)
   const [students, setStudents] = useState<RosterStudent[]>([])
   const [studentId, setStudentId] = useState('')
-  const [page, setPage] = useState(0)
-  const [rows, setRows] = useState<HabitRecord[]>([])
-  const [hasMore, setHasMore] = useState(false)
-  const [date, setDate] = useState(schoolToday())
-  const [habits, setHabits] = useState<boolean[]>(() => Array(7).fill(false))
-  const [notes, setNotes] = useState('')
-  const [dirty, setDirty] = useState(false)
-  const [pendingId, setPendingId] = useState('')
-  const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
-  const [rowsLoading, setRowsLoading] = useState(false)
   const [rosterError, setRosterError] = useState('')
-  const [rowsError, setRowsError] = useState('')
-  const [actionError, setActionError] = useState('')
   const [denied, setDenied] = useState(false)
-  const [message, setMessage] = useState('')
-  const [weekly, setWeekly] = useState<HabitWeeklySummary | null>(null)
-  const [weeklyState, setWeeklyState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle')
-  const [weeklyAttempt, setWeeklyAttempt] = useState(0)
-  const dirtyRef = useRef(false)
-  const dateRef = useRef(date)
-  dirtyRef.current = dirty
-  dateRef.current = date
 
   const loadRoster = useCallback(async () => {
     if (!supabase) { setRosterError('Supabase belum terkonfigurasi.'); setLoading(false); return }
@@ -87,76 +68,76 @@ function HabitsWorkspace({ userId }: { userId: string }) {
 
   useEffect(() => { void loadRoster() }, [loadRoster])
 
-  const applyDraft = useCallback((list: HabitRecord[], forDate: string, forStudent: string) => {
-    const existing = list.find(row => row.record_date === forDate && row.student_id === forStudent)
-    setHabits(existing ? [...existing.habits] : Array(7).fill(false))
-    setNotes(existing?.notes ?? '')
-  }, [])
+  const selected = students.find(student => student.id === studentId)
+  return <section className="board">
+    <div className="board-heading"><div><div className="eyebrow">RUANG KEBIASAAN</div><h1>7 Kebiasaan Anak Indonesia Hebat</h1><p>Wali mencatat kebiasaan anak; guru memvalidasi setelah melakukan konfirmasi.</p></div><Link to="/dashboard">Dashboard</Link></div>
+    {loading ? <LoadingState /> : denied ? <EmptyState>Halaman kebiasaan tidak tersedia untuk peran ini.</EmptyState> : rosterError ? <ErrorNotice onRetry={() => void loadRoster()}>{rosterError}</ErrorNotice> : <>
+      <p className="help">Catatan yang sudah tervalidasi dapat dilihat oleh murid, guru, wali, dan kepala sekolah sesuai relasi serta RLS.</p>
+      {students.length > 1 && <label className="habit-picker" htmlFor="habit-student">Pilih murid<select id="habit-student" value={studentId} onChange={event => setStudentId(event.target.value)}>{students.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}
+      {students.length === 0 && <EmptyState>{isTeacher(role) ? 'Belum ada murid pada kelas penugasan Anda.' : 'Belum ada murid yang tertaut ke akun ini.'}</EmptyState>}
+      {students.length > 0 && isStudent(role) && <p className="help">Wali mengisi catatan harian untuk anak. Anda dapat melihat catatan milik sendiri dan rekap yang diizinkan.</p>}
+      {selected && role && <HabitStudent key={selected.id} student={selected} role={role} />}
+    </>}
+  </section>
+}
 
-  const loadRows = useCallback(async () => {
-    if (!supabase) return
-    if (!studentId) { setRows([]); setHasMore(false); return }
-    setRowsLoading(true); setRowsError('')
-    try {
-      const result = await daftarKebiasaan(supabase, studentId, page)
-      setRows(result.items)
-      setHasMore(result.hasMore)
-      if (!dirtyRef.current) applyDraft(result.items, dateRef.current, studentId)
-    } catch {
-      setRowsError('Catatan kebiasaan belum dapat dimuat. Silakan coba lagi.')
-    } finally { setRowsLoading(false) }
-  }, [studentId, page, applyDraft])
+function HabitStudent({ student, role }: { student: RosterStudent; role: string }) {
+  const studentId = student.id
+  const [page, setPage] = useState(0)
+  const [rows, setRows] = useState<HabitRecord[]>([])
+  const [hasMore, setHasMore] = useState(false)
+  const [rowsLoading, setRowsLoading] = useState(true)
+  const [rowsError, setRowsError] = useState('')
+  const [rowsAttempt, setRowsAttempt] = useState(0)
+  const [weeklyAttempt, setWeeklyAttempt] = useState(0)
+  const [weekly, setWeekly] = useState<HabitWeeklySummary | null>(null)
+  const [weeklyState, setWeeklyState] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [pendingId, setPendingId] = useState('')
+  const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
+  const [actionError, setActionError] = useState('')
+  const [message, setMessage] = useState('')
 
-  useEffect(() => { void loadRows() }, [loadRows])
+  useEffect(() => {
+    let active = true
+    setRowsLoading(true)
+    setRowsError('')
+    setRows([])
+    async function load() {
+      try {
+        if (!supabase) throw new Error()
+        const result = await daftarKebiasaan(supabase, studentId, page)
+        if (active) {
+          setRows(result.items)
+          setHasMore(result.hasMore)
+        }
+      } catch {
+        if (active) setRowsError('Catatan kebiasaan belum dapat dimuat. Silakan coba lagi.')
+      } finally { if (active) setRowsLoading(false) }
+    }
+    void load()
+    return () => { active = false }
+  }, [studentId, page, rowsAttempt])
 
-  const loadWeekly = useCallback(async () => {
-    if (!supabase || !studentId) { setWeekly(null); setWeeklyState('idle'); return }
+  useEffect(() => {
+    let active = true
     setWeeklyState('loading')
-    try {
-      const result = await ringkasanKebiasaanMingguan(supabase, weekStartOf(schoolToday()), studentId)
-      setWeekly(result.items[0] ?? null)
-      setWeeklyState('ready')
-    } catch {
-      setWeekly(null)
-      setWeeklyState('error')
+    async function load() {
+      try {
+        if (!supabase) throw new Error()
+        const result = await ringkasanKebiasaanMingguan(supabase, weekStartOf(schoolToday()), studentId)
+        if (active) {
+          setWeekly(result.items[0] ?? null)
+          setWeeklyState('ready')
+        }
+      } catch { if (active) setWeeklyState('error') }
     }
-  }, [studentId])
+    void load()
+    return () => { active = false }
+  }, [studentId, weeklyAttempt])
 
-  useEffect(() => { void loadWeekly() }, [loadWeekly, weeklyAttempt])
-
-  function pickDate(next: string) {
-    setDate(next)
-    setDirty(false)
-    applyDraft(rows, next, studentId)
-  }
-
-  function pickStudent(next: string) {
-    setStudentId(next)
-    setPage(0)
-    setDirty(false)
-  }
-
-  function toggle(index: number) {
-    setHabits(value => value.map((item, position) => position === index ? !item : item))
-    setDirty(true)
-  }
-
-  async function save() {
-    if (!supabase || !studentId) return
-    setActionError('')
-    if (habits.filter(Boolean).length === 0) {
-      setActionError('Pilih dulu minimal satu kebiasaan yang sudah dilakukan hari ini. Jika belum ada yang bisa dicatat, biarkan tanggal ini belum diisi.')
-      return
-    }
-    try {
-      await simpanKebiasaan(supabase, { student_id: studentId, record_date: date, habits, notes }, schoolToday())
-      setMessage('Catatan harian tersimpan dan menunggu validasi guru. Terima kasih sudah mendampingi anak mencatat kebiasaannya.')
-      setDirty(false)
-      await loadRows()
-    } catch (thrown) {
-      setMessage('')
-      setActionError(errorMessage(thrown, 'Catatan belum tersimpan. Periksa koneksi lalu coba lagi.'))
-    }
+  function refresh() {
+    setRowsAttempt(value => value + 1)
+    setWeeklyAttempt(value => value + 1)
   }
 
   async function review(row: HabitRecord) {
@@ -168,7 +149,7 @@ function HabitsWorkspace({ userId }: { userId: string }) {
       await validasiKebiasaan(supabase, row.id, row.revision, note)
       setMessage('Catatan berhasil divalidasi.')
       setReviewNotes(value => ({ ...value, [row.id]: '' }))
-      await loadRows()
+      refresh()
     } catch (thrown) {
       const code = errorCode(thrown)
       setMessage('')
@@ -178,40 +159,14 @@ function HabitsWorkspace({ userId }: { userId: string }) {
     } finally { setPendingId('') }
   }
 
-  const nameById = new Map(students.map(item => [item.id, item.name]))
-  const canWrite = canSubmitHabits(role)
   const canValidate = canValidateHabits(role)
-  const marked = habits.filter(Boolean).length
-  const existingDraft = rows.some(row => row.record_date === date && row.student_id === studentId)
   const recent = page === 0 ? rows.slice(0, 7) : []
 
-  return <section className="board">
-    <div className="board-heading"><div><div className="eyebrow">RUANG KEBIASAAN</div><h1>7 Kebiasaan Anak Indonesia Hebat</h1><p>Wali mencatat kebiasaan anak; guru memvalidasi setelah melakukan konfirmasi.</p></div><Link to="/dashboard">Dashboard</Link></div>
+  return <>
     {message && <p className="status" role="status">{message}</p>}
     {actionError && <p className="error" role="alert">{actionError}</p>}
-    {loading ? <LoadingState /> : denied ? <EmptyState>Halaman kebiasaan tidak tersedia untuk peran ini.</EmptyState> : rosterError ? <ErrorNotice onRetry={() => void loadRoster()}>{rosterError}</ErrorNotice> : <>
-      <p className="help">Catatan yang sudah tervalidasi dapat dilihat oleh murid, guru, wali, dan kepala sekolah sesuai relasi serta RLS.</p>
-      {(isParent(role) || isTeacher(role)) && students.length > 1 && <label className="habit-picker" htmlFor="habit-student">Pilih murid<select id="habit-student" value={studentId} onChange={event => pickStudent(event.target.value)}>{students.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}
-      {students.length === 0 && <EmptyState>{isTeacher(role) ? 'Belum ada murid pada kelas penugasan Anda.' : 'Belum ada murid yang tertaut ke akun ini.'}</EmptyState>}
-      {students.length > 0 && isStudent(role) && <p className="help">Wali mengisi catatan harian untuk anak. Anda dapat melihat catatan milik sendiri dan rekap yang diizinkan.</p>}
-      {students.length > 0 && canWrite && <form className="announcement-editor habit-editor" onSubmit={event => { event.preventDefault(); void save() }}>
-        <fieldset className="journal-fields"><legend>Catatan harian: {existingDraft ? 'sudah diisi' : 'belum diisi'}</legend>
-          <label htmlFor="habit-date">Tanggal</label>
-          <input id="habit-date" type="date" max={schoolToday()} value={date} onChange={event => pickDate(event.target.value)} />
-          <p className="help" role="status">{existingDraft ? 'Catatan untuk tanggal ini sudah ada. Ketuk kebiasaan yang dilakukan; kebiasaan yang tidak diketuk tidak dihitung sebagai terlaksana.' : 'Tanggal ini belum diisi. Ketuk kebiasaan yang sudah dilakukan; tanggal tanpa catatan berarti belum diisi, bukan berarti tidak dilakukan.'}</p>
-          <div className="habit-grid" role="group" aria-label="Pilih kebiasaan yang dilakukan hari ini">
-            {habitLabels.map((label, index) => <button key={label} className="habit-choice" type="button" aria-pressed={habits[index]} onClick={() => toggle(index)}>
-              <strong>{label}</strong>
-              <small>{habits[index] ? 'Sudah dicatat' : 'Ketuk untuk tandai'}</small>
-            </button>)}
-          </div>
-          <p className="help" role="status">{marked} dari 7 kebiasaan ditandai.{existingDraft ? ' Simpan untuk memperbarui catatan tanggal ini.' : ''}</p>
-          <label htmlFor="habit-notes">Catatan tambahan</label>
-          <textarea id="habit-notes" maxLength={1000} value={notes} onChange={event => { setNotes(event.target.value); setDirty(true) }} />
-          <button className="button" type="submit">{existingDraft ? 'Perbarui catatan' : 'Simpan catatan'}</button>
-        </fieldset>
-      </form>}
-      {students.length > 0 && <section className="habit-recap" aria-labelledby="habit-weekly-title">
+    {canSubmitHabits(role) && <HabitDayEditor studentId={studentId} onSaved={refresh} />}
+      <section className="habit-recap" aria-labelledby="habit-weekly-title">
         <h2 id="habit-weekly-title">Rekap minggu ini</h2>
         {weeklyState === 'loading' && <p className="help" role="status">Memuat rekap minggu ini…</p>}
         {weeklyState === 'error' && <p className="error" role="alert">Rekap minggu ini belum dapat dimuat. <button className="text-button" type="button" onClick={() => setWeeklyAttempt(value => value + 1)}>Coba lagi</button></p>}
@@ -220,19 +175,19 @@ function HabitsWorkspace({ userId }: { userId: string }) {
           <p className="help">Minggu ini {weekly.days_filled} dari {weekly.days_expected} hari terisi. {weekly.days_missing} hari belum diisi, bukan berarti tidak dilakukan. Rekap untuk melihat perkembangan, bukan peringkat.</p>
           <ul className="habit-recap-list">{habitLabels.map((label, index) => <li key={label}><strong>{label}</strong><span>{weekly[weeklyKeys[index]]} hari</span></li>)}</ul>
         </>}
-      </section>}
-      {students.length > 0 && !rowsLoading && recent.length > 0 && <section className="habit-recap" aria-labelledby="habit-recap-title">
+      </section>
+      {!rowsLoading && recent.length > 0 && <section className="habit-recap" aria-labelledby="habit-recap-title">
         <h2 id="habit-recap-title">Rekap {recent.length} catatan terakhir</h2>
         <p className="help">Dihitung dari catatan terbaru yang termuat. Catatan yang belum ditandai tidak dianggap gagal. Rekap ini untuk melihat perkembangan anak, bukan peringkat atau perbandingan antarmurid.</p>
         <ul className="habit-recap-list">{habitLabels.map((label, index) => <li key={label}><strong>{label}</strong><span>{recent.filter(row => row.habits[index]).length} dari {recent.length} catatan</span></li>)}</ul>
       </section>}
-      {students.length > 0 && <div className="habit-list-heading"><h2>Riwayat catatan</h2>{rowsError && <p className="error" role="alert">{rowsError} <button className="text-button" type="button" onClick={() => void loadRows()}>Coba lagi</button></p>}</div>}
-      {rowsLoading ? <LoadingState>Memuat catatan…</LoadingState> : students.length > 0 && !rows.length ? <EmptyState>Belum ada catatan kebiasaan. Tanggal tanpa catatan berarti belum diisi, bukan berarti tidak dilakukan.</EmptyState> : rows.length > 0 && <div className="announcement-list">{rows.map(row => <article className="announcement habit-record" key={row.id}>
+      <div className="habit-list-heading"><h2>Riwayat catatan</h2>{rowsError && <p className="error" role="alert">{rowsError} <button className="text-button" type="button" onClick={() => setRowsAttempt(value => value + 1)}>Coba lagi</button></p>}</div>
+      {rowsLoading ? <LoadingState>Memuat catatan…</LoadingState> : !rowsError && !rows.length ? <EmptyState>Belum ada catatan kebiasaan. Tanggal tanpa catatan berarti belum diisi, bukan berarti tidak dilakukan.</EmptyState> : rows.length > 0 && <div className="announcement-list">{rows.map(row => <article className="announcement habit-record" key={row.id}>
         <div className="announcement-meta">
           <time dateTime={row.record_date}>{new Date(`${row.record_date}T00:00:00`).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</time>
           <span className={row.validation_status === 'validated' ? 'badge published' : 'badge'}>{row.validation_status === 'validated' ? 'Tervalidasi' : 'Menunggu validasi guru'}</span>
         </div>
-        <h3>{nameById.get(row.student_id) ?? 'Murid terhubung'}</h3>
+        <h3>{student.name}</h3>
         <ul className="habit-summary">{habitLabels.map((label, index) => <li key={label} className={row.habits[index] ? 'habit-done' : 'habit-missing'}>{label}: {row.habits[index] ? 'dilakukan' : 'belum ditandai'}</li>)}</ul>
         {row.notes && <p className="announcement-body">{row.notes}</p>}
         {row.validation_status === 'validated' && row.validation_note && <p className="help">Catatan guru: {row.validation_note}</p>}
@@ -242,11 +197,10 @@ function HabitsWorkspace({ userId }: { userId: string }) {
           <button className="button" type="button" disabled={pendingId === row.id} onClick={() => void review(row)}>{pendingId === row.id ? 'Menyimpan validasi…' : 'Validasi setelah konfirmasi orang tua'}</button>
         </div>}
       </article>)}</div>}
-      {students.length > 0 && (page > 0 || hasMore) && <nav className="pagination" aria-label="Halaman catatan kebiasaan">
+      {(page > 0 || hasMore) && <nav className="pagination" aria-label="Halaman catatan kebiasaan">
         <button className="text-button" type="button" disabled={page === 0} onClick={() => setPage(value => Math.max(0, value - 1))}>Sebelumnya</button>
         <span aria-live="polite">Halaman {page + 1}</span>
         <button className="text-button" type="button" disabled={!hasMore} onClick={() => setPage(value => value + 1)}>Berikutnya</button>
       </nav>}
-    </>}
-  </section>
+  </>
 }

@@ -81,8 +81,11 @@ async function mockSupabase(page: Page, role: string, initial: DocumentRow[]) {
     const url = new URL(request.url())
     const json = (data: unknown, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(data) })
 
-    if (url.hostname === 'school-abc.storage.supabase.co' && url.pathname.includes('/object/school-documents/')) {
-      const path = decodeURIComponent(url.pathname.split('/object/school-documents/')[1] ?? '')
+    if (!['school-abc.supabase.co', 'school-abc.storage.supabase.co'].includes(url.hostname)) return route.continue()
+
+    const bucketPrefix = '/storage/v1/object/school-documents/'
+    if (url.pathname.startsWith(bucketPrefix)) {
+      const path = decodeURIComponent(url.pathname.slice(bucketPrefix.length))
       if (request.method() === 'GET') {
         downloadedPaths.push(path)
         return route.fulfill({ status: 200, contentType: 'application/pdf', body: Buffer.from('Data Contoh berkas dokumen') })
@@ -90,24 +93,12 @@ async function mockSupabase(page: Page, role: string, initial: DocumentRow[]) {
       if (request.method() === 'POST') return json({ Key: `school-documents/${path}` })
     }
 
-    if (!url.hostname.endsWith('.supabase.co')) return route.continue()
-
     if (url.pathname.endsWith('/user')) return json({ user })
     if (url.pathname.endsWith('/profiles')) return json([{ role }])
     if (url.pathname.endsWith('/document_categories')) return json([
       { key: 'rkt', label: 'Rencana Kerja Tahunan (RKT)', is_active: true },
       { key: 'ksp', label: 'Kurikulum Satuan Pendidikan (KSP)', is_active: true },
     ])
-
-    if (url.pathname.includes('/storage/v1/object/school-documents/') && request.method() === 'GET') {
-      const path = decodeURIComponent(url.pathname.split('/school-documents/')[1] ?? '')
-      downloadedPaths.push(path)
-      return route.fulfill({ status: 200, contentType: 'application/pdf', body: Buffer.from('Data Contoh berkas dokumen') })
-    }
-    if (url.pathname.includes('/storage/v1/object/school-documents/') && request.method() === 'POST') {
-      const path = decodeURIComponent(url.pathname.split('/school-documents/')[1] ?? '')
-      return json({ Key: `school-documents/${path}` })
-    }
 
     if (url.pathname.endsWith('/document_versions') && request.method() === 'GET') {
       const documentId = url.searchParams.get('document_id')?.replace(/^eq\./, '') ?? ''
@@ -121,6 +112,11 @@ async function mockSupabase(page: Page, role: string, initial: DocumentRow[]) {
     if (url.pathname.endsWith('/school_documents')) {
       if (request.method() === 'GET') {
         tableReads.push(url.pathname)
+        if (request.headers().accept === 'application/vnd.pgrst.object+json') {
+          const id = url.searchParams.get('id')?.replace(/^eq\./, '')
+          const item = documents.find(document => document.id === id)
+          return item ? json(item) : json({ code: 'PGRST116' }, 406)
+        }
         const start = Number(url.searchParams.get('offset') ?? 0)
         const limit = Number(url.searchParams.get('limit') ?? 26)
         return json(documents.slice(start, start + limit))
@@ -128,7 +124,7 @@ async function mockSupabase(page: Page, role: string, initial: DocumentRow[]) {
       if (request.method() === 'POST') {
         inserted += 1
         const payload = request.postDataJSON()
-        const created = makeDocument({ title: payload.title, description: payload.description, category: 'rkt' })
+        const created = makeDocument({ ...payload, owner_profile_id: userId })
         documents.unshift(created)
         return json(created, 201)
       }
@@ -244,14 +240,20 @@ test('teacher uploads a replacement and downloads current and previous document 
   await page.getByRole('button', { name: 'Unggah versi baru' }).click()
   await expect(page.getByText('Versi baru untuk “Data Contoh RKT 2026/2027” tersimpan.')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Unduh berkas dokumen' }).click()
-  await expect(page.getByText('Berkas “Data Contoh RKT 2026/2027” tidak dapat diunduh. Periksa akses dokumen atau coba lagi.')).toHaveCount(0)
+  const [current] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Unduh berkas dokumen' }).click(),
+  ])
+  expect(current.suggestedFilename()).toBe('data-contoh-rkt-v2.pdf')
 
   await page.getByRole('button', { name: 'Lihat riwayat versi & tinjauan' }).click()
   await expect(page.getByText('Versi berkas:')).toBeVisible()
-  await page.getByRole('button', { name: 'Unduh versi 1' }).click()
-  await expect(page.getByText('Berkas “Data Contoh RKT 2026/2027” tidak dapat diunduh. Periksa akses dokumen atau coba lagi.')).toHaveCount(0)
-  expect(state.downloadedPaths).toEqual([])
+  const [previous] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Unduh versi 1' }).click(),
+  ])
+  expect(previous.suggestedFilename()).toBe('data-contoh-rkt.pdf')
+  expect(state.downloadedPaths).toEqual([state.documents[0].file_path, 'document-one/data-contoh-rkt.pdf'])
 })
 
 for (const role of ['parent', 'student', 'pending'] as const) {

@@ -7,6 +7,13 @@ test('school identity validates optional NPSN and required name', () => {
   assert.notEqual(validateMaster('school_settings', { name: 'Data Contoh', npsn: '123' }), '')
   assert.equal(validateMaster('school_settings', { name: 'Data Contoh', npsn: '12345678', address: '' }), '')
 })
+test('school WhatsApp number is optional and uses the 62 international format', () => {
+  assert.equal(validateMaster('school_settings', { name: 'Data Contoh', whatsapp_number: '' }), '')
+  assert.equal(validateMaster('school_settings', { name: 'Data Contoh', whatsapp_number: '6281234567890' }), '')
+  for (const value of ['081234567890', '+6281234567890', '62 812 3456', '62812']) {
+    assert.notEqual(validateMaster('school_settings', { name: 'Data Contoh', whatsapp_number: value }), '', value)
+  }
+})
 test('calendar validates date ordering and numeric boundaries', () => {
   assert.notEqual(validateMaster('academic_years', { name: 'Data Contoh', starts_on: '2026-07-01', ends_on: '2026-06-01' }), '')
   assert.notEqual(validateMaster('academic_years', { name: 'Data Contoh', starts_on: '2026-02-30', ends_on: '2026-06-01' }), '')

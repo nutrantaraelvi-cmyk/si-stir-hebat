@@ -15,6 +15,7 @@ export const masterDefinitions: Record<MasterKind, MasterDefinition> = {
     { key: 'name', label: 'Nama sekolah', type: 'text', required: true, maxLength: 160 },
     { key: 'npsn', label: 'NPSN (8 digit, opsional)', type: 'text', maxLength: 8 },
     { key: 'address', label: 'Alamat sekolah', type: 'textarea', maxLength: 500 },
+    { key: 'whatsapp_number', label: 'Nomor WhatsApp sekolah (contoh 6281234567890, opsional)', type: 'text', maxLength: 15 },
   ] },
   academic_years: { label: 'Tahun ajaran', singular: 'tahun ajaran', fields: [
     { key: 'name', label: 'Nama tahun ajaran', type: 'text', required: true, maxLength: 40 }, ...dates, active,
@@ -61,6 +62,7 @@ export function validateMaster(kind: MasterKind, values: Record<string, string>)
   }
   if (values.starts_on && values.ends_on && values.ends_on <= values.starts_on) return 'Tanggal selesai harus setelah tanggal mulai.'
   if (kind === 'school_settings' && values.npsn && !/^\d{8}$/.test(values.npsn)) return 'NPSN harus berisi tepat 8 digit.'
+  if (kind === 'school_settings' && values.whatsapp_number && !/^62\d{8,13}$/.test(values.whatsapp_number)) return 'Nomor WhatsApp harus diawali 62 dan berisi 10–15 digit, tanpa spasi atau tanda plus.'
   if (kind === 'subjects' && !/^[A-Z0-9_-]{1,20}$/.test(values.code ?? '')) return 'Kode hanya boleh berisi huruf besar, angka, _ atau -.'
   if ((kind === 'teachers' || kind === 'students') && !/^[A-Z0-9_-]{1,30}$/.test(values.code ?? '')) return 'Kode sekolah hanya boleh berisi huruf besar, angka, _ atau -.'
   return ''

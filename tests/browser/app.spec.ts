@@ -118,6 +118,7 @@ async function mockSchool(page: Page, { role = 'administrator', signedIn = true,
       const limit = Number(url.searchParams.get('limit') ?? visible.length)
       return json(visible.slice(offset, offset + limit))
     }
+    if (url.pathname.endsWith('/rpc/record_auth_event')) return route.fulfill({ status: 204 })
     throw new Error(`Unexpected mocked request: ${method} ${url.pathname}`)
   })
 }
@@ -1023,6 +1024,38 @@ test('attendance teacher records unmarked pupils then corrects with a reason',as
   await page.getByRole('button',{name:'Simpan absensi',exact:true}).click()
   await page.getByRole('button',{name:'Ya, simpan absensi'}).click()
   await expect(page.getByText('Data Contoh Koreksi',{exact:true})).toBeVisible()
+})
+
+test('attendance saved offline is queued on the device and synced when the connection returns',async({page,context})=>{
+  await mockAttendance(page)
+  await page.goto('/absensi')
+  await page.getByLabel('Status Data Contoh Satu',{exact:true}).selectOption('present')
+  await context.setOffline(true)
+  await page.getByRole('button',{name:'Simpan absensi',exact:true}).click()
+  await page.getByRole('button',{name:'Ya, simpan absensi'}).click()
+  await expect(page.getByRole('status').filter({hasText:'disimpan di perangkat dan belum tersinkron'})).toBeVisible()
+  const queue=page.getByRole('region',{name:'Absensi di perangkat ini'})
+  await expect(queue).toContainText('1 perubahan · Belum tersinkron')
+  await context.setOffline(false)
+  await expect(page.getByRole('status').filter({hasText:'1 antrean absensi berhasil dikirim'})).toBeVisible()
+  await expect(queue.getByText('Belum tersinkron')).toHaveCount(0)
+  await expect(page.getByLabel('Status Data Contoh Satu',{exact:true})).toHaveValue('present')
+})
+
+test('offline attendance that conflicts with a newer change is kept for review instead of resent',async({page,context})=>{
+  await mockAttendance(page,'teacher',{conflict:true})
+  await page.goto('/absensi')
+  await page.getByLabel('Status Data Contoh Satu',{exact:true}).selectOption('sick')
+  await context.setOffline(true)
+  await page.getByRole('button',{name:'Simpan absensi',exact:true}).click()
+  await page.getByRole('button',{name:'Ya, simpan absensi'}).click()
+  await context.setOffline(false)
+  const queue=page.getByRole('region',{name:'Absensi di perangkat ini'})
+  await expect(queue).toContainText('Konflik: data sudah diubah di perangkat lain')
+  await expect(queue.getByRole('button',{name:'Kirim sekarang'})).toHaveCount(0)
+  page.once('dialog',dialog=>void dialog.accept())
+  await queue.getByRole('button',{name:'Buang antrean'}).click()
+  await expect(queue).toHaveCount(0)
 })
 
 test('attendance student sees own record without editors or staff history',async({page})=>{

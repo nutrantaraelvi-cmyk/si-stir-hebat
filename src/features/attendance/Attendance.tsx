@@ -1,5 +1,5 @@
 import { hasMoreReferences, referenceLimit } from '../../utils/references'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../components/auth/auth-context'
 import { supabase } from '../../lib/supabase'
@@ -11,6 +11,8 @@ import { schoolToday } from '../../utils/date'
 import { attendanceLabels, attendanceSummary, prepareAttendanceChanges, type AttendanceChange, type AttendanceDraft, type AttendanceRecord } from './attendance-model'
 import { AttendanceImport } from './AttendanceImport'
 import { AttendanceReport } from './AttendanceReport'
+import { OfflineAttendanceQueue } from './OfflineAttendanceQueue'
+import { enqueueAttendance, isNetworkFailure } from './offline-queue'
 
 type Session = { id: string; class_id: string; held_on: string }
 type ClassChoice = { id: string; name: string; academic_year_id: string; is_active: boolean }
@@ -23,6 +25,7 @@ export function Attendance() {
 }
 
 function AttendanceWorkspace({ userId }: { userId: string }) {
+  const [queueVersion, setQueueVersion] = useState(0)
   const [role, setRole] = useState<string | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [classes, setClasses] = useState<ClassChoice[]>([])
@@ -133,6 +136,7 @@ function AttendanceWorkspace({ userId }: { userId: string }) {
     return () => { active = false }
   }, [selected,recordsAttempt,role])
 
+  const refreshRecords = useCallback(() => setRecordsAttempt(value => value + 1), [])
   function discardChanges() {
     return !dirty || window.confirm('Perubahan belum disimpan. Buang perubahan dan lanjutkan?')
   }
@@ -145,12 +149,27 @@ function AttendanceWorkspace({ userId }: { userId: string }) {
     if (!supabase || !canWrite || !confirmChanges || saving) return
     setSaving(true); setSaveError(''); setMessage('')
     try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) throw new TypeError('offline')
       const { data,error } = await supabase.rpc('record_attendance',{ target_session: selected, changes: confirmChanges })
       if (error) throw error
       setConfirmChanges(null)
       setMessage(`${data} catatan kehadiran berhasil disimpan.`)
       setRecordsAttempt(value => value+1)
     } catch (failure) {
+      const offline = failure instanceof TypeError || isNetworkFailure(failure as { code?: unknown; message?: unknown })
+      if (offline && current) {
+        try {
+          enqueueAttendance(userId, { sessionId: selected, sessionLabel: `${current.held_on} · ${classLabel(current.class_id)}`, changes: confirmChanges })
+          setConfirmChanges(null)
+          setQueueVersion(value => value + 1)
+          setMessage(`${confirmChanges.length} perubahan disimpan di perangkat dan belum tersinkron. Data akan dikirim otomatis saat koneksi kembali.`)
+          return
+        } catch (queueFailure) {
+          setConfirmChanges(null)
+          setSaveError(queueFailure instanceof Error ? queueFailure.message : 'Absensi belum tersimpan di perangkat.')
+          return
+        }
+      }
       setConfirmChanges(null)
       setSaveError(typeof failure === 'object' && failure && 'code' in failure && failure.code === '40001' ? 'Data telah diubah pada sesi lain. Muat ulang absensi sebelum menyimpan kembali.' : 'Absensi belum tersimpan. Periksa izin penugasan, status, dan alasan koreksi, lalu coba lagi.')
     } finally { setSaving(false) }
@@ -181,6 +200,7 @@ function AttendanceWorkspace({ userId }: { userId: string }) {
   return <section className="board attendance"><div className="board-heading"><div><div className="eyebrow">KEHADIRAN SEKOLAH</div><h1>Absensi</h1><p>Sesi harian kelas dan catatan kehadiran yang dapat Anda akses.</p></div><Link to="/dashboard">Dashboard</Link></div>
     {message && <p className="status" role="status">{message}</p>}
     <ReferenceNotice truncated={referencesTruncated}/>
+    {canWrite && <OfflineAttendanceQueue userId={userId} version={queueVersion} onSynced={refreshRecords}/>}
     {saveError && <ErrorNotice>{saveError}</ErrorNotice>}
     {loading ? <LoadingState/> : error ? <ErrorNotice onRetry={() => setAttempt(value => value+1)}>{error}</ErrorNotice> : !allowed ? <EmptyState>Anda belum memiliki akses absensi. Akses orang tua menunggu relasi wali yang terverifikasi.</EmptyState> : <>
       <AttendanceReport classes={classes.map(item=>({id:item.id,label:classLabel(item.id)}))}/>

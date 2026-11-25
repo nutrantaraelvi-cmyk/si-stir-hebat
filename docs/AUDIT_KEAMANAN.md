@@ -37,6 +37,8 @@ Saran perbaikan:
 
 ### S-02 — Bukti uji policy Storage masih kurang (Sedang)
 
+> **Status 25 November 2026: ditutup.** Tes PGlite `supervision evidence storage policy separates principal, owner teacher and outsiders` di `tests/database.test.mjs` membuktikan akses kepala sekolah, guru pemilik, guru lain, siswa, wali, akun pending, dan anon, sebelum dan sesudah terbit. Uraian di bawah dipertahankan sebagai riwayat.
+
 `supervision-evidence` sudah privat, dibatasi 10 MB dan MIME PDF/JPEG/PNG di server, serta unggah/hapus hanya untuk kepala sekolah pada tahap 4 yang belum dipublikasikan (`supabase/migrations/20261111082822_supervision_evidence.sql:1-44`). Policy baca (`:29-39`) tidak menyebut peran, tetapi subkuerinya membaca `public.academic_supervisions` secara langsung. Karena RLS tabel itu berlaku pada subkueri, pembacaan seharusnya tersaring oleh `academic_supervisions_read` (`20261111080735_academic_supervision.sql:51-57`): kepala sekolah melihat semua; guru hanya sesi miliknya yang sudah dipublikasikan; siswa/wali/pending tidak melihat baris sehingga policy baca gagal.
 
 Kesimpulan statis itu masuk akal, tetapi **belum dibuktikan oleh tes**. K4 di `SECURITY_REVIEW.md` masih terbuka: pengujian sebelumnya memakai tabel `storage.objects` tiruan dan tidak menguji peran siswa/wali/pending, guru pada sesi belum terbit, maupun nama objek tidak valid.

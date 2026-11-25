@@ -82,7 +82,7 @@ tetap. Jangan mengubah peran akun untuk menonaktifkan akses.
 - Navigasi responsif: sidebar >=1000px; di bawahnya bottom nav 4 tujuan + drawer `role="dialog"`
   dengan Escape, klik latar, fokus kembali, dan `aria-expanded`/`aria-controls`.
 - Token warna global ada di `src/styles/global.css`; jangan menambah hex baru di komponen.
-  Kontras dan pemetaan palet: `docs/PALETTE_D8_2026-11-20.md`.
+  Kontras dan pemetaan palet: `docs/archive/PALETTE_D8_2026-11-20.md`.
 - Tes browser memakai API tiruan; bukan UAT. Untuk halaman baru, tambah skenario desktop dan
   ponsel, termasuk state kosong, galat, dan kirim ulang aman.
 - Audit luapan/aksesibilitas dasar: `tests/browser/audit-responsive.spec.ts`; jalankan ulang bila

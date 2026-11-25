@@ -33,7 +33,7 @@ Urutan dari yang paling mengikat ke yang paling rendah:
 5. **Blueprint** — Database Blueprint, UI/UX Blueprint, RBAC matriks, serta Implementation Plan sebagai rencana pendukung.
 6. **Kode, migration, tes, dan konfigurasi** — bukti keadaan saat ini, bukan sumber kewenangan. Jika kode berbeda dari acuan, kode tidak otomatis benar; perbedaan dicatat dan diputuskan pemilik.
 
-Jika terjadi konflik, tingkat yang lebih tinggi menang. Konflik yang belum diputuskan dicatat di `docs/AUDIT_KESESUAIAN_ACUAN.md` dan `docs/DECISIONS.md`; jangan menyelesaikannya dengan mengubah isi dokumen acuan.
+Jika terjadi konflik, tingkat yang lebih tinggi menang. Konflik yang belum diputuskan dicatat di `docs/archive/AUDIT_KESESUAIAN_ACUAN.md` dan `docs/DECISIONS.md`; jangan menyelesaikannya dengan mengubah isi dokumen acuan.
 
 ## 4. Keputusan yang sudah mengubah acuan
 

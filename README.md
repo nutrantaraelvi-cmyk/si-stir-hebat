@@ -12,7 +12,7 @@ Folder ini adalah root utama SI STIR HEBAT. Aplikasi utamanya tetap React/Vite; 
 
 Laporan rinci: [Status proyek](docs/PROJECT_STATUS.md), [Log implementasi](docs/IMPLEMENTATION_LOG.md), [Keputusan sementara](docs/DECISIONS.md), [Telaah keamanan migration](docs/SECURITY_REVIEW.md), dan [Panduan UAT](docs/PANDUAN_UAT.md). Tujuh dokumen acuan tersedia sebagai Markdown di [`docs/references/`](docs/references/README.md), lengkap dengan hash dan hierarki otoritas; salinan tersebut belum disahkan sebagai acuan resmi. Skema nilai maksimum per asesmen dan publikasi manual guru merupakan keputusan sementara; skema resmi akan diberikan pengguna. Tidak ada perhitungan rapor otomatis.
 
-Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Read-only terakhir mengonfirmasi 23 migration hosted hingga 13 November 2026; repository kini memuat **42 berkas migration lokal** menurut `node scripts/check-migrations.mjs`, sehingga 19 berkas belum hosted. Jangan menganggap berkas lokal sudah diterapkan:
+Koneksi Supabase sudah dikonfigurasi di workspace ini. Email login aktif. Read-only terakhir mengonfirmasi 23 migration hosted hingga 13 November 2026; repository kini memuat **46 berkas migration lokal** menurut `node scripts/check-migrations.mjs`, sehingga 23 berkas belum hosted (urutan penerapan: [runbook staging dan migrasi](docs/RUNBOOK_STAGING_DAN_MIGRASI.md)). Jangan menganggap berkas lokal sudah diterapkan:
 
 | Versi | Migration |
 | --- | --- |

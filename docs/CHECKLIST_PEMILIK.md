@@ -15,11 +15,11 @@ Checklist ini menyiapkan langkah yang perlu dilakukan langsung oleh pemilik/oper
 
 - [ ] Perbaiki resolusi DNS/jaringan lokal untuk URL project Supabase di `.env.local`; `check:supabase` 21 November 2026 gagal `ENOTFOUND` sebelum mencapai Auth. URL terverifikasi cocok dengan project tersambung; jangan kirim key/kredensial. Ringkasan diagnostik aman: `docs/logs/check-supabase-diagnostic-2026-11-21.log`.
 
-- [ ] Verifikasi 23 versi hosted terhadap daftar berkas lokal dan `docs/MIGRATION_REVIEW_2026-11-20.md`.
+- [ ] Verifikasi 23 versi hosted terhadap daftar berkas lokal dan `docs/archive/MIGRATION_REVIEW_2026-11-20.md`.
 - [ ] Pastikan backup dan uji restore ke lingkungan terisolasi berhasil.
 - [ ] Selesaikan Security Advisor baseline (saat ini ada WARN perlindungan kata sandi bocor nonaktif) sebelum penerapan; jangan meminta agen melewati syarat Advisor bersih.
 - [ ] Setelah tiap tahap, jalankan `npm run check:supabase` dan tinjau Security Advisor. Berhenti bila ada temuan baru/tidak bersih.
-- [ ] Sebelum UAT modul baru, setujui dan terapkan migration yang masih tercatat belum hosted di `docs/MIGRATION_REVIEW_2026-11-20.md` (notifikasi, laporan ketidakhadiran, 7 Kebiasaan, dokumen sekolah, absensi guru); catat versi yang diterapkan.
+- [ ] Sebelum UAT modul baru, setujui dan terapkan migration yang masih tercatat belum hosted di `docs/archive/MIGRATION_REVIEW_2026-11-20.md` (notifikasi, laporan ketidakhadiran, 7 Kebiasaan, dokumen sekolah, absensi guru); catat versi yang diterapkan.
 - [ ] Setelah migration diterapkan, jalankan baris UAT bagian 9 di `docs/UAT_CHECKLIST.md` dengan akun uji sintetis tiap peran; jangan memakai data siswa nyata.
 
 ## Vercel

@@ -1,7 +1,7 @@
 # Audit Arsitektur dan Utang Teknis
 
 Tanggal: 14 November 2026. Auditor: Qoder. Basis: `03b87c0`, Node 24.22.1.
-Sifat: baca-saja. Tidak ada perubahan kode; temuan besar diajukan sebagai usulan di [HANDOFF.md](HANDOFF.md).
+Sifat: baca-saja. Tidak ada perubahan kode; temuan besar diajukan sebagai usulan di [archive/HANDOFF.md](archive/HANDOFF.md).
 
 ## Peta modul
 

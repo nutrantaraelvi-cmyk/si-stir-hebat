@@ -36,11 +36,10 @@ React 19 + Vite + TypeScript + React Router; Supabase Auth/PostgreSQL/Storage/RL
 9. Use labels 'Data Contoh' for seeded/mock UI content; do not expose real school data.
 10. Follow the latest user design brief in `PROJECT_CONTEXT.md` for new features and explicitly requested polish: mobile-first, deep purple/lilac/light blue/pink, and a professional playful font style. Do not restyle completed pages unless requested; preserve accessibility and sufficient contrast.
 
-## Current handoff baseline — 21 November 2026
-- This is an established React 19 + Vite + TypeScript + React Router application with Supabase Auth/PostgreSQL/Storage; `src/` is the application source. The active owner decision prohibits Next.js migration. See `README.md`, `docs/PROJECT_STATUS.md`, and `docs/IMPLEMENTATION_LOG.md` for current feature and verification details.
-- Existing Supabase browser integration and email/password auth are in `src/lib/supabase.ts` and `src/app/`. Use `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; `.env.local` is ignored by Git and must never be printed.
-- The hosted project had 23 recorded migrations through `20261113074045_create_private_todos` on the latest read-only check; 39 migration files are now local and the next 16 (including `20261121090000_school_configuration.sql`) are not hosted. Reconcile every timestamp immediately before any approved hosted change; do not reapply recorded migrations or skip a pending one. Hosted migration work remains gated by clean Security Advisor, backup/restore evidence, Supabase local, and `check:supabase`.
-- The canonical local check is `npm run check` under Node 24; latest evidence is 149/149 unit/database tests, isolated build 1,789 modules, and 30 JS bundles audited without demo accounts. Release `npm run build` also succeeded on 21 November 2026 and rebuilt `dist/` (same module/bundle audit). Browser tests use mock APIs and do not establish real-account UAT. Real-account UAT, email delivery, hosted migration gates, and production operational readiness remain outstanding. Check the project status docs before repeating verification claims.
+## Current handoff baseline
+- Do not copy test counts or migration counts into this file. The single source of current numbers, gates, and open owner decisions is `docs/PROJECT_STATUS.md`; the document index is `docs/README.md`.
+- Hosted Supabase still records 23 migrations through `20261113074045`; every later local migration is unapplied. Follow `docs/RUNBOOK_STAGING_DAN_MIGRASI.md` (staging first, tested restore, owner approval) before any hosted change.
+- Browser tests use mocked APIs and do not establish real-account UAT.
 
 ## Start work
 1. Check `pwd`, file tree, Git state and `package.json`.
@@ -48,4 +47,3 @@ React 19 + Vite + TypeScript + React Router; Supabase Auth/PostgreSQL/Storage/RL
 3. Audit `src/app/App.tsx`, `src/lib/supabase.ts`, migration SQL and `.env.example`. Never output secret values.
 4. Document actual results and blockers in `docs/PROJECT_STATUS.md`.
 5. Implement highest-priority safe missing foundation steps. Seek explicit approval before changing remote database or deploying.
-- Latest verification (21 November 2026): Node v24.22.3 `npm run check` EXIT 0; 140/140 unit/database tests, isolated build 1,789 modules, 30 JS bundles audited with no demo accounts. Browser full suite 420/420 EXIT 0 (port 5191; see `docs/logs/browser-full-2026-11-21-port5191-reuse.log`). `npm run build` also rebuilt `dist/` successfully and audited 30 JS bundles with no demo accounts. PDF chunk warning 790.69 kB.

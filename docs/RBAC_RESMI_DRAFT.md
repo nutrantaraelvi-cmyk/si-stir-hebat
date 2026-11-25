@@ -5,7 +5,7 @@
 Status: **DRAF untuk disahkan pemilik** — bukan kebijakan resmi
 Tanggal: 15 November 2026; diperbarui 20 November 2026 (modul kebiasaan validasi, laporan ketidakhadiran wali, notifikasi, dokumen sekolah)
 Penulis: Qoder
-Sumber utama: `docs/AUDIT_RINGKASAN_PROYEK.md` bagian 7, dikoreksi dengan pembacaan policy RLS pada migration lokal (termasuk `20261118000100`–`20261118000400`).
+Sumber utama: `docs/archive/AUDIT_RINGKASAN_PROYEK.md` bagian 7, dikoreksi dengan pembacaan policy RLS pada migration lokal (termasuk `20261118000100`–`20261118000400`).
 Sifat: baca-saja. Tidak ada perubahan policy, schema, kode, atau data hosted. Tidak ada baris data pengguna yang dibaca.
 
 ## 1. Cara membaca
@@ -127,7 +127,7 @@ Catatan penerapan:
 | PD-11 | Validasi kebiasaan — revert status | `validated_by`/`validated_at` tetap terisi bila status kembali `pending` | Putuskan apakah kolom validasi dikosongkan saat status bukan `validated`, lalu sesuaikan trigger. |
 | PD-12 | Model kebiasaan — "belum diisi" vs "tidak dilakukan" | `habits` berupa boolean per hari; keduanya tidak dapat dibedakan | Putuskan apakah perlu status tiga nilai atau kolom terpisah sebelum form siswa/wali disempurnakan. |
 
-## 6. Koreksi terhadap `AUDIT_RINGKASAN_PROYEK.md` bagian 7
+## 6. Koreksi terhadap `archive/AUDIT_RINGKASAN_PROYEK.md` bagian 7
 
 | No | Catatan audit lama | Keadaan policy yang terbaca | Dampak |
 | --- | --- | --- | --- |

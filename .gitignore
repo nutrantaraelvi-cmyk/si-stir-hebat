@@ -10,3 +10,8 @@ playwright-report/
 .vercel/
 release/
 dist-check
+
+# Artefak lokal agen (bukti resmi disimpan di docs/logs/)
+/.tmp-shots/
+/test-results-*.log
+/check-*.log

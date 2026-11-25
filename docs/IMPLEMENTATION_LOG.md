@@ -1,3 +1,25 @@
+## Roadmap perbaikan 2–7 (Claude) - 25 November 2026
+
+Branch `ai/claude-roadmap-2-7`, belum di-commit. Tidak ada perubahan hosted, deploy, atau push.
+
+- **Repo dan dokumen:** 10 branch lokal yang sudah di-merge dihapus dengan `git branch -d`; branch yang belum di-merge tetap ada. 21 dokumen bertanggal, `PROGRESS.md`, `files.zip`, `si-stir-hebat.mdc`, serta riwayat panjang PROJECT_STATUS dan AI_COORDINATION dipindah ke `docs/archive/` dan tautannya diperbarui. Log Kilo di root dipindah ke `.arsip-lokal/` (diabaikan Git). Ditambahkan `docs/README.md` (indeks), PROJECT_STATUS ringkas, papan koordinasi baru, dan `.nvmrc` (Node 24). Baseline angka di AGENTS.md diganti rujukan ke PROJECT_STATUS.
+- **Database (lokal saja):**
+  - `20261121085900_quarantine_hosted_config_drift` memindahkan enam tabel konfigurasi yang drift ke schema `drift_archive` tanpa menghapus data. Di database bersih, migration ini tidak melakukan apa-apa.
+  - `20261125090000_foreign_key_indexes` menambah index untuk 20 FK.
+  - `20261125090100_security_audit_and_sessions` menambah `security_audit_events`, RPC `record_auth_event`/`admin_revoke_sessions`/`audit_actor_names`, dan view `audit_log`.
+  - `20261125090200_school_whatsapp_contact` menambah `school_settings.whatsapp_number`.
+  - `scripts/check-supabase.mjs` kini juga memeriksa tabel konfigurasi.
+- **Keamanan:** `vercel.json` memasang CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, HSTS, dan COOP. `vite preview` memakai header yang sama. Chromium terhadap preview build sintetis: tidak ada pelanggaran CSP di beranda/login. S-02 dinyatakan tertutup karena tes Storage sudah ada.
+- **Fitur PRD:**
+  - Logout otomatis setelah 30 menit tanpa aktivitas, dengan peringatan 1 menit sebelumnya.
+  - Tombol "Keluar dari semua perangkat".
+  - Pencatatan login/logout.
+  - Halaman `/audit` untuk administrator/kepala sekolah, termasuk pencabutan sesi oleh administrator.
+  - Antrean absensi offline dengan deteksi duplikat/konflik, plus service worker cangkang aplikasi. Muat ulang offline sudah terverifikasi di Chromium.
+  - Tombol WhatsApp sekolah di ruang keluarga.
+- **Refactor:** `Dashboard.tsx` (434 baris) dipecah menjadi `src/app/dashboard/*` dengan satu `ServiceCard`; HTML keluaran tetap sama. Hook `useOwnRole` dibuat untuk halaman baru. 37 aturan CSS mati dihapus memakai postcss.
+- **Tes baru:** `hosted-drift-quarantine`, `schema-guards`, `security-audit`, `security-headers`, `offline-queue`, serta validasi WhatsApp di `master`. `npm run check` EXIT 0 dengan 170/170 tes; suite browser penuh 444/444. Ditemukan dan diperbaiki dua bug saat pengujian: pesan antrean offline tertinggal setelah dibuang, dan race antara transition `navigate()` React Router dan redirect `ProtectedRoute` yang menghapus pesan logout otomatis (kini alasan logout disimpan di sessionStorage).
+
 ## Tema ceria dan perbaikan tes - 25 November 2026
 
 - Menambahkan `src/styles/theme-playful.css` (dimuat terakhir) dengan bingkai tebal, bayangan keras, tombol/tab pil, latar bertitik, header kapsul untuk halaman publik, pita miring beranda, chip label, lencana nomor, dan footer ungu. Font judul Poppins, navigasi/tombol Montserrat, isi tetap Inter. Rincian referensi di `docs/UI_REFERENSI_NOTES.md`.
@@ -50,19 +72,19 @@
 
 - `AbsenceReports.tsx` membedakan `40001` (konflik revisi), `55000` (tidak ada satu sesi/roster absensi yang cocok untuk tanggal laporan), dan galat lain. Pesan `55000` menyatakan laporan belum dikonfirmasi dan status absensi tidak berubah; blok galat menyediakan tombol "Kembali ke daftar laporan" untuk memuat ulang, catatan pemeriksa tetap di layar, dan pesan sukses tidak ditampilkan.
 - Tes baru `teacher sees an actionable error when no single attendance session matches` memakai `setupTeacher` dengan kode galat pertama yang dapat diatur; fokus 6/6 (desktop + ponsel) port 5376.
-- Bukti: `npm run check` EXIT 0 (137/137, 39 migration, 26 bundel; `check-55000.log`); rincian `docs/ABSENSI_55000_2026-11-20.md`. Tidak ada perubahan API, RPC, atau migration.
+- Bukti: `npm run check` EXIT 0 (137/137, 39 migration, 26 bundel; `check-55000.log`); rincian `docs/archive/ABSENSI_55000_2026-11-20.md`. Tidak ada perubahan API, RPC, atau migration.
 
 ## Q3/Q4 lanjutan - Sinyal pemotongan daftar master - 20 November 2026
 
 - Semua hard cap referensi kini memakai `limit(cap + 1)`: opsi penugasan di `Assessments.tsx`, `ClassMaterials.tsx`, `TeachingModules.tsx`, `Schedules.tsx` (penugasan + kelas), opsi guru `AcademicSupervision.tsx`, selector tahun ajaran `MasterData.tsx` (200), dan riwayat absensi `Attendance.tsx` (200). Sebelumnya cap terpenuhi melempar galat generik seluruh halaman; sekarang data sampai batas tetap tampil dengan `ReferenceNotice` atau status "Riwayat dipotong pada 200 perubahan terbaruâ€¦".
 - Tes baru `truncated assignment options are announced instead of silently dropped` (mock 1.001 penugasan: notifikasi tampil, tombol tetap aktif, 1.000 opsi + placeholder).
-- Bukti: `npm run check` Node v24.22.3 EXIT 0 (39 migration, 137/137, 26 bundel; `check-truncation.log`); `tests/browser/app.spec.ts` **214/214** desktop+ponsel port 5375 (`browser-truncation-5375.log`). Rincian: `docs/PEMOTONGAN_DAFTAR_2026-11-20.md`.
+- Bukti: `npm run check` Node v24.22.3 EXIT 0 (39 migration, 137/137, 26 bundel; `check-truncation.log`); `tests/browser/app.spec.ts` **214/214** desktop+ponsel port 5375 (`browser-truncation-5375.log`). Rincian: `docs/archive/PEMOTONGAN_DAFTAR_2026-11-20.md`.
 
 ## Q10 - Dashboard per peran memakai RPC `dashboard_overview` - 20 November 2026
 
 - `src/app/Dashboard.tsx`: peran administrator/kepala sekolah kini memakai satu RPC `dashboard_overview()` lewat `getDashboardOverview(client)` (kontrak Codex, tidak diubah) untuk registri aktif, tahapan supervisi, status modul, dan pengumuman terbaru. `SchoolOverview.tsx`/`PrincipalOverview.tsx` (3 + 6 hitungan `head`) dihapus. Galat RPC tampil sebagai alert "Ringkasan dashboard belum dapat dimuat..." dan dipulihkan lewat tombol "Muat ulang"; guru/siswa/wali/pending tetap memakai jalur pengumuman lama.
 - Tes: mock `/rpc/dashboard_overview`, +5 skenario (satu panggilan overview untuk kepala sekolah, tanpa pemanggilan guru, galat pulih, angka registri + tautan, empat peran tanpa RPC); 3 tes principal/overview lama diganti; audit responsif memakai mock overview berangka nol.
-- Bukti: `npm run check` Node v24.22.3 EXIT 0 (39 migration, 137/137, 26 bundel; `check-q10.log`); suite penuh port 5372 300 tes, 299 lulus â€” satu timeout 30 dtk `[mobile] attendance administrator` yang lulus 2/2 saat diulang terpisah port 5373; run terfokus 56/56 port 5371. Rincian dan batas: `docs/DASHBOARD_Q10_2026-11-20.md`.
+- Bukti: `npm run check` Node v24.22.3 EXIT 0 (39 migration, 137/137, 26 bundel; `check-q10.log`); suite penuh port 5372 300 tes, 299 lulus â€” satu timeout 30 dtk `[mobile] attendance administrator` yang lulus 2/2 saat diulang terpisah port 5373; run terfokus 56/56 port 5371. Rincian dan batas: `docs/archive/DASHBOARD_Q10_2026-11-20.md`.
 
 ## Q9 - 7 Kebiasaan ramah anak sesuai D6 - 20 November 2026
 
@@ -83,14 +105,14 @@
 - Spec baru `tests/browser/audit-responsive.spec.ts`: luapan horizontal `scrollWidth - innerWidth <= 1` pada 32 kombinasi rute/peran (administrator, guru, wali) di 1280x900 dan 390x844; skip link Tab+Enter memfokuskan `main#main-content`; target sentuh nav >=44px (bottom nav 48px). **68/68 lulus** port 5367.
 - Suite penuh dengan spec audit: **296/296 lulus** (6,2 menit, port 5368; log `C:\Users\axioo\AppData\Local\Temp\qoder-qa-2026-11-18\browser-audit-5368.log`). `npm run check` EXIT 0: 137/137 unit/database, 38 migration, bundel 26 berkas (log `...\check-audit.log`).
 - Q3: berkas TSX terbesar 303 baris (AcademicSupervision); pemecahan dinilai belum sepadan risiko regresi. Lazy route, useAuth, dan indikator terpotong sudah ada.
-- Batas: API tiruan, belum uji pembaca layar/zoom/perangkat fisik, peran siswa dan pending belum masuk matriks luapan. Rincian dan batas jujur: `docs/Q4_AUDIT_2026-11-20.md`.
+- Batas: API tiruan, belum uji pembaca layar/zoom/perangkat fisik, peran siswa dan pending belum masuk matriks luapan. Rincian dan batas jujur: `docs/archive/Q4_AUDIT_2026-11-20.md`.
 
 ## Q2 (lanjutan) - Navigasi responsif: sidebar desktop, bottom nav + drawer ponsel - 20 November 2026
 
 - `src/app/Header.tsx` tetap memakai helper RLS yang sama; desktop >=1000px memakai sidebar tetap 264px, ponsel <1000px memakai 4 tujuan cepat + tombol "Lainnya" yang membuka drawer aksesibel (role=dialog, aria-expanded/controls, Escape, klik latar, fokus kembali, tutup saat rute berubah). Target sentuh item bottom nav >=48px dan tautan drawer >=44px.
 - `src/styles/global.css` menambah aturan `.guest-nav`, `.bottom-nav`, `.nav-drawer*`, dan media query 999px/1000px. Tidak ada perubahan API, kontrak, RLS, migration, atau hosted.
 - `tests/browser/app.spec.ts` memakai helper `clickNavLink` sadar drawer dan asersi navigasi desktop/ponsel; suite penuh **228/228 lulus** (port 5364, 5,7 menit; log `C:\Users\axioo\AppData\Local\Temp\qoder-qa-2026-11-18\browser-nav-5364.log`).
-- `npm run check` Node v24.22.3 EXIT 0: **137/137** tes unit/database, **38** berkas migration, lint/typecheck bersih, bundel 26 berkas tanpa akun demo. Tangkapan 1280/390 + drawer: `nav-1280.png`, `nav-390.png`, `nav-390-drawer.png`. Rincian: `docs/NAV_Q2_2026-11-20.md`.
+- `npm run check` Node v24.22.3 EXIT 0: **137/137** tes unit/database, **38** berkas migration, lint/typecheck bersih, bundel 26 berkas tanpa akun demo. Tangkapan 1280/390 + drawer: `nav-1280.png`, `nav-390.png`, `nav-390-drawer.png`. Rincian: `docs/archive/NAV_Q2_2026-11-20.md`.
 - Entri ini ditulis di working tree bersama; berkas log/koordinasi memuat perubahan agen lain yang belum di-commit, sehingga commit Qoder hanya memuat berkas miliknya dan dokumen bukti.
 
 ## Q2 (increment) - Migrasi palet D8 ke ungu/lilac/biru muda/pink - 20 November 2026
@@ -107,7 +129,7 @@
   `...\qoder-qa-2026-11-18\palette-390.png` dan `palette-1280.png`.
 - Suite browser penuh pasca-palet: **228/228 lulus** port 5361 (6,3 menit); log
   `...rowser-palette-5361.log`.
-- Rincian dan rasio kontras: `docs/PALETTE_D8_2026-11-20.md`.
+- Rincian dan rasio kontras: `docs/archive/PALETTE_D8_2026-11-20.md`.
 - Belum: sidebar desktop + navigasi bawah 5 tujuan (Q2 lanjutan), aksen siswa, verifikasi suite
   browser penuh setelah struktur navigasi berubah.
 
@@ -521,7 +543,7 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 
 - `scripts/check-migrations.mjs` dan `scripts/check-ci.mjs` dirangkai ke depan `npm run check`; `.github/pull_request_template.md` dan `docs/CI_RUNBOOK.md` ditambahkan. Uji negatif menolak timestamp ganda, nama salah, dan urutan `komunikasi` sebelum `student_habits`.
 - `scripts/smoke-production.mjs` memeriksa beranda, fallback SPA, akun demo di bundel, dan penolakan REST anonim. Terhadap build lokal: 3/4 lulus; pemeriksaan akun demo gagal sesuai temuan S-01. `docs/RUNBOOK_OPERASIONAL.md` memuat rollback, checklist Site URL/redirect, dan monitoring.
-- `docs/L11_BUNDEL_CACHE.md` mencatat muatan awal 758,72 kB (gzip 213,92 kB); chunk PDF dan XLSX tetap lazy. Usulan header cache belum diterapkan.
+- `docs/archive/L11_BUNDEL_CACHE.md` mencatat muatan awal 758,72 kB (gzip 213,92 kB); chunk PDF dan XLSX tetap lazy. Usulan header cache belum diterapkan.
 - Batas: `npm run check` penuh belum lulus karena `src/app/Password.tsx` sedang disunting agen lain (`TS6133`, `TS2304`). Run GitHub Actions, branch protection, smoke produksi, dan monitoring belum diverifikasi.
 
 ## L14 - suite penuh 202/202 - 15 November 2026 (Kilo/QA)
@@ -584,7 +606,7 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Ditemukan HEAD merujuk berkas yang belum pernah di-commit. Dipulihkan: `src/components/ui/ReferenceNotice.tsx` (`b0e3600`), `src/lib/auth-context.tsx` dan `src/lib/dashboard-overview.ts` (`2ce1ca2`).
 - Sisa impor yang belum ada di HEAD: `src/features/student-habits/api/index.ts` dan `src/features/parents/api/absence-reports.ts` (milik Codex, untracked). Upaya menyertakannya tanpa mengubah isi ditolak auto-review, jadi menunggu Codex (tercatat di `AI_COORDINATION.md`).
 - Wiring tertahan di working tree: `src/app/App.tsx` (rute lazy `/komunikasi`, `/kebiasaan`, `/notifikasi`, `/laporan-ketidakhadiran`), `Communication.tsx`, `NotificationCenter.tsx`, `tests/browser/communication.spec.ts`, `tests/browser/notifications.spec.ts`; menunggu `src/features/notifications/api/index.ts` (X5).
-- Tidak ada perubahan migration, API, atau hosted. Tidak ada klaim branch hijau: working tree tetap sesuai bukti `REAUDIT_HANDOFF_2026-11-20.md` (suite 304/304 port 5377; check EXIT 0 137/137).
+- Tidak ada perubahan migration, API, atau hosted. Tidak ada klaim branch hijau: working tree tetap sesuai bukti `archive/REAUDIT_HANDOFF_2026-11-20.md` (suite 304/304 port 5377; check EXIT 0 137/137).
 
 ## Suite 306/306 dan tes pemotongan Data sekolah â€” 20 November 2026 (Qoder)
 
@@ -613,15 +635,15 @@ Migration 20261114083827 dan API pesan/penerima dibuat dengan RLS, penugasan dan
 - Insiden lingkungan (bukan kegagalan aplikasi): run port 5395 tidak valid karena `node_modules` dikosongkan proses instalasi agen lain di tengah run (galat `Cannot find package '@playwright/test'`, 189 tes tidak berjalan). Run diulang setelah dependensi pulih.
 - Bukti akhir: suite penuh **312/312 lulus** port 5401 (8,8 menit, EXIT 0; log `%TEMP%\qoder-qa-2026-11-18\browser-full-5401.log`); `npm run check` Node v24.22.3 EXIT 0 (39 migration, CI, lint, typecheck, 137/137, build 1.781 modul, 26 JS tanpa akun demo; log `...\check-5401.log`).
 - Tidak ada perubahan migration, API, hosted, atau klaim UAT. Angka kanonik browser kini 312/312; 310/310 port 5391, 308/308 port 5387, dan 306/306 port 5383 tetap tercatat sebagai riwayat.
-- Koreksi angka usang (hanya dokumen): `AGENTS.md` bagian "Canonical counts" masih menyebut 127/127, 32 migration, dan 228/228 port 5358; kini menunjuk pasangan kanonik (137/137, 39 migration lokal dengan 16 belum hosted, 312/312 port 5401, log `check-5401.log`/`browser-full-5401.log`) dan menyebut angka lama sebagai riwayat. Daftar migration lokal di baris di atasnya juga diperbarui dari 32/sembilan belum hosted menjadi 39/16 belum hosted. `docs/AI_COORDINATION.md` mendapat catatan supersede di bagian Qoder karena catatan Codex masih menyebut 306/306 port 5383 sebagai angka terbaru, dan `docs/DELIVERY_GATE_2026-11-20.md` mendapat catatan status bahwa angka eksekusinya berasal dari run saat dokumen dibuat. Tidak ada perubahan kode, tes, migration, atau hosted; tidak ada run ulang karena hanya teks dokumen.
-- Tidak ada berkas yang di-commit pada langkah koreksi angka ini: `AGENTS.md`, `AI_COORDINATION.md`, `IMPLEMENTATION_LOG.md`, dan `DELIVERY_GATE_2026-11-20.md` semuanya berada di aliran kerja bersama yang indeksnya berisi berkas staged milik agen lain (`.github/pull_request_template.md`, `package.json`, `playwright.config.ts`, `scripts/*.mjs`, `vite.config.ts`); commit terfokus tidak dapat diambil tanpa menyapu pekerjaan mereka. Dokumen akan ikut ter-commit saat Codex merge.
+- Koreksi angka usang (hanya dokumen): `AGENTS.md` bagian "Canonical counts" masih menyebut 127/127, 32 migration, dan 228/228 port 5358; kini menunjuk pasangan kanonik (137/137, 39 migration lokal dengan 16 belum hosted, 312/312 port 5401, log `check-5401.log`/`browser-full-5401.log`) dan menyebut angka lama sebagai riwayat. Daftar migration lokal di baris di atasnya juga diperbarui dari 32/sembilan belum hosted menjadi 39/16 belum hosted. `docs/AI_COORDINATION.md` mendapat catatan supersede di bagian Qoder karena catatan Codex masih menyebut 306/306 port 5383 sebagai angka terbaru, dan `docs/archive/DELIVERY_GATE_2026-11-20.md` mendapat catatan status bahwa angka eksekusinya berasal dari run saat dokumen dibuat. Tidak ada perubahan kode, tes, migration, atau hosted; tidak ada run ulang karena hanya teks dokumen.
+- Tidak ada berkas yang di-commit pada langkah koreksi angka ini: `AGENTS.md`, `AI_COORDINATION.md`, `IMPLEMENTATION_LOG.md`, dan `archive/DELIVERY_GATE_2026-11-20.md` semuanya berada di aliran kerja bersama yang indeksnya berisi berkas staged milik agen lain (`.github/pull_request_template.md`, `package.json`, `playwright.config.ts`, `scripts/*.mjs`, `vite.config.ts`); commit terfokus tidak dapat diambil tanpa menyapu pekerjaan mereka. Dokumen akan ikut ter-commit saat Codex merge.
 - Dua kesenjangan QA yang tidak bisa ditutup dari sisi UI dicatat sebagai "Permintaan Lintas AI" (Qoder â†’ Codex): badge jumlah notifikasi belum dibaca di navigasi (butuh sumber data lintas halaman; `NotificationCenter` hanya menghitung 25 baris halaman aktif) dan ringkasan dashboard guru/wali (`dashboard_overview()` hanya untuk administrator/kepala sekolah). Tidak ada RPC, migration, atau halaman baru ditambahkan.
 - Verifikasi ulang fokus 20 November 2026: `tests/browser/habits.spec.ts` pada working tree bersama (sesudah perubahan backend Codex) 10/10 lulus desktop + ponsel dalam 43,6 detik, EXIT 0, port 5411 (log `%TEMP%\qoder-qa-2026-11-18\habits-5411.log`). Bukti fokus. Suite penuh terbaru sesudah perubahan berikutnya lulus 402/402; lihat entri paling atas dokumen.
 - `AGENTS.md` belum di-commit oleh Qoder: berkas itu memuat bagian "Owner override terbaru â€” 20 November 2026" yang belum di-commit milik Codex dan menyebut 35 migration lokal/12 belum hosted; angka itu kini 39/16 sehingga perlu diperbarui Codex saat ia meng-commit bagiannya. Perubahan Qoder hanya pada dua baris "Current handoff baseline" (daftar migration dan canonical counts).
 - Rekap minggu ini di 7 Kebiasaan (UI, 20 November 2026): `StudentHabits.tsx` memakai RPC Codex `habit_weekly_summary` yang sudah ada tetapi belum terpakai UI. Bagian "Rekap minggu ini" menampilkan `days_filled`/`days_expected`/`days_missing` dan hitungan per indikator untuk murid terpilih, dengan kalimat "belum diisi, bukan berarti tidak dilakukan" dan "bukan peringkat", tanpa angka lain antarmurid. Status loading, galat dengan tombol coba lagi, dan kosong tersedia. `weekStartOf` menghitung Senin dari `schoolToday()`. Tidak ada perubahan API, migration, atau RPC; kontrak tetap milik Codex.
 - Tes rekap habits historical: `tests/browser/habits.spec.ts` menambah tiruan; suite penuh terbaru setelah skenario ini lulus 402/402 (lihat entri paling atas).
 - `npm run check` Node v24.22.3 EXIT 0 pada working tree ini: `Migration OK: 39 berkas`, lint, typecheck, 137/137 tes unit/database, build 1.781 modul, `Bundel produksi OK: 26 berkas JavaScript tanpa akun demo` (log `%TEMP%\qoder-qa-2026-11-18\check-habits-weekly.log`). Run suite penuh ulang pada port 5415 dihentikan sebelum selesai karena laju ~3 dtk/tes (dugaan beban dari proses lain di worktree bersama); angka kanonik browser tetap 312/312 port 5401 dan tidak diklaim ulang.
-- Commit Qoder `6d7563c` (branch `ai/qoder-palette-d8`) memuat `StudentHabits.tsx`, `habits.spec.ts`, `QA_COVERAGE.md`, `PROJECT_STATUS.md`, `IMPLEMENTATION_LOG.md`, dan `AI_COORDINATION.md` lewat `git commit --only`; indeks staged milik agen lain tidak disentuh. `docs/DELIVERY_GATE_2026-11-20.md` masih untracked sehingga belum bisa ikut lewat `--only`.
+- Commit Qoder `6d7563c` (branch `ai/qoder-palette-d8`) memuat `StudentHabits.tsx`, `habits.spec.ts`, `QA_COVERAGE.md`, `PROJECT_STATUS.md`, `IMPLEMENTATION_LOG.md`, dan `AI_COORDINATION.md` lewat `git commit --only`; indeks staged milik agen lain tidak disentuh. `docs/archive/DELIVERY_GATE_2026-11-20.md` masih untracked sehingga belum bisa ikut lewat `--only`.
 - Kepatuhan R-02 diperbaiki (20 November 2026): legenda formulir di `StudentHabits.tsx` memakai em dash (`Catatan harian â€” ...`), satu-satunya karakter em dash di `src` dan bertentangan dengan klaim gate. Diganti titik dua (`Catatan harian: ...`); enam assertion `habits.spec.ts` disesuaikan. `grep` em dash pada `src` kini kosong. Verifikasi ulang: 10/10 desktop + ponsel, 1,3 menit, EXIT 0, port 5417 (log `%TEMP%\qoder-qa-2026-11-18\habits-5417.log`).
 
 ## Codex â€” Gerbang demo dan kontrak backend â€” 20 November 2026

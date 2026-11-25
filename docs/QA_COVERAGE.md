@@ -20,6 +20,8 @@ Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponse
 | Rekap absensi | rentang >31 hari ditolak, agregasi hanya baris sendiri (siswa), ekspor CSV | ekspor PDF rekap absensi |
 | Jurnal | simpan + konfirmasi, retry ID sama, baca admin/kepala sekolah, penolakan siswa/wali/pending, pagination/CSV, status kesiapan | persetujuan/koreksi jurnal |
 | Modul ajar | guru simpan draf, guru ajukan, kepala sekolah kembalikan dengan catatan, kepala sekolah setujui lalu arsipkan modul terbit | lampiran |
+| Audit log & sesi | admin membaca audit gabungan dengan nama pelaku, mencabut sesi setelah konfirmasi (RPC dengan ID yang benar); guru/wali/pending ditolak tanpa request audit; "Keluar dari semua perangkat" mencatat event sebelum logout global; peringatan sesi tidak aktif, "Tetap masuk", dan logout otomatis ke /login?sesi=berakhir (12/12 desktop + ponsel). PGlite: RPC, RLS view, pencabutan sesi | kepala sekolah di browser, akun sekolah nyata, hak DML auth.sessions di hosted |
+| Absensi offline | perubahan saat offline masuk antrean perangkat dan tersinkron otomatis saat online; konflik revisi disimpan untuk ditinjau, tidak dikirim ulang, dan dapat dibuang (4/4 desktop + ponsel). Unit: klasifikasi duplikat/konflik/jaringan, antrean rusak | duplikat setelah respons hilang di browser, banyak tab, perangkat sekolah nyata |
 | Materi kelas | guru terbitkan, siswa membaca terbit tanpa kontrol tulis, guru mengarsipkan materi terbit setelah konfirmasi (tanpa tulis sebelum setuju) | lampiran |
 | Tugas kelas | siswa melihat tenggat, siswa mengirim jawaban (sukses/respons hilang/duplikat), guru membuat tugas, umpan balik guru, wali membaca umpan balik | pengumpulan lampiran, penilaian tugas→asesmen |
 | Asesmen & rekap | guru buat/nilai nol/terbit/koreksi+riwayat, konflik revisi, laporan filter/grafik/ekspor CSV-Excel-PDF, mode terpotong/limpas/gagal, wali hanya hasil terbit, pending ditolak, peran baca-saja | kewenangan wali kelas, perubahan peserta |
@@ -48,4 +50,4 @@ Cara membaca: "Ada" berarti minimal satu skenario browser pada desktop dan ponse
 - Riwayat run penuh lama (digantikan):
 - Riwayat: run Qoder 18 November (port 5331) 215/216 dan run T-A Copilot 18 November (port 5191, Node v26.13.0) 213/216; kegagalan assertion keduanya adalah tes beranda usang, ditambah satu `ENOENT` artefak trace saat teardown. Angka itu tidak lagi menjadi status terkini.
 - Hasil di atas memakai API tiruan dan tidak menggantikan UAT.
-- Kesenjangan yang butuh keputusan produk (kehadiran guru, komunikasi, dokumen) tercatat di [DECISIONS.md](DECISIONS.md) dan [HANDOFF.md](HANDOFF.md).
+- Kesenjangan yang butuh keputusan produk (kehadiran guru, komunikasi, dokumen) tercatat di [DECISIONS.md](DECISIONS.md) dan [archive/HANDOFF.md](archive/HANDOFF.md).

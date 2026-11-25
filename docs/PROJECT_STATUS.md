@@ -37,7 +37,7 @@ Dicatat sebagai D9–D12 di [DECISIONS.md](DECISIONS.md):
 
 - **D9:** pendaftaran mandiri diizinkan. Akun baru berstatus `pending` sampai email terverifikasi dan administrator menetapkan peran. Alur ini sudah ada di kode.
 - **D10:** login memakai email, bukan NISN/NIP.
-- **D11:** remote resmi `nutrantaraelvi` (`remote.pushDefault` sudah diatur di repo lokal).
+- **D11:** remote resmi `origin` = `nutrantaraelvi-cmyk/si-stir-hebat` (`remote.pushDefault` sudah diatur di repo lokal; remote lama `mariomagfii-sys` bernama `mariomagfii`, hanya arsip).
 - **D12:** data drift: retensi memakai nilai lokal (komunikasi dan bukti supervisi 1 tahun ajaran); `deletion_requests` dipindahkan dengan `guardian` → `parent`. Langkah operator ada di runbook bagian 5.
 
 Tidak ada keputusan produk yang tertunda saat ini. Gate operasional di atas tetap berlaku.

@@ -4,7 +4,7 @@
 
 - **D9 — Pendaftaran mandiri diizinkan (menggantikan PRD 6.2):** pengguna boleh mendaftar sendiri di `/daftar`. Akun baru berstatus `pending` tanpa akses layanan. Pengguna wajib memverifikasi email, lalu **administrator** memeriksa identitas dan menetapkan peran di halaman Akun sekolah (RPC `assign_school_role` menolak email yang belum terverifikasi). Metadata peran dari pendaftar tetap diabaikan. Pembuatan akun oleh admin tetap boleh dilakukan.
 - **D10 — Login memakai email (menggantikan PRD 6.1):** identitas login adalah email dan kata sandi untuk semua peran. NISN/NIP tetap menjadi data registri, bukan identitas login.
-- **D11 — Remote Git resmi `nutrantaraelvi`** (`nutrantaraelvi-cmyk/si-stir-hebat`, CI `verify`). Push hanya ke remote ini (`git config remote.pushDefault nutrantaraelvi`). Remote `mariomagfii-sys` (rilis Vercel 14 November) tidak menerima push baru dan hanya menjadi arsip.
+- **D11 — Remote Git resmi `origin`** (`nutrantaraelvi-cmyk/si-stir-hebat`, CI `verify`). Push hanya ke remote ini (`git config remote.pushDefault origin`). Nama remote diubah 25 November 2026 (sebelumnya `nutrantaraelvi`). Remote `mariomagfii` (`mariomagfii-sys/si-stir-hebat`) (rilis Vercel 14 November) tidak menerima push baru dan hanya menjadi arsip.
 - **D12 — Data drift hosted di `drift_archive`:**
   - Retensi mengikuti definisi lokal D5 dengan masa **1 tahun ajaran** untuk komunikasi dan bukti supervisi (`retention_policies` lokal). Baris retensi hosted dengan kategori lama (`assessment`, `learning`, `habits`, `teacher_documents`, aksi `anonymize`) tidak dipindahkan.
   - Permintaan penghapusan dari `drift_archive.deletion_requests` dipindahkan dengan `subject_type` `guardian` diganti menjadi **`parent`**.

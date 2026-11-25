@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Bell, BookHeart, ClipboardCheck, KeyRound, LogOut, ShieldCheck, Sparkles, UserRound, UsersRound, type LucideIcon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../components/auth/auth-context'
 import { Profile } from './Profile'
+import { clearIdleLogoutReason, hasIdleLogoutReason, markActivity, recordAuthEvent } from '../lib/session-security'
 
 const loginRoles: { id: string; label: string; title: string; detail: string; icon: LucideIcon }[] = [
   { id: 'student', label: 'Murid', title: 'Hai, teman hebat!', detail: 'Siap belajar, bermain, dan tumbuh hari ini?', icon: BookHeart },
@@ -25,6 +26,7 @@ function ActiveSessionNotice({ destination }: { destination: 'login' | 'daftar' 
     setBusy(true)
     setError('')
     try {
+      await recordAuthEvent(client, 'logout')
       const { error: failure } = await client.auth.signOut({ scope: 'local' })
       if (failure) setError('Belum berhasil keluar. Silakan coba lagi.')
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }
@@ -62,6 +64,8 @@ export function Login() {
   const [selectedRole, setSelectedRole] = useState(() => loginRoles.some(role => role.id === searchParams.get('ruang')) ? searchParams.get('ruang')! : 'student')
   const activeRole = loginRoles.find(role => role.id === selectedRole) ?? loginRoles[0]
   const RoleIcon = activeRole.icon
+  const [idleNotice] = useState(() => searchParams.get('sesi') === 'berakhir' || hasIdleLogoutReason())
+  useEffect(() => { if (!session) clearIdleLogoutReason() }, [session])
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (busy) return
@@ -76,7 +80,11 @@ export function Login() {
     try {
       const { error: failure } = await client.auth.signInWithPassword({ email: email.trim(), password })
       if (failure) setError('Tidak dapat masuk. Periksa email dan kata sandi, lalu coba lagi.')
-      else navigate('/dashboard', { replace: true })
+      else {
+        markActivity()
+        void recordAuthEvent(client, 'login')
+        navigate('/dashboard', { replace: true })
+      }
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }
     finally { setBusy(false) }
   }
@@ -105,6 +113,7 @@ export function Login() {
     </div>
     <div className="login-panel">
     <h2>Masuk sebagai {activeRole.label}</h2><p>Gunakan email dan kata sandi akun sekolah Anda.</p>
+    {idleNotice && <p className="status" role="status">Sesi berakhir karena tidak ada aktivitas selama 30 menit. Silakan masuk kembali.</p>}
     <form onSubmit={submit}>
       <label htmlFor="email">Email</label><input id="email" type="email" autoComplete="username" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />
       <label htmlFor="password">Kata sandi</label><input id="password" type="password" autoComplete="current-password" required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} />
@@ -144,8 +153,8 @@ export function Register() {
         options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/login` },
       })
       if (failure) setError(registrationErrorMessage(failure.message))
-      else if (data.session) setMessage('Akun berhasil dibuat dan menunggu verifikasi sekolah sebelum layanan dibuka.')
-      else setMessage('Pendaftaran diterima. Periksa email untuk verifikasi. Akun tetap menunggu verifikasi sekolah sebelum layanan dibuka.')
+      else if (data.session) setMessage('Akun berhasil dibuat dan menunggu verifikasi administrator sekolah sebelum layanan dibuka.')
+      else setMessage('Pendaftaran diterima. Periksa email untuk verifikasi. Akun tetap menunggu verifikasi administrator sekolah sebelum layanan dibuka.')
       setPassword('')
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }
     finally { setBusy(false) }
@@ -192,7 +201,7 @@ export function Account() {
   const { session } = useAuth()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  async function signOut() {
+  async function signOut(scope: 'local' | 'global') {
     if (busy) return
     setBusy(true)
     setError('')
@@ -202,7 +211,8 @@ export function Account() {
         setError('Konfigurasi Supabase belum tersedia.')
         return
       }
-      const { error: failure } = await client.auth.signOut({ scope: 'local' })
+      await recordAuthEvent(client, scope === 'global' ? 'logout_all' : 'logout')
+      const { error: failure } = await client.auth.signOut({ scope })
       if (failure) setError('Belum berhasil keluar. Silakan coba lagi.')
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }
     finally { setBusy(false) }
@@ -259,10 +269,14 @@ export function Account() {
             </Link>
           </nav>
           {error && <p className="error" role="alert">{error}</p>}
-          <button className="button account-sign-out" disabled={busy} onClick={signOut}>
+          <button className="button account-sign-out" type="button" disabled={busy} onClick={() => void signOut('local')}>
             <LogOut aria-hidden="true" />
             {busy ? 'Sedang keluar…' : 'Keluar'}
           </button>
+          <button className="text-button account-sign-out-all" type="button" disabled={busy} onClick={() => void signOut('global')}>
+            Keluar dari semua perangkat
+          </button>
+          <p className="help">Sesi berakhir otomatis setelah 30 menit tanpa aktivitas. Gunakan &ldquo;Keluar dari semua perangkat&rdquo; bila akun pernah dipakai di HP atau komputer lain.</p>
         </aside>
       </div>
     </section>

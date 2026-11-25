@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { canReadMasterData } from '../features/school/master'
 import { canReadAnnouncements } from '../lib/announcements'
 import { supabase } from '../lib/supabase'
-import { canAccessCommunication, canReadAbsenceReports, canReadAccountLinks, canReadAssessments, canReadAttendance, canReadGuardianPortal, canReadHabits, canReadJournals, canReadLearning, canReadNotifications, canReadSchedules, canReadSchoolDocuments, canReadSupervision, canReadTeacherAttendance, canReadTeachingModules } from '../utils/permissions'
+import { canAccessCommunication, canReadAbsenceReports, canReadAccountLinks, canReadAssessments, canReadAuditLog, canReadAttendance, canReadGuardianPortal, canReadHabits, canReadJournals, canReadLearning, canReadNotifications, canReadSchedules, canReadSchoolDocuments, canReadSupervision, canReadTeacherAttendance, canReadTeachingModules } from '../utils/permissions'
 import { useAuth } from '../components/auth/auth-context'
 
 type NavItem = { to: string; label: string }
@@ -32,6 +32,7 @@ function navItems(role: string | null): NavItem[] {
   if (canReadAbsenceReports(role)) items.push({ to: '/laporan-ketidakhadiran', label: 'Laporan ketidakhadiran' })
   if (canReadNotifications(role)) items.push({ to: '/notifikasi', label: 'Notifikasi' })
   if (canReadHabits(role)) items.push({ to: '/kebiasaan', label: '7 Kebiasaan' })
+  if (canReadAuditLog(role)) items.push({ to: '/audit', label: 'Audit log' })
   items.push({ to: '/akun', label: 'Akun' })
   return items
 }

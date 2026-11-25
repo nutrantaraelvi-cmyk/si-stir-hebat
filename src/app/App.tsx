@@ -9,6 +9,7 @@ import { Header } from './Header'
 import { ErrorBoundary } from '../components/ui/ErrorBoundary'
 import { Account, Login, Register } from './Account'
 import { ChangePassword, ForgotPassword } from './Password'
+import { IdleSessionGuard } from './IdleSessionGuard'
 const Announcements = lazy(() => import('./Announcements').then(module => ({ default: module.Announcements })))
 const MasterData = lazy(() => import('../features/school/MasterData').then(module => ({ default: module.MasterData })))
 const AccountRelationships = lazy(() => import('../features/school/AccountRelationships').then(module => ({ default: module.AccountRelationships })))
@@ -26,6 +27,7 @@ const StudentHabits = lazy(() => import('../features/student-habits/StudentHabit
 const NotificationCenter = lazy(() => import('../features/notifications/NotificationCenter').then(module => ({ default: module.NotificationCenter })))
 const AbsenceReports = lazy(() => import('../features/parents/AbsenceReports').then(module => ({ default: module.AbsenceReports })))
 const SchoolDocuments = lazy(() => import('../features/school-documents/SchoolDocuments').then(module => ({ default: module.SchoolDocuments })))
+const AuditLog = lazy(() => import('../features/audit/AuditLog').then(module => ({ default: module.AuditLog })))
 const TeacherAttendance = lazy(() => import('../features/attendance/TeacherAttendance').then(module => ({ default: module.TeacherAttendance })))
 const roles = [
   { id: 'student', icon: GraduationCap, title: 'Murid', detail: 'Materi, tugas, jadwal, dan perkembangan belajar' },
@@ -79,7 +81,7 @@ function Home() { return <div className="home-page">
 </div> }
 export default function App() {
   if (!isConfigured && !demoAllowed) return <ErrorBoundary><ConfigMissing/></ErrorBoundary>
-  return <ErrorBoundary><BrowserRouter><AuthProvider><a className="skip-link" href="#main-content">Langsung ke isi halaman</a><Header/><main id="main-content" className="min-w-0" tabIndex={-1}><Suspense fallback={<section className="board" role="status"><p>Memuat halaman…</p></section>}><Routes>
+  return <ErrorBoundary><BrowserRouter><AuthProvider><IdleSessionGuard/><a className="skip-link" href="#main-content">Langsung ke isi halaman</a><Header/><main id="main-content" className="min-w-0" tabIndex={-1}><Suspense fallback={<section className="board" role="status"><p>Memuat halaman…</p></section>}><Routes>
     <Route path="/" element={<Home/>}/>
     <Route path="/login" element={<Login/>}/>
     <Route path="/daftar" element={<Register/>}/>
@@ -105,6 +107,7 @@ export default function App() {
     <Route path="/laporan-ketidakhadiran" element={<ProtectedRoute><AbsenceReports/></ProtectedRoute>}/>
     <Route path="/dokumen" element={<ProtectedRoute><SchoolDocuments/></ProtectedRoute>}/>
     <Route path="/absensi-guru" element={<ProtectedRoute><TeacherAttendance/></ProtectedRoute>}/>
+    <Route path="/audit" element={<ProtectedRoute><AuditLog/></ProtectedRoute>}/>
     <Route path="/pengumuman" element={<ProtectedRoute><Announcements/></ProtectedRoute>}/>
     <Route path="*" element={<section className="login"><h1>Halaman tidak ditemukan</h1><Link to="/">Kembali</Link></section>}/>
   </Routes></Suspense></main><footer>© SI STIR HEBAT · SDN 03 Wonosari · Tumbuh Bersama</footer></AuthProvider></BrowserRouter></ErrorBoundary>

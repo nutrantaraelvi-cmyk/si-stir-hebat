@@ -81,3 +81,7 @@ export const canSubmitHabits = isParent
 export const canValidateHabits = isTeacher
 
 export const canReadDashboardOverview = (role: RoleInput) => has(role, 'administrator', 'principal')
+
+// Audit log gabungan (PRD 6.4) dan pencabutan sesi (PRD 6.3).
+export const canReadAuditLog = (role: RoleInput) => has(role, 'administrator', 'principal')
+export const canRevokeSessions = isAdministrator

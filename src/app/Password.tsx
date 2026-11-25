@@ -28,7 +28,7 @@ export function ForgotPassword() {
     } catch { setError('Koneksi bermasalah. Silakan coba lagi.') }
     finally { setBusy(false) }
   }
-  return <section className="login"><h1>Lupa kata sandi?</h1><p>Masukkan email akun sekolah untuk meminta tautin pemulihan.</p>
+  return <section className="login"><h1>Lupa kata sandi?</h1><p>Masukkan email akun sekolah untuk meminta tautan pemulihan.</p>
     {sent ? <div className="status" role="status">Jika email terdaftar, Anda akan menerima tautan pemulihan. Periksa kotak masuk dan folder spam. Jika email belum diterima, hubungi administrator sekolah.</div> : <form onSubmit={submit}>
       <label htmlFor="recovery-email">Email akun sekolah</label>
       <input id="recovery-email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />

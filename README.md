@@ -75,7 +75,7 @@ VITE_SUPABASE_URL=https://PROJECT_REF.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-Gunakan publishable key untuk frontend. Jangan masukkan secret key, service role key, password database, atau personal access token ke variabel `VITE_*`. Konfigurasi kosong, placeholder, URL tidak valid, dan key berprivilege yang dikenali tidak dipakai untuk terhubung ke Supabase; dalam kondisi itu aplikasi berjalan dalam **mode demo lokal** dengan akun sintetis dan data contoh di `localStorage`. Mode demo bukan untuk operasional: pastikan kedua variabel terisi pada build produksi. Restart server setelah mengubah konfigurasi; konfigurasi hosting memerlukan build ulang.
+Gunakan publishable key untuk frontend. Jangan masukkan secret key, service role key, password database, atau personal access token ke variabel `VITE_*`. Konfigurasi kosong, placeholder, URL tidak valid, dan key berprivilege yang dikenali tidak dipakai untuk terhubung ke Supabase. Dalam kondisi itu server pengembangan tetap membuka beranda, tetapi login dan halaman terlindungi menampilkan pesan bahwa konfigurasi Supabase belum tersedia, dan `npm run build` ditolak. UI tidak menyediakan login demo; modul `src/lib/demo-auth*` saat ini hanya dipakai tes. Restart server setelah mengubah konfigurasi; konfigurasi hosting memerlukan build ulang.
 
 ```powershell
 npm run check:supabase
